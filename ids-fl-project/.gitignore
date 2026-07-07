@@ -1,0 +1,30 @@
+# Data
+data/*
+!data/.gitkeep
+*.csv
+*.zip
+
+# Kaggle credentials
+kaggle.json
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+venv/
+*.egg-info/
+
+# Model artifacts
+*.pkl
+*.joblib
+*.h5
+*.model
+
+# OS/editor
+.DS_Store
+.vscode/
+.idea/
+
+# Results (keep summary metrics, ignore large outputs if needed)
+results/*.png
