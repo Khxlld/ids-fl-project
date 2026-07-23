@@ -1,0 +1,26 @@
+# Exact versions used and tested (Python 3.11.0, Windows 11).
+#
+# PyTorch is the CUDA (cu121) build. It is normally already installed on this
+# machine; if you need to (re)install it, use the PyTorch CUDA index:
+#   pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cu121
+# The pip line below assumes that index is configured or torch is preinstalled.
+torch==2.5.1
+
+flwr[simulation]==1.32.1
+scikit-learn==1.9.0
+pandas==3.0.3
+numpy==2.3.1
+matplotlib==3.10.3
+seaborn==0.13.2
+joblib==1.5.3
+imbalanced-learn==0.14.2
+tqdm==4.67.1
+pyarrow==25.0.0
+
+# Notebook execution
+jupyterlab==4.6.1
+nbconvert==7.17.1
+ipykernel==6.*
+
+# Tests
+pytest>=8.0

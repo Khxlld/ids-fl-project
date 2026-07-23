@@ -1,0 +1,45 @@
+{
+  "dataset_file": "DNN-EdgeIIoT-dataset.csv",
+  "subset_rows": 221838,
+  "train_rows": 155286,
+  "val_rows": 33276,
+  "test_rows": 33276,
+  "n_input_features": 72,
+  "n_dropped_columns": 21,
+  "config": {
+    "random_seed": 42,
+    "dataset_fraction": 0.1,
+    "normal_attack_ratio": 0.5,
+    "validation_fraction": 0.15,
+    "test_fraction": 0.15,
+    "num_clients": 5,
+    "client_names": [
+      "Factory_A",
+      "Factory_B",
+      "Factory_C",
+      "Factory_D",
+      "Factory_E"
+    ],
+    "hidden_layers": [
+      128,
+      64,
+      32
+    ],
+    "dropout_rates": [
+      0.2,
+      0.1
+    ],
+    "learning_rate": 0.001,
+    "weight_decay": 0.0,
+    "batch_size": 256,
+    "centralized_epochs": 15,
+    "early_stopping_patience": 5,
+    "local_epochs": 2,
+    "federated_rounds": 10,
+    "fraction_fit": 1.0,
+    "fraction_evaluate": 0.0,
+    "decision_threshold": 0.5,
+    "use_smote": false,
+    "max_categorical_cardinality": 50
+  }
+}

@@ -1,0 +1,42 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "edgeiiot-federated"
+version = "1.0.0"
+description = "Binary federated intrusion detection on DNN-EdgeIIoT with PyTorch + Flower (FedAvg)"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11"
+dependencies = [
+    "flwr[simulation]>=1.32,<2.0",
+    "torch>=2.5",
+    "scikit-learn>=1.5",
+    "pandas>=2.2",
+    "numpy>=1.26",
+    "matplotlib>=3.8",
+    "seaborn>=0.13",
+    "joblib>=1.4",
+    "imbalanced-learn>=0.12",
+    "tqdm>=4.66",
+]
+
+[project.optional-dependencies]
+notebook = ["jupyterlab>=4.0", "nbconvert>=7.0", "ipykernel>=6.0"]
+test = ["pytest>=8.0"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+# Note on running the federation:
+# We drive the Flower FedAvg simulation with `flwr.simulation.run_simulation`
+# from inside the notebook (Section 15) rather than the `flwr run` CLI. In
+# Flower 1.32 the CLI switched to an async SuperLink deployment model that
+# spawns background daemons, migrates settings into a global ~/.flwr/config.toml
+# and needs a UTF-8 console on Windows -- all of which hurt reproducibility for
+# a teaching demo. `run_simulation` is still supported in 1.32.1 and lets the
+# notebook display per-round metrics inline. See README "Technical decisions".

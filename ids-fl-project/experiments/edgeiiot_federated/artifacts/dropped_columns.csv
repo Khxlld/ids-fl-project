@@ -1,0 +1,22 @@
+column,reason,category
+Attack_type,Detailed attack category; directly reveals the binary label,target-leakage
+frame.time,Packet capture timestamp; encodes when each attack was run,identifier
+ip.src_host,"Source IP address; identifies the lab host, not behaviour",identifier
+ip.dst_host,Destination IP address; identifies the lab victim,identifier
+arp.src.proto_ipv4,Source IPv4 in ARP; host identifier,identifier
+arp.dst.proto_ipv4,Destination IPv4 in ARP; host identifier,identifier
+icmp.transmit_timestamp,ICMP timestamp; encodes capture time,identifier
+tcp.payload,Raw TCP payload bytes; leaks attack content verbatim,leakage-prone
+mqtt.msg,Raw MQTT message payload; leaks attack content,leakage-prone
+http.file_data,Raw HTTP body; leaks attack content,leakage-prone
+http.request.full_uri,Full request URI string; leaks attack content,leakage-prone
+http.request.uri.query,URI query string; leaks attack content,leakage-prone
+http.referer,HTTP referer string; leaks attack content,leakage-prone
+tcp.options,Raw TCP options hex string; high-cardinality identifier,identifier
+tcp.srcport,Source port; tied to the specific lab attack setup,leakage-prone
+tcp.dstport,Destination service port; tied to the lab attack target,leakage-prone
+udp.port,UDP port; tied to the specific lab attack setup,leakage-prone
+icmp.unused,Constant column (<=1 unique value),constant
+http.tls_port,Constant column (<=1 unique value),constant
+dns.qry.type,Constant column (<=1 unique value),constant
+mqtt.msg_decoded_as,Constant column (<=1 unique value),constant

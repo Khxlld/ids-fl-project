@@ -1,0 +1,15 @@
+# Local data, caches, and generated binary artifacts
+data/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+artifacts/*.pt
+artifacts/*.joblib
+artifacts/test_raw.csv
+artifacts/federated_cache/
+artifacts_clean/*.pt
+artifacts_clean/*.joblib
+
+# Small JSON/CSV summaries in artifacts*, results, and results_clean are
+# deliberately committed as the reproducible research record.

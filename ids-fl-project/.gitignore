@@ -1,30 +1,42 @@
-# Data
+# Raw data and credentials
 data/*
 !data/.gitkeep
-*.csv
 *.zip
-
-# Kaggle credentials
 kaggle.json
 
-# Python
+# CSV files are data by default. The small, reviewable experiment summaries
+# below are intentionally versioned.
+*.csv
+!experiments/edgeiiot_federated/results/*.csv
+!experiments/edgeiiot_federated/results_clean/*.csv
+!experiments/edgeiiot_federated/artifacts/*.csv
+!experiments/edgeiiot_federated/artifacts_clean/*.csv
+
+# Python / Jupyter
 __pycache__/
-*.pyc
+*.py[cod]
+.pytest_cache/
 .ipynb_checkpoints/
 .venv/
 venv/
 *.egg-info/
 
-# Model artifacts
+# Generated models and preprocessing objects
+*.pt
+*.pth
 *.pkl
 *.joblib
 *.h5
 *.model
+
+# Generated experiment data/cache
+artifacts/test_raw.csv
+artifacts/federated_cache/
 
 # OS/editor
 .DS_Store
 .vscode/
 .idea/
 
-# Results (keep summary metrics, ignore large outputs if needed)
+# Large generated figures
 results/*.png
