@@ -6,18 +6,36 @@ across five simulated factory clients.
 
 ## Which experiment to use
 
-Use `notebooks/02_simple_clean_federated_pipeline.ipynb` and `results_clean/`
-as the current baseline. It removes known source-format, identity, timestamp,
-payload, checksum, sequence, and transaction fields; removes conflicting and
-duplicate feature patterns; and uses disjoint capture groups for train,
-validation, and test.
+Use `notebooks/03_full_dataset_federated_pipeline.ipynb`, `artifacts_full/`,
+and `results_full/` for the full-data continuation. It retains every clean
+unique row after the leakage-aware controls approved in notebook 02, preserves
+the natural class prevalence, and trains only the five-client federated model.
+
+`notebooks/02_simple_clean_federated_pipeline.ipynb` and `results_clean/`
+contain the accepted 10% balanced trial. It remains the reference for the
+cleaning policy and centralized/federated comparison.
 
 `notebooks/01_binary_federated_pipeline.ipynb`, the modular `src/` package, and
 `results/` are retained as the first-generation experiment. Its 100% result is
 historical only: the follow-up audit found that its representation admitted
 source-format and duplicate-pattern leakage.
 
-## Current saved result
+## Full-data saved result
+
+The full-data run was executed on **2026-07-27** with seed 42, 25 numeric
+features, all 15,827 clean unique rows, natural 20.21% Normal / 79.79% Attack
+prevalence, five IID clients, class-weighted binary cross-entropy, and ten
+FedAvg rounds. The centralized DNN was intentionally omitted.
+
+| Model | Accuracy | Balanced accuracy | Attack F1 | Macro F1 | ROC-AUC | Test confusion matrix |
+|---|---:|---:|---:|---:|---:|---|
+| Federated global MLP | 0.97810 | 0.97383 | 0.98620 | 0.96657 | 0.99698 | TN 464, FP 16, FN 36, TP 1,858 |
+
+The best validation-macro-F1 checkpoint was round 10. The group-disjoint split
+used 11,079 / 2,374 / 2,374 rows for train / validation / test with no group or
+exact-feature overlap. Full details are saved in `results_full/run_summary.json`.
+
+## Accepted 10% trial result
 
 The leakage-aware run was executed on **2026-07-14** with seed 42, 25 numeric
 features, a balanced 1,582-row modeling sample, five balanced IID clients, ten
@@ -38,14 +56,18 @@ not uncertainty estimates. Full details and research next steps are in
 edgeiiot_federated/
 ├── notebooks/
 │   ├── 01_binary_federated_pipeline.ipynb       # historical executed run
-│   └── 02_simple_clean_federated_pipeline.ipynb # current executed run
+│   ├── 02_simple_clean_federated_pipeline.ipynb # accepted balanced trial
+│   └── 03_full_dataset_federated_pipeline.ipynb # full-data federated run
 ├── src/                                         # modular first-generation code
 ├── tests/                                       # fast tests for src/
 ├── results/                                     # historical metrics
-├── results_clean/                               # current metrics
+├── results_clean/                               # accepted-trial metrics
+├── results_full/                                # full-data metrics
 ├── artifacts/                                   # historical metadata summaries
-├── artifacts_clean/                             # current feature/drop summaries
+├── artifacts_clean/                             # accepted-trial artifacts
+├── artifacts_full/                              # full-data model/preprocessor
 ├── build_notebook.py                            # rebuilds notebook 01
+├── build_notebook_03.py                         # rebuilds notebook 03
 ├── smoke_test.py
 ├── pyproject.toml
 └── requirements.txt
@@ -78,13 +100,14 @@ $env:EDGEIIOT_DATASET = "D:\path\to\DNN-EdgeIIoT-dataset.csv"
 
 ## Run and validate
 
-For the current leakage-aware experiment:
+For the full-data federated experiment:
 
 ```powershell
+$env:EDGEIIOT_DATASET = "D:\path\to\DNN-EdgeIIoT-dataset.csv"
 cd notebooks
 python -m jupyter nbconvert --to notebook --execute --inplace `
-  --ExecutePreprocessor.timeout=1200 `
-  02_simple_clean_federated_pipeline.ipynb
+  --ExecutePreprocessor.timeout=1800 `
+  03_full_dataset_federated_pipeline.ipynb
 ```
 
 For the fast modular tests:
@@ -93,14 +116,18 @@ For the fast modular tests:
 python -m pytest -q
 ```
 
-The full run requires the roughly 1.2 GB raw CSV and several GB of working
-memory. CPU execution is supported but slower. The saved run used a CUDA GPU
-for centralized training and CPU/sequential client training.
+The source CSV is roughly 1.2 GB. Notebook 03 restricts loading to the 28
+approved feature/target/grouping columns (about 714 MiB in the saved run), uses
+shared arrays, and trains clients sequentially. The saved run used one CUDA GPU
+client at a time and completed the federated rounds in about 13.5 seconds;
+loading, grouping, and cleaning were the dominant costs.
 
 ## Important limitations
 
-- The current result is one seeded run on a small balanced sample.
-- Clients are balanced IID partitions, not realistic heterogeneous sites.
+- The full-data result is one seeded run; repeated seeds are still needed for
+  uncertainty estimates.
+- Clients are IID partitions preserving natural training prevalence, not
+  realistic heterogeneous sites.
 - This is a local simulation, not a distributed or privacy-preserving
   deployment.
 - Capture groups use attack/capture blocks to prevent split leakage; that

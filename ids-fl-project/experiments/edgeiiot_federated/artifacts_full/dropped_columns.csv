@@ -1,0 +1,38 @@
+column,reason
+Attack_type,attack name; grouping only
+arp.dst.proto_ipv4,host identity
+arp.src.proto_ipv4,host identity
+dns.qry.name.len,confirmed source-format/schema pollution
+dns.qry.type,constant or entirely missing
+dns.retransmit_request_in,capture frame reference
+frame.time,capture timestamp; grouping only
+http.file_data,payload/body
+http.referer,raw HTTP text
+http.request.full_uri,URL/payload content
+http.request.method,protocol text/source-format shortcut
+http.request.uri.query,query/payload content
+http.request.version,confirmed attack-content/schema pollution
+http.tls_port,constant or entirely missing
+icmp.checksum,packet checksum/capture-specific
+icmp.seq_le,packet sequence identifier
+icmp.transmit_timestamp,capture timestamp
+icmp.unused,constant or entirely missing
+ip.dst_host,destination host identity
+ip.src_host,source host identity
+mbtcp.trans_id,transaction identifier
+mbtcp.unit_id,device/unit identity
+mqtt.conack.flags,confirmed source-format leakage
+mqtt.msg,raw message
+mqtt.msg_decoded_as,constant or entirely missing
+mqtt.protoname,confirmed source-format leakage
+mqtt.topic,confirmed source-format leakage
+tcp.ack,absolute acknowledgement identifier
+tcp.ack_raw,absolute acknowledgement identifier
+tcp.checksum,packet checksum/capture-specific
+tcp.dstport,capture/target port identity
+tcp.options,raw protocol text/high-cardinality identifier
+tcp.payload,raw payload
+tcp.seq,absolute sequence identifier
+tcp.srcport,capture/source port identity
+udp.port,capture port identity
+udp.stream,capture stream identifier

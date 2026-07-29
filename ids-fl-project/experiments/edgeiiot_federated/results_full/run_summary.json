@@ -1,0 +1,177 @@
+{
+  "notebook": "03_full_dataset_federated_pipeline.ipynb",
+  "dataset_scope": "all clean unique rows after approved conflict and duplicate controls",
+  "sampling_fraction_after_cleaning": 1.0,
+  "class_balancing_or_resampling": false,
+  "centralized_dnn_run": false,
+  "raw_rows": 2219201,
+  "raw_class_counts": {
+    "normal": 1615643,
+    "attack": 603558
+  },
+  "ambiguous_conflicting_rows_removed": 1628811,
+  "same_label_duplicate_rows_removed": 574563,
+  "clean_unique_rows": 15827,
+  "clean_class_counts": {
+    "normal": 3199,
+    "attack": 12628
+  },
+  "final_feature_count": 25,
+  "grouping_method": "Attack_type capture block + time-reset run + 5-minute window + bounded contiguous chunk",
+  "split_method": "class-stratified row-aware greedy assignment of indivisible capture groups",
+  "group_overlap": 0,
+  "exact_feature_overlap": 0,
+  "split_distributions": [
+    {
+      "split": "train",
+      "groups": 39,
+      "rows": 11079,
+      "row_fraction": 0.7000063183168004,
+      "normal": 2239,
+      "attack": 8840,
+      "attack_fraction": 0.7979059481902698,
+      "attack_rate_delta": 2.8902635205718674e-05
+    },
+    {
+      "split": "validation",
+      "groups": 32,
+      "rows": 2374,
+      "row_fraction": 0.1499968408415998,
+      "normal": 480,
+      "attack": 1894,
+      "attack_fraction": 0.797809604043808,
+      "attack_rate_delta": -6.744151125614994e-05
+    },
+    {
+      "split": "test",
+      "groups": 31,
+      "rows": 2374,
+      "row_fraction": 0.1499968408415998,
+      "normal": 480,
+      "attack": 1894,
+      "attack_fraction": 0.797809604043808,
+      "attack_rate_delta": -6.744151125614994e-05
+    }
+  ],
+  "distribution_warnings": [],
+  "client_distributions": [
+    {
+      "client": "Factory_A",
+      "rows": 2216,
+      "normal": 448,
+      "attack": 1768,
+      "attack_fraction": 0.7978339350180506,
+      "attack_rate_delta": -7.19869179846011e-05,
+      "batches_per_local_epoch": 5
+    },
+    {
+      "client": "Factory_B",
+      "rows": 2216,
+      "normal": 448,
+      "attack": 1768,
+      "attack_fraction": 0.7978339350180506,
+      "attack_rate_delta": -7.19869179846011e-05,
+      "batches_per_local_epoch": 5
+    },
+    {
+      "client": "Factory_C",
+      "rows": 2216,
+      "normal": 448,
+      "attack": 1768,
+      "attack_fraction": 0.7978339350180506,
+      "attack_rate_delta": -7.19869179846011e-05,
+      "batches_per_local_epoch": 5
+    },
+    {
+      "client": "Factory_D",
+      "rows": 2216,
+      "normal": 448,
+      "attack": 1768,
+      "attack_fraction": 0.7978339350180506,
+      "attack_rate_delta": -7.19869179846011e-05,
+      "batches_per_local_epoch": 5
+    },
+    {
+      "client": "Factory_E",
+      "rows": 2215,
+      "normal": 447,
+      "attack": 1768,
+      "attack_fraction": 0.798194130925508,
+      "attack_rate_delta": 0.0002882089894727935,
+      "batches_per_local_epoch": 5
+    }
+  ],
+  "client_partition": "five row-level IID shards preserving natural training prevalence",
+  "loss": {
+    "name": "BCEWithLogitsLoss",
+    "pos_weight_normal_over_attack": 0.2532805429864253
+  },
+  "selection_metric": "validation_macro_f1",
+  "best_round": 10,
+  "federated_wall_seconds": 13.451273441314697,
+  "csv_load_seconds": 32.763352155685425,
+  "normalization_and_grouping_seconds": 19.611438274383545,
+  "hardware": {
+    "python": "3.11.0",
+    "pytorch": "2.5.1+cu121",
+    "logical_cpus": 16,
+    "torch_cpu_threads": 4,
+    "cuda_available": true,
+    "cuda_free_gb_at_start": 5.033,
+    "federated_device": "cuda",
+    "project_disk_free_gb": 40.0
+  },
+  "config": {
+    "seed": 42,
+    "train_fraction": 0.7,
+    "val_fraction": 0.15,
+    "test_fraction": 0.15,
+    "batch_size": 512,
+    "hidden_layers": [
+      128,
+      64,
+      32
+    ],
+    "dropout": [
+      0.2,
+      0.1
+    ],
+    "learning_rate": 0.001,
+    "local_epochs": 2,
+    "federated_rounds": 10,
+    "num_clients": 5,
+    "client_names": [
+      "Factory_A",
+      "Factory_B",
+      "Factory_C",
+      "Factory_D",
+      "Factory_E"
+    ],
+    "threshold": 0.5,
+    "max_group_rows": 10000,
+    "leakage_flag_accuracy": 0.995,
+    "cpu_threads": 4,
+    "prefer_cuda": true,
+    "minimum_free_cuda_gb": 1.0
+  },
+  "federated_test": {
+    "accuracy": 0.9780960404380792,
+    "balanced_accuracy": 0.9738296374516016,
+    "precision": 0.991462113127001,
+    "recall": 0.9809926082365364,
+    "f1": 0.9861995753715499,
+    "macro_f1": 0.966569175440877,
+    "mcc": 0.9334542299582239,
+    "roc_auc": 0.9969761967617038,
+    "pr_auc": 0.9986719341869726,
+    "tn": 464,
+    "fp": 16,
+    "fn": 36,
+    "tp": 1858,
+    "normal_support": 480,
+    "attack_support": 1894,
+    "fpr": 0.03333333333333333,
+    "fnr": 0.01900739176346357,
+    "loss": 0.04620158488285008
+  }
+}
