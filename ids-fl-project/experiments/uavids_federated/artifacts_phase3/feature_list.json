@@ -1,0 +1,17 @@
+[
+  "FlowDuration/s",
+  "TxPackets",
+  "RxPackets",
+  "LostPackets",
+  "TxBytes",
+  "RxBytes",
+  "TxPacketRate/s",
+  "RxPacketRate/s",
+  "TxByteRate/s",
+  "RxByteRate/s",
+  "MeanDelay/s",
+  "MeanJitter/s",
+  "Throughput/Kbps",
+  "PacketDropRate",
+  "AverageHopCount"
+]

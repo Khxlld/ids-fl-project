@@ -1,0 +1,149 @@
+{
+  "phase": 1,
+  "dataset_path": "C:\\Projects\\ids-fl-project\\ids-fl-project\\experiments\\UAVIDS-2025\\UAVIDS-2025.csv",
+  "official_md5": "ec84ed5390d5de42b07e8a011709ff82",
+  "shape": {
+    "rows": 122171,
+    "columns": 23,
+    "features": 22,
+    "label_columns": 1
+  },
+  "label_column": "label",
+  "class_counts": {
+    "Normal Traffic": 26172,
+    "Blackhole Attack": 26110,
+    "Flooding Attack": 19726,
+    "Sybil Attack": 24077,
+    "Wormhole Attack": 26086
+  },
+  "quality": {
+    "missing_cells": 0,
+    "infinite_numeric_cells": 0,
+    "negative_numeric_cells": 0,
+    "constant_columns": [
+      "Protocol"
+    ],
+    "near_constant_columns_at_99pct": [],
+    "packet_drop_rate_outside_0_1_rows": 81,
+    "normalization_documentation_note": "The paper says numerical features were normalized, but the official CSV retains raw-scale values; whether normalization occurred only during modeling is unresolved."
+  },
+  "sources": {
+    "distinct": 176,
+    "normal_and_attack": 95,
+    "attack_only": 81,
+    "normal_only": 0,
+    "physical_uav_mapping_verified": false
+  },
+  "duplicates": {
+    "full_row_exact_duplicates": 0,
+    "published_feature_redundant_rows_including_flowid": 0,
+    "without_flowid_repeated_groups": 2548,
+    "without_flowid_rows_in_repeated_groups": 10753,
+    "without_flowid_redundant_rows": 8205,
+    "without_flowid_conflicting_label_groups": 0,
+    "behavior_repeated_groups": 2555,
+    "behavior_rows_in_repeated_groups": 10774,
+    "behavior_redundant_rows": 8219,
+    "behavior_conflicting_label_groups": 0
+  },
+  "proposed_clients": [
+    {
+      "client_id": "uav-client-1",
+      "original_source_value": "192.168.0.26",
+      "entity_evidence": "Documented source IP; normal+attack observations support a logical client, but no physical-UAV map is published.",
+      "samples": 1230,
+      "normal_count": 597,
+      "attack_count": 633,
+      "blackhole_count": 255,
+      "flooding_count": 17,
+      "sybil_count": 23,
+      "wormhole_count": 338,
+      "attacks_present": "Blackhole Attack, Flooding Attack, Sybil Attack, Wormhole Attack",
+      "normal_percentage": 48.53658536585366,
+      "attack_percentage": 51.46341463414634,
+      "imbalance_or_reliability_concern": "Physical-UAV identity unverified; Sybil rows may involve forged identities.",
+      "selection_reason": "Near-balanced binary mix and all four attacks; broad reference client."
+    },
+    {
+      "client_id": "uav-client-2",
+      "original_source_value": "192.168.0.25",
+      "entity_evidence": "Documented source IP; normal+attack observations support a logical client, but no physical-UAV map is published.",
+      "samples": 1065,
+      "normal_count": 264,
+      "attack_count": 801,
+      "blackhole_count": 367,
+      "flooding_count": 61,
+      "sybil_count": 25,
+      "wormhole_count": 348,
+      "attacks_present": "Blackhole Attack, Flooding Attack, Sybil Attack, Wormhole Attack",
+      "normal_percentage": 24.788732394366196,
+      "attack_percentage": 75.21126760563381,
+      "imbalance_or_reliability_concern": "75% attack; physical-UAV identity unverified.",
+      "selection_reason": "Attack-heavy and all four attacks; complements client 1 with different prevalence."
+    },
+    {
+      "client_id": "uav-client-3",
+      "original_source_value": "192.168.0.100",
+      "entity_evidence": "Documented source IP; normal+attack observations support a logical client, but no physical-UAV map is published.",
+      "samples": 596,
+      "normal_count": 145,
+      "attack_count": 451,
+      "blackhole_count": 161,
+      "flooding_count": 3,
+      "sybil_count": 167,
+      "wormhole_count": 120,
+      "attacks_present": "Blackhole Attack, Flooding Attack, Sybil Attack, Wormhole Attack",
+      "normal_percentage": 24.328859060402685,
+      "attack_percentage": 75.67114093959732,
+      "imbalance_or_reliability_concern": "Only 596 rows and 145 normal; physical-UAV identity unverified.",
+      "selection_reason": "Smaller attack-heavy source with substantial Sybil representation; preserves a rare attack locally."
+    },
+    {
+      "client_id": "uav-client-4",
+      "original_source_value": "192.168.0.5",
+      "entity_evidence": "Documented source IP; normal+attack observations support a logical client, but no physical-UAV map is published.",
+      "samples": 3341,
+      "normal_count": 201,
+      "attack_count": 3140,
+      "blackhole_count": 329,
+      "flooding_count": 2743,
+      "sybil_count": 0,
+      "wormhole_count": 68,
+      "attacks_present": "Blackhole Attack, Flooding Attack, Wormhole Attack",
+      "normal_percentage": 6.016162825501347,
+      "attack_percentage": 93.98383717449865,
+      "imbalance_or_reliability_concern": "94% attack, flooding dominates, and no Sybil rows.",
+      "selection_reason": "Large, strongly attack-heavy and flooding-dominated source; supplies deliberate non-IID stress."
+    },
+    {
+      "client_id": "uav-client-5",
+      "original_source_value": "192.168.0.32",
+      "entity_evidence": "Documented source IP; normal+attack observations support a logical client, but no physical-UAV map is published.",
+      "samples": 1262,
+      "normal_count": 619,
+      "attack_count": 643,
+      "blackhole_count": 254,
+      "flooding_count": 21,
+      "sybil_count": 0,
+      "wormhole_count": 368,
+      "attacks_present": "Blackhole Attack, Flooding Attack, Wormhole Attack",
+      "normal_percentage": 49.04912836767036,
+      "attack_percentage": 50.95087163232964,
+      "imbalance_or_reliability_concern": "No Sybil rows; physical-UAV identity unverified.",
+      "selection_reason": "Near-balanced source dominated by blackhole/wormhole and no Sybil; contrasts client 4."
+    }
+  ],
+  "remaining": {
+    "rows": 114677,
+    "sources": 171,
+    "sources_with_normal_and_attack": 90,
+    "class_counts": {
+      "Normal Traffic": 24346,
+      "Blackhole Attack": 24744,
+      "Flooding Attack": 16881,
+      "Sybil Attack": 23862,
+      "Wormhole Attack": 24844
+    }
+  },
+  "phase_2_decision": "Decide whether SrcAddr values may be used explicitly as source-based logical clients without claiming physical-UAV identity. If stronger entity independence is required, obtain simulator topology/IP and scenario-run metadata before partitioning."
+}

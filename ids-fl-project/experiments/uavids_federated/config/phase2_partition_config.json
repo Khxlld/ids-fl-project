@@ -1,0 +1,96 @@
+{
+  "phase": 2,
+  "design_version": "uavids-phase2-v1",
+  "raw_dataset": {
+    "relative_path": "../UAVIDS-2025/UAVIDS-2025.csv",
+    "expected_rows": 122171,
+    "expected_columns": 23,
+    "expected_md5": "ec84ed5390d5de42b07e8a011709ff82",
+    "expected_sha256": "d50d339f68be7b23f0bf089dd438b20a1835c13182d8641220538121440164d0"
+  },
+  "source_interpretation": "SrcAddr values are source-based logical client identifiers, not verified physical UAV identities.",
+  "training_clients": [
+    {
+      "client_id": "uav-client-1",
+      "source": "192.168.0.26"
+    },
+    {
+      "client_id": "uav-client-2",
+      "source": "192.168.0.25"
+    },
+    {
+      "client_id": "uav-client-3",
+      "source": "192.168.0.100"
+    },
+    {
+      "client_id": "uav-client-4",
+      "source": "192.168.0.5"
+    },
+    {
+      "client_id": "uav-client-5",
+      "source": "192.168.0.32"
+    }
+  ],
+  "binary_label_mapping": {
+    "Normal Traffic": 0,
+    "Blackhole Attack": 1,
+    "Flooding Attack": 1,
+    "Sybil Attack": 1,
+    "Wormhole Attack": 1
+  },
+  "approved_model_features": [
+    "FlowDuration/s",
+    "TxPackets",
+    "RxPackets",
+    "LostPackets",
+    "TxBytes",
+    "RxBytes",
+    "TxPacketRate/s",
+    "RxPacketRate/s",
+    "TxByteRate/s",
+    "RxByteRate/s",
+    "MeanDelay/s",
+    "MeanJitter/s",
+    "Throughput/Kbps",
+    "PacketDropRate",
+    "AverageHopCount"
+  ],
+  "excluded_model_fields": {
+    "FlowID": "Unique sequential flow/row identifier and possible file-order shortcut.",
+    "SrcAddr": "Logical client/grouping identity; retained only in traceability metadata.",
+    "DstAddr": "Endpoint and simulated-topology identity shortcut.",
+    "SrcPort": "Only two values, strongly scenario-associated, and identical to DstPort in every audited row.",
+    "DstPort": "Only two values, strongly scenario-associated, and identical to SrcPort in every audited row.",
+    "Protocol": "Constant UDP in the released dataset.",
+    "MeanPacketSize": "Deterministically exposes the port/application regime in the audit and is redundant with packet/byte counts.",
+    "label": "Original multiclass target; preserved as original_label, never used as a model input."
+  },
+  "suspicious_row_policy": {
+    "action": "exclude_before_signature_deduplication",
+    "rule": "PacketDropRate outside [0,1] OR LostPackets greater than TxPackets",
+    "reason": "The published meanings make these records internally suspicious; clipping or imputing would invent data."
+  },
+  "duplicate_policy": {
+    "signature_columns": "approved_model_features",
+    "conflicting_label_action": "fail_clean_run",
+    "same_label_action": "retain_lowest_FlowID_globally",
+    "reason": "One global representative prevents repeated signatures within or across source-disjoint partitions."
+  },
+  "heldout_assignment": {
+    "group": "SrcAddr",
+    "partitions": [
+      "validation",
+      "test"
+    ],
+    "use_all_remaining_sources": true,
+    "algorithm": "Deterministic largest-source-first greedy assignment minimizing normalized multiclass and total-row imbalance.",
+    "target_fraction_each": 0.5,
+    "claim": "Source-address-disjoint evaluation only; not scenario-, run-, temporal-, or verified-physical-UAV-disjoint evaluation."
+  },
+  "partition_output_columns": {
+    "features": "approved_model_features",
+    "traceable_target": "original_label",
+    "binary_target": "binary_label"
+  },
+  "future_training_imbalance_policy": "Do not resample validation or test. In Phase 3, if needed, compute loss weights or a training sampler from training-client labels only."
+}

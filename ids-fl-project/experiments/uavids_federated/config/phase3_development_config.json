@@ -1,0 +1,114 @@
+{
+  "phase": 3,
+  "design_version": "uavids-phase3-v1",
+  "seed": 42,
+  "reference_device": "cpu",
+  "torch_num_threads": 1,
+  "batch_size": 128,
+  "optimizer": {
+    "name": "AdamW",
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001
+  },
+  "checkpoint_selection": {
+    "validation_threshold": 0.5,
+    "primary_metric": "macro_f1",
+    "tie_breakers": [
+      "attack_recall",
+      "lower_fpr",
+      "lower_log_loss"
+    ]
+  },
+  "threshold_selection": {
+    "dataset": "validation",
+    "minimum": 0.1,
+    "maximum": 0.9,
+    "step": 0.01,
+    "primary_metric": "macro_f1",
+    "tie_breakers": [
+      "attack_recall",
+      "lower_fpr",
+      "closest_to_0.5"
+    ]
+  },
+  "candidate_models": [
+    {
+      "candidate_id": "small_unweighted",
+      "hidden_layers": [
+        64,
+        32
+      ],
+      "dropout": [
+        0.15,
+        0.05
+      ],
+      "loss_policy": "unweighted"
+    },
+    {
+      "candidate_id": "small_balanced",
+      "hidden_layers": [
+        64,
+        32
+      ],
+      "dropout": [
+        0.15,
+        0.05
+      ],
+      "loss_policy": "global_training_pos_weight"
+    },
+    {
+      "candidate_id": "edge_style_unweighted",
+      "hidden_layers": [
+        128,
+        64,
+        32
+      ],
+      "dropout": [
+        0.2,
+        0.1,
+        0.0
+      ],
+      "loss_policy": "unweighted"
+    },
+    {
+      "candidate_id": "edge_style_balanced",
+      "hidden_layers": [
+        128,
+        64,
+        32
+      ],
+      "dropout": [
+        0.2,
+        0.1,
+        0.0
+      ],
+      "loss_policy": "global_training_pos_weight"
+    }
+  ],
+  "centralized_training": {
+    "maximum_epochs": 60,
+    "early_stopping_patience": 10
+  },
+  "local_only_training": {
+    "maximum_epochs": 60,
+    "early_stopping_patience": 10,
+    "initialization": "same_selected_architecture_state_for_every_client"
+  },
+  "federated_training": {
+    "algorithm": "FedAvg",
+    "rounds": 30,
+    "local_epochs": 2,
+    "clients_per_round": 5,
+    "aggregation_weight": "retained_client_sample_count",
+    "client_optimizer_state": "reset_each_round",
+    "initialization": "same_selected_architecture_state_as_centralized_and_local_only"
+  },
+  "preprocessing": {
+    "fit_rows": "pooled_five_training_clients_only",
+    "numeric_imputer": "median",
+    "scaler": "StandardScaler",
+    "output_dtype": "float32",
+    "privacy_limitation": "Pooled training-client preprocessing is a research-prototype convenience and is not a privacy-preserving federated statistics protocol."
+  },
+  "final_test_policy": "The development program must not read test.csv. The final program may read it only after phase3_locked_config.json exists and must not alter the locked policy."
+}

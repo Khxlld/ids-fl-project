@@ -1,0 +1,317 @@
+{
+  "batch_size": 128,
+  "centralized_training": {
+    "early_stopping_patience": 10,
+    "maximum_epochs": 60
+  },
+  "checkpoint_selection": {
+    "primary_metric": "macro_f1",
+    "tie_breakers": [
+      "attack_recall",
+      "lower_fpr",
+      "lower_log_loss"
+    ],
+    "validation_threshold": 0.5
+  },
+  "design_version": "uavids-phase3-v1",
+  "development_config_sha256": "0947980e9983305b51068193e0daeb4d8f2d666120363e833321d17d4aeb13de",
+  "development_loaded_paths": [
+    "partitions\\phase2\\train_uav_client_1.csv",
+    "partitions\\phase2\\train_uav_client_2.csv",
+    "partitions\\phase2\\train_uav_client_3.csv",
+    "partitions\\phase2\\train_uav_client_4.csv",
+    "partitions\\phase2\\train_uav_client_5.csv",
+    "partitions\\phase2\\validation.csv"
+  ],
+  "features": [
+    "FlowDuration/s",
+    "TxPackets",
+    "RxPackets",
+    "LostPackets",
+    "TxBytes",
+    "RxBytes",
+    "TxPacketRate/s",
+    "RxPacketRate/s",
+    "TxByteRate/s",
+    "RxByteRate/s",
+    "MeanDelay/s",
+    "MeanJitter/s",
+    "Throughput/Kbps",
+    "PacketDropRate",
+    "AverageHopCount"
+  ],
+  "federated_training": {
+    "aggregation_weight": "retained_client_sample_count",
+    "algorithm": "FedAvg",
+    "client_optimizer_state": "reset_each_round",
+    "clients_per_round": 5,
+    "initialization": "same_selected_architecture_state_as_centralized_and_local_only",
+    "local_epochs": 2,
+    "rounds": 30
+  },
+  "final_test": {
+    "expected_sha256": "fa094088a9ee44858401d58064b35cd76e20e7962eb1c5b68c2a3136c8b95e03",
+    "path": "partitions\\phase2\\test.csv",
+    "status": "locked_not_evaluated"
+  },
+  "local_only_training": {
+    "early_stopping_patience": 10,
+    "initialization": "same_selected_architecture_state_for_every_client",
+    "maximum_epochs": 60
+  },
+  "locked_after_validation": true,
+  "model_artifacts": {
+    "centralized": {
+      "path": "artifacts_phase3\\centralized_model.pt",
+      "sha256": "035379e315e0752cd9acc5914fed06a42c8a93aa58332cbb1bae460b5dcd45c7"
+    },
+    "federated_fedavg": {
+      "path": "artifacts_phase3\\federated_global_model.pt",
+      "sha256": "5652da68689708d7dda651b562df9d79f41bd67b6db345a91d3e9e2f66d4698b"
+    },
+    "local/uav-client-1": {
+      "path": "artifacts_phase3\\local_uav_client_1_model.pt",
+      "sha256": "c0860fad3da1ce337f98a7ad8075cd0608708b58d094cc89357e184d63172235"
+    },
+    "local/uav-client-2": {
+      "path": "artifacts_phase3\\local_uav_client_2_model.pt",
+      "sha256": "47e6f804e588e82a2ea812f4c645d6ac7e52ec02c650b0fbe78f16475ca44576"
+    },
+    "local/uav-client-3": {
+      "path": "artifacts_phase3\\local_uav_client_3_model.pt",
+      "sha256": "121fce67973af85634d9141cae0f58b9f3c9ccd60aab6cd43b2ffb79610c2465"
+    },
+    "local/uav-client-4": {
+      "path": "artifacts_phase3\\local_uav_client_4_model.pt",
+      "sha256": "a215fddedf2443c322ef1ac24c6c73441f3371ccdbd8a2cf4eb47cc5c9cce7c8"
+    },
+    "local/uav-client-5": {
+      "path": "artifacts_phase3\\local_uav_client_5_model.pt",
+      "sha256": "cda4a1c267fe58feee341cae68edff4ac2fcb877de814f14449f204d42b3c44e"
+    }
+  },
+  "model_thresholds": {
+    "centralized": 0.46,
+    "federated_fedavg": 0.42,
+    "local/uav-client-1": 0.28,
+    "local/uav-client-2": 0.49,
+    "local/uav-client-3": 0.9,
+    "local/uav-client-4": 0.48,
+    "local/uav-client-5": 0.22
+  },
+  "optimizer": {
+    "learning_rate": 0.001,
+    "name": "AdamW",
+    "weight_decay": 0.0001
+  },
+  "phase": 3,
+  "phase2_manifest_sha256": "0b68a1924d2f07335647f802156f9b61ad79a4d267362879915840d5cf5b071d",
+  "preprocessor": {
+    "fit_rows": 6148,
+    "fit_scope": "pooled five Phase 2 training clients only",
+    "path": "artifacts_phase3\\training_only_preprocessor.joblib",
+    "sha256": "c68e56105b4f25462bedc34bd5b2c031d577fa76fef71e810f025841bab67256"
+  },
+  "privacy_limitation": "Pooled training-client preprocessing is a research-prototype convenience and is not a privacy-preserving federated statistics protocol.",
+  "reference_device": "cpu",
+  "seed": 42,
+  "selected_candidate": {
+    "candidate_id": "edge_style_unweighted",
+    "dropout": [
+      0.2,
+      0.1,
+      0.0
+    ],
+    "hidden_layers": [
+      128,
+      64,
+      32
+    ],
+    "loss_policy": "unweighted"
+  },
+  "selected_positive_class_weight": 1.0,
+  "test_partition_loaded_during_development": false,
+  "threshold_selection": {
+    "dataset": "validation",
+    "maximum": 0.9,
+    "minimum": 0.1,
+    "primary_metric": "macro_f1",
+    "step": 0.01,
+    "tie_breakers": [
+      "attack_recall",
+      "lower_fpr",
+      "closest_to_0.5"
+    ]
+  },
+  "validation_metrics": {
+    "centralized": {
+      "accuracy": 0.9841966310935931,
+      "attack_f1": 0.9897664339032025,
+      "attack_precision": 0.9927784755096126,
+      "attack_recall": 0.9867726137891301,
+      "balanced_accuracy": 0.9810614923850844,
+      "fn": 551,
+      "fnr": 0.013227386210869982,
+      "fp": 299,
+      "fpr": 0.024649629018961252,
+      "log_loss": 0.04820055906338889,
+      "macro_f1": 0.9775447704764054,
+      "normal_f1": 0.9653231070496083,
+      "normal_precision": 0.955499919237603,
+      "normal_recall": 0.9753503709810387,
+      "pr_auc": 0.9994149704811573,
+      "roc_auc": 0.9979677214514484,
+      "rows": 53786,
+      "threshold": 0.46,
+      "tn": 11831,
+      "tp": 41105
+    },
+    "federated_fedavg": {
+      "accuracy": 0.9627970103744469,
+      "attack_f1": 0.9759879039516158,
+      "attack_precision": 0.975742015980037,
+      "attack_recall": 0.9762339158824659,
+      "balanced_accuracy": 0.9464434212553302,
+      "fn": 990,
+      "fnr": 0.02376608411753409,
+      "fp": 1011,
+      "fpr": 0.08334707337180544,
+      "log_loss": 0.09818023321070313,
+      "macro_f1": 0.9467174966764969,
+      "normal_f1": 0.917447089401378,
+      "normal_precision": 0.91824262944917,
+      "normal_recall": 0.9166529266281945,
+      "pr_auc": 0.9969024263168339,
+      "roc_auc": 0.9902779325852018,
+      "rows": 53786,
+      "threshold": 0.42,
+      "tn": 11119,
+      "tp": 40666
+    },
+    "local/uav-client-1": {
+      "accuracy": 0.9498568400699067,
+      "attack_f1": 0.967923787776073,
+      "attack_precision": 0.9591514437242192,
+      "attack_recall": 0.9768580756673708,
+      "balanced_accuracy": 0.9169945778171973,
+      "best_epoch": 11,
+      "epochs_executed": 21,
+      "fn": 964,
+      "fnr": 0.023141924332629155,
+      "fp": 1733,
+      "fpr": 0.1428689200329761,
+      "log_loss": 0.2675426974642391,
+      "macro_f1": 0.9265569302849546,
+      "normal_f1": 0.885190072793836,
+      "normal_precision": 0.9151483144089428,
+      "normal_recall": 0.8571310799670239,
+      "pr_auc": 0.9892137045890721,
+      "roc_auc": 0.9680195046667313,
+      "rows": 53786,
+      "threshold": 0.28,
+      "tn": 10397,
+      "tp": 40692,
+      "training_rows": 1230
+    },
+    "local/uav-client-2": {
+      "accuracy": 0.9601383259584279,
+      "attack_f1": 0.9744390662629057,
+      "attack_precision": 0.967907725830136,
+      "attack_recall": 0.9810591511426925,
+      "balanced_accuracy": 0.9346763191822284,
+      "best_epoch": 54,
+      "epochs_executed": 60,
+      "fn": 789,
+      "fnr": 0.01894084885730747,
+      "fp": 1355,
+      "fpr": 0.11170651277823578,
+      "log_loss": 0.18013576440947168,
+      "macro_f1": 0.9419760115648115,
+      "normal_f1": 0.9095129568667173,
+      "normal_precision": 0.9317710134901418,
+      "normal_recall": 0.8882934872217643,
+      "pr_auc": 0.9825875001434332,
+      "roc_auc": 0.9713421283828876,
+      "rows": 53786,
+      "threshold": 0.49,
+      "tn": 10775,
+      "tp": 40867,
+      "training_rows": 1046
+    },
+    "local/uav-client-3": {
+      "accuracy": 0.9285501803443276,
+      "attack_f1": 0.9550510544229622,
+      "attack_precision": 0.9312515681667846,
+      "attack_recall": 0.9800989053197618,
+      "balanced_accuracy": 0.8658120247950829,
+      "best_epoch": 26,
+      "epochs_executed": 36,
+      "fn": 829,
+      "fnr": 0.01990109468023814,
+      "fp": 3014,
+      "fpr": 0.24847485572959604,
+      "log_loss": 0.34534930786408774,
+      "macro_f1": 0.8904813596010621,
+      "normal_f1": 0.825911664779162,
+      "normal_precision": 0.9166415284062343,
+      "normal_recall": 0.751525144270404,
+      "pr_auc": 0.9816229927596297,
+      "roc_auc": 0.954431317764421,
+      "rows": 53786,
+      "threshold": 0.9,
+      "tn": 9116,
+      "tp": 40827,
+      "training_rows": 591
+    },
+    "local/uav-client-4": {
+      "accuracy": 0.9430335031420816,
+      "attack_f1": 0.9627531545549586,
+      "attack_precision": 0.97520070925479,
+      "attack_recall": 0.9506193585557903,
+      "balanced_accuracy": 0.9338010230536578,
+      "best_epoch": 52,
+      "epochs_executed": 60,
+      "fn": 2057,
+      "fnr": 0.04938064144420972,
+      "fp": 1007,
+      "fpr": 0.08301731244847485,
+      "log_loss": 0.33771719085080376,
+      "macro_f1": 0.9208471422715527,
+      "normal_f1": 0.878941129988147,
+      "normal_precision": 0.8439301972685888,
+      "normal_recall": 0.9169826875515251,
+      "pr_auc": 0.9922709513092659,
+      "roc_auc": 0.9714822278922199,
+      "rows": 53786,
+      "threshold": 0.48,
+      "tn": 11123,
+      "tp": 39599,
+      "training_rows": 2027
+    },
+    "local/uav-client-5": {
+      "accuracy": 0.8364444279180456,
+      "attack_f1": 0.8879548609784367,
+      "attack_precision": 0.9457633556719212,
+      "attack_recall": 0.8368062223929326,
+      "balanced_accuracy": 0.8360041004792362,
+      "best_epoch": 38,
+      "epochs_executed": 48,
+      "fn": 6798,
+      "fnr": 0.1631937776070674,
+      "fp": 1999,
+      "fpr": 0.16479802143446,
+      "log_loss": 0.6013665359683426,
+      "macro_f1": 0.7926129650912349,
+      "normal_f1": 0.6972710692040331,
+      "normal_precision": 0.5984405458089669,
+      "normal_recall": 0.83520197856554,
+      "pr_auc": 0.9783576525427713,
+      "roc_auc": 0.9247577566171861,
+      "rows": 53786,
+      "threshold": 0.22,
+      "tn": 10131,
+      "tp": 34858,
+      "training_rows": 1254
+    }
+  }
+}

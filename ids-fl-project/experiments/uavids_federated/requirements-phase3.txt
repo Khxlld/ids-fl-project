@@ -1,0 +1,9 @@
+# Reference Phase 3 environment: Python 3.11, Windows 11.
+# torch is the cu121 build, although the reference runs deliberately use CPU.
+torch==2.5.1
+scikit-learn==1.9.0
+pandas==3.0.3
+numpy==2.3.1
+matplotlib==3.10.3
+joblib==1.5.3
+pytest==9.1.1

@@ -1,0 +1,23 @@
+{
+  "artifacts": {
+    "centralized": "035379e315e0752cd9acc5914fed06a42c8a93aa58332cbb1bae460b5dcd45c7",
+    "federated_fedavg": "5652da68689708d7dda651b562df9d79f41bd67b6db345a91d3e9e2f66d4698b",
+    "local/uav-client-1": "c0860fad3da1ce337f98a7ad8075cd0608708b58d094cc89357e184d63172235",
+    "local/uav-client-2": "47e6f804e588e82a2ea812f4c645d6ac7e52ec02c650b0fbe78f16475ca44576",
+    "local/uav-client-3": "121fce67973af85634d9141cae0f58b9f3c9ccd60aab6cd43b2ffb79610c2465",
+    "local/uav-client-4": "a215fddedf2443c322ef1ac24c6c73441f3371ccdbd8a2cf4eb47cc5c9cce7c8",
+    "local/uav-client-5": "cda4a1c267fe58feee341cae68edff4ac2fcb877de814f14449f204d42b3c44e",
+    "preprocessor": "c68e56105b4f25462bedc34bd5b2c031d577fa76fef71e810f025841bab67256"
+  },
+  "centralized_best_epoch": 52,
+  "federated_best_round": 30,
+  "local_validation_mean_macro_f1": 0.8944948817627232,
+  "local_validation_worst_macro_f1": 0.7926129650912349,
+  "local_validation_worst_model": "local/uav-client-5",
+  "locked_config_path": "config\\phase3_locked_config.json",
+  "locked_config_sha256": "5a4f00def41ee1ba5e827471179ffd0e1395f26587b0149439a70cd9168bbca5",
+  "positive_class_weight": 1.0,
+  "selected_candidate_id": "edge_style_unweighted",
+  "selected_loss_policy": "unweighted",
+  "test_partition_loaded": false
+}
