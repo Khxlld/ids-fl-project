@@ -1,0 +1,225 @@
+{
+  "clients": {
+    "uav-client-1": {
+      "round_training_ms": [
+        1373.628,
+        72.604,
+        72.092
+      ],
+      "steady_round_training_mean_ms": 72.348
+    },
+    "uav-client-2": {
+      "round_training_ms": [
+        1819.512,
+        101.53,
+        66.71
+      ],
+      "steady_round_training_mean_ms": 84.12
+    },
+    "uav-client-3": {
+      "round_training_ms": [
+        2588.321,
+        34.068,
+        33.896
+      ],
+      "steady_round_training_mean_ms": 33.982
+    },
+    "uav-client-4": {
+      "round_training_ms": [
+        1049.558,
+        92.841,
+        165.873
+      ],
+      "steady_round_training_mean_ms": 129.357
+    },
+    "uav-client-5": {
+      "round_training_ms": [
+        2203.122,
+        73.049,
+        91.699
+      ],
+      "steady_round_training_mean_ms": 82.374
+    }
+  },
+  "container_start_to_api_ready_seconds": 6.977482,
+  "container_start_to_terminal_state_seconds": 28.156243,
+  "coordinator_start_to_all_clients_ready_seconds": 14.332287,
+  "coordinator_total_runtime_seconds": 20.584276,
+  "failure_exercise": {
+    "incompatible_update_rejections": 1,
+    "reason": "incompatible contract_hash"
+  },
+  "final_demo_validation_metrics": {
+    "accuracy": 0.9664410813222771,
+    "attack_f1": 0.9783803854399981,
+    "attack_precision": 0.9763105682116989,
+    "attack_recall": 0.9804589975033609,
+    "balanced_accuracy": 0.9493803643741041,
+    "fn": 814,
+    "fnr": 0.01954100249663914,
+    "fp": 991,
+    "fpr": 0.08169826875515251,
+    "log_loss": 0.09393461488906998,
+    "macro_f1": 0.9517156255979627,
+    "normal_f1": 0.9250508657559274,
+    "normal_precision": 0.931899941437296,
+    "normal_recall": 0.9183017312448475,
+    "pr_auc": 0.9971752534827799,
+    "roc_auc": 0.9911421211711484,
+    "rows": 53786,
+    "threshold": 0.42,
+    "tn": 11139,
+    "tp": 40842
+  },
+  "http_update_body_bytes": {
+    "maximum": 64311,
+    "minimum": 64237
+  },
+  "maximum_server_socket_receive_ms": 0.203,
+  "mode": "demo_nonresearch",
+  "resource_samples": {
+    "control-center": {
+      "last_network_io": "1.22MB / 1.56MB",
+      "peak_cpu_percent_of_one_host_core": 58.29,
+      "peak_memory_mib": 270.8,
+      "samples": 9
+    },
+    "uav-client-1": {
+      "last_network_io": "179kB / 92.5kB",
+      "peak_cpu_percent_of_one_host_core": 65.11,
+      "peak_memory_mib": 270.1,
+      "samples": 7
+    },
+    "uav-client-2": {
+      "last_network_io": "175kB / 154kB",
+      "peak_cpu_percent_of_one_host_core": 54.63,
+      "peak_memory_mib": 270.7,
+      "samples": 7
+    },
+    "uav-client-3": {
+      "last_network_io": "238kB / 210kB",
+      "peak_cpu_percent_of_one_host_core": 36.08,
+      "peak_memory_mib": 269.2,
+      "samples": 8
+    },
+    "uav-client-4": {
+      "last_network_io": "193kB / 164kB",
+      "peak_cpu_percent_of_one_host_core": 99.05,
+      "peak_memory_mib": 272.4,
+      "samples": 7
+    },
+    "uav-client-5": {
+      "last_network_io": "247kB / 219kB",
+      "peak_cpu_percent_of_one_host_core": 45.5,
+      "peak_memory_mib": 270.4,
+      "samples": 8
+    }
+  },
+  "rounds": {
+    "1": {
+      "aggregation_ms": 2.052,
+      "evaluation_ms": 220.005,
+      "round_ms": 3445.828,
+      "straggler_client": "uav-client-3",
+      "straggler_training_ms": 2588.321,
+      "validation_macro_f1": 0.9471239503223295
+    },
+    "2": {
+      "aggregation_ms": 1.67,
+      "evaluation_ms": 158.925,
+      "round_ms": 1189.156,
+      "straggler_client": "uav-client-2",
+      "straggler_training_ms": 101.53,
+      "validation_macro_f1": 0.9501648033410426
+    },
+    "3": {
+      "aggregation_ms": 1.677,
+      "evaluation_ms": 139.259,
+      "round_ms": 1244.208,
+      "straggler_client": "uav-client-4",
+      "straggler_training_ms": 165.873,
+      "validation_macro_f1": 0.9517156255979627
+    }
+  },
+  "run_id": "9ec38846-0983-4f1e-a343-f7f8a320ba46",
+  "state": "completed",
+  "update_archive_bytes": {
+    "maximum": 47884,
+    "minimum": 47829
+  },
+  "verification": {
+    "aggregation": {
+      "clients_per_round": 5,
+      "event_count": 116,
+      "frozen_phase3_hashes_unchanged": true,
+      "maximum_aggregation_absolute_difference": 0.0,
+      "rounds": 3,
+      "run_id": "9ec38846-0983-4f1e-a343-f7f8a320ba46",
+      "total_samples_per_round": 6148,
+      "verified": true
+    },
+    "isolation": {
+      "client_training_partitions_visible_each": 1,
+      "server_training_partitions_visible": 0,
+      "services": {
+        "control-center": {
+          "cpus": 1.25,
+          "data_mounts": [
+            "/data/validation.csv"
+          ],
+          "exit_code": 0,
+          "memory_bytes": 805306368,
+          "read_only_root": true
+        },
+        "uav-client-1": {
+          "cpus": 0.65,
+          "data_mounts": [
+            "/data/train.csv"
+          ],
+          "exit_code": 0,
+          "memory_bytes": 536870912,
+          "read_only_root": true
+        },
+        "uav-client-2": {
+          "cpus": 0.55,
+          "data_mounts": [
+            "/data/train.csv"
+          ],
+          "exit_code": 0,
+          "memory_bytes": 536870912,
+          "read_only_root": true
+        },
+        "uav-client-3": {
+          "cpus": 0.35,
+          "data_mounts": [
+            "/data/train.csv"
+          ],
+          "exit_code": 0,
+          "memory_bytes": 469762048,
+          "read_only_root": true
+        },
+        "uav-client-4": {
+          "cpus": 1.0,
+          "data_mounts": [
+            "/data/train.csv"
+          ],
+          "exit_code": 0,
+          "memory_bytes": 805306368,
+          "read_only_root": true
+        },
+        "uav-client-5": {
+          "cpus": 0.45,
+          "data_mounts": [
+            "/data/train.csv"
+          ],
+          "exit_code": 0,
+          "memory_bytes": 536870912,
+          "read_only_root": true
+        }
+      },
+      "training_csv_files_embedded_in_image": 0,
+      "verified": true
+    },
+    "phase3_artifacts_unchanged": true
+  }
+}

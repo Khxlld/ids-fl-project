@@ -1,0 +1,273 @@
+[
+  {
+    "client_id": null,
+    "elapsed_ms": 984.796,
+    "event_type": "server_started",
+    "payload": {
+      "contract_hash": "dd2281ef2a1ec98a9c2c6197067fe8029b76026e6f9710e1dddcfd10a2df7d01",
+      "expected_clients": [
+        "uav-client-1",
+        "uav-client-2",
+        "uav-client-3",
+        "uav-client-4",
+        "uav-client-5"
+      ],
+      "initial_model_bytes": 47880,
+      "local_epochs": 2,
+      "mode": "demo_nonresearch",
+      "rounds": 3
+    },
+    "round": 0,
+    "seq": 1,
+    "severity": "info",
+    "source": "control-center"
+  },
+  {
+    "client_id": "uav-client-4",
+    "elapsed_ms": 6129.859,
+    "event_type": "client_registered",
+    "payload": {
+      "profile": "NVIDIA Jetson Orin Nano 8GB-inspired",
+      "registered_utc": "2026-08-04T16:15:31.642489Z",
+      "samples": 2027
+    },
+    "round": 0,
+    "seq": 2,
+    "severity": "info",
+    "source": "control-center"
+  },
+  {
+    "client_id": null,
+    "elapsed_ms": 14332.287,
+    "event_type": "all_clients_ready",
+    "payload": {
+      "client_count": 5
+    },
+    "round": 0,
+    "seq": 11,
+    "severity": "info",
+    "source": "control-center"
+  },
+  {
+    "client_id": null,
+    "elapsed_ms": 14353.308,
+    "event_type": "round_started",
+    "payload": {
+      "expected_clients": [
+        "uav-client-1",
+        "uav-client-2",
+        "uav-client-3",
+        "uav-client-4",
+        "uav-client-5"
+      ],
+      "model_bytes": 47880,
+      "model_sha256": "0b4b620b12ca6adeae9e7eec0b847823751f5c23dfca7f4fa3bc3f053aebdf40"
+    },
+    "round": 1,
+    "seq": 12,
+    "severity": "info",
+    "source": "control-center"
+  },
+  {
+    "client_id": "uav-client-4",
+    "elapsed_ms": 14382.171,
+    "event_type": "global_model_distributed",
+    "payload": {
+      "model_bytes": 47880,
+      "model_sha256": "0b4b620b12ca6adeae9e7eec0b847823751f5c23dfca7f4fa3bc3f053aebdf40"
+    },
+    "round": 1,
+    "seq": 13,
+    "severity": "info",
+    "source": "control-center"
+  },
+  {
+    "client_id": "uav-client-4",
+    "elapsed_ms": 14543.481,
+    "event_type": "client_training_started",
+    "payload": {
+      "epochs": 2,
+      "global_model_sha256": "0b4b620b12ca6adeae9e7eec0b847823751f5c23dfca7f4fa3bc3f053aebdf40",
+      "samples": 2027
+    },
+    "round": 1,
+    "seq": 17,
+    "severity": "info",
+    "source": "uav-client-4"
+  },
+  {
+    "client_id": "uav-client-4",
+    "elapsed_ms": 15665.748,
+    "event_type": "client_training_completed",
+    "payload": {
+      "accuracy": 0.9955599407992106,
+      "attack_recall": 0.9983570646221248,
+      "fpr": 0.029850746268656716,
+      "loss": 0.02237027475392592,
+      "macro_f1": 0.9874906143607993,
+      "training_ms": 1049.558,
+      "update_bytes": 47851,
+      "update_sha256": "44809ee83a96362bd24d483ba70e187668905bf7ddf2f9e486ec4050592a6868"
+    },
+    "round": 1,
+    "seq": 25,
+    "severity": "info",
+    "source": "uav-client-4"
+  },
+  {
+    "client_id": "uav-client-1",
+    "elapsed_ms": 14492.773,
+    "event_type": "update_rejected",
+    "payload": {
+      "reason": "incompatible contract_hash"
+    },
+    "round": 1,
+    "seq": 16,
+    "severity": "error",
+    "source": "control-center"
+  },
+  {
+    "client_id": "uav-client-4",
+    "elapsed_ms": 15714.802,
+    "event_type": "client_update_received",
+    "payload": {
+      "http_content_bytes": 64269,
+      "receive_ms": 0.084,
+      "samples": 2027,
+      "update_bytes": 47851,
+      "update_sha256": "44809ee83a96362bd24d483ba70e187668905bf7ddf2f9e486ec4050592a6868"
+    },
+    "round": 1,
+    "seq": 26,
+    "severity": "info",
+    "source": "control-center"
+  },
+  {
+    "client_id": null,
+    "elapsed_ms": 15735.92,
+    "event_type": "server_waiting_for_clients",
+    "payload": {
+      "missing_clients": [
+        "uav-client-1",
+        "uav-client-2",
+        "uav-client-3",
+        "uav-client-5"
+      ]
+    },
+    "round": 1,
+    "seq": 27,
+    "severity": "info",
+    "source": "control-center"
+  },
+  {
+    "client_id": null,
+    "elapsed_ms": 17504.365,
+    "event_type": "aggregation_started",
+    "payload": {
+      "sample_counts": {
+        "uav-client-1": 1230,
+        "uav-client-2": 1046,
+        "uav-client-3": 591,
+        "uav-client-4": 2027,
+        "uav-client-5": 1254
+      },
+      "total_samples": 6148
+    },
+    "round": 1,
+    "seq": 43,
+    "severity": "info",
+    "source": "control-center"
+  },
+  {
+    "client_id": null,
+    "elapsed_ms": 17819.881,
+    "event_type": "aggregation_completed",
+    "payload": {
+      "aggregation_ms": 2.052,
+      "model_sha256": "14b78eaddf7eed1d7f36fb6e82e186b11d41a3a1755d3863127050208cd0458b",
+      "total_samples": 6148
+    },
+    "round": 1,
+    "seq": 44,
+    "severity": "info",
+    "source": "control-center"
+  },
+  {
+    "client_id": null,
+    "elapsed_ms": 17858.119,
+    "event_type": "round_metrics",
+    "payload": {
+      "accuracy": 0.9630387089577214,
+      "attack_f1": 0.9761327346507551,
+      "attack_precision": 0.9763437244824439,
+      "attack_recall": 0.9759218359900135,
+      "balanced_accuracy": 0.9473591043099284,
+      "fn": 1003,
+      "fnr": 0.024078164009986556,
+      "fp": 985,
+      "fpr": 0.08120362737015664,
+      "log_loss": 0.09698100018011445,
+      "macro_f1": 0.9471239503223295,
+      "normal_f1": 0.918115165993904,
+      "normal_precision": 0.9174349687191308,
+      "normal_recall": 0.9187963726298434,
+      "pr_auc": 0.9969947869317964,
+      "roc_auc": 0.9905705641353174,
+      "rows": 53786,
+      "threshold": 0.42,
+      "tn": 11145,
+      "tp": 40653
+    },
+    "round": 1,
+    "seq": 45,
+    "severity": "info",
+    "source": "control-center"
+  },
+  {
+    "client_id": null,
+    "elapsed_ms": 17888.586,
+    "event_type": "round_completed",
+    "payload": {
+      "round_ms": 3445.828
+    },
+    "round": 1,
+    "seq": 46,
+    "severity": "info",
+    "source": "control-center"
+  },
+  {
+    "client_id": null,
+    "elapsed_ms": 20559.809,
+    "event_type": "demo_completed",
+    "payload": {
+      "final_metrics": {
+        "accuracy": 0.9664410813222771,
+        "attack_f1": 0.9783803854399981,
+        "attack_precision": 0.9763105682116989,
+        "attack_recall": 0.9804589975033609,
+        "balanced_accuracy": 0.9493803643741041,
+        "fn": 814,
+        "fnr": 0.01954100249663914,
+        "fp": 991,
+        "fpr": 0.08169826875515251,
+        "log_loss": 0.09393461488906998,
+        "macro_f1": 0.9517156255979627,
+        "normal_f1": 0.9250508657559274,
+        "normal_precision": 0.931899941437296,
+        "normal_recall": 0.9183017312448475,
+        "pr_auc": 0.9971752534827799,
+        "roc_auc": 0.9911421211711484,
+        "rows": 53786,
+        "threshold": 0.42,
+        "tn": 11139,
+        "tp": 40842
+      },
+      "rounds": 3,
+      "total_runtime_seconds": 20.559772
+    },
+    "round": 3,
+    "seq": 114,
+    "severity": "info",
+    "source": "control-center"
+  }
+]

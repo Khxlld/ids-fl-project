@@ -1,0 +1,69 @@
+{
+  "config_version": "uavids-phase4-demo-v1",
+  "protocol_version": "phase4-http-fedavg-v1",
+  "event_schema_version": "phase4-event-v1",
+  "mode": "demo_nonresearch",
+  "phase3_lock_sha256": "5a4f00def41ee1ba5e827471179ffd0e1395f26587b0149439a70cd9168bbca5",
+  "initial_model": "locked_phase3_federated_checkpoint",
+  "rounds": 3,
+  "local_epochs": 2,
+  "client_poll_seconds": 0.25,
+  "round_timeout_seconds": 120,
+  "startup_timeout_seconds": 120,
+  "maximum_update_bytes": 1048576,
+  "validation": {
+    "rows": 53786,
+    "sha256": "e401d919379f3611aca6369380584e139996c4c35313cc3f05551766bb5631dc"
+  },
+  "server": {
+    "cpus": 1.25,
+    "memory": "768m"
+  },
+  "clients": [
+    {
+      "client_id": "uav-client-1",
+      "partition_filename": "train_uav_client_1.csv",
+      "partition_sha256": "d30b8217542c83370f6bdec82c7b2a3c21d269b5a50179d2380f70bef648c5a5",
+      "samples": 1230,
+      "profile": "Raspberry Pi 4 Model B-inspired",
+      "cpus": 0.65,
+      "memory": "512m"
+    },
+    {
+      "client_id": "uav-client-2",
+      "partition_filename": "train_uav_client_2.csv",
+      "partition_sha256": "4f93be7c7ae45c5ddc5a1fe9c4ecd78c38af0317347afad7f2a0e2a2be91d0a2",
+      "samples": 1046,
+      "profile": "NVIDIA Jetson Nano-inspired",
+      "cpus": 0.55,
+      "memory": "512m"
+    },
+    {
+      "client_id": "uav-client-3",
+      "partition_filename": "train_uav_client_3.csv",
+      "partition_sha256": "a615376eabce812e42f8e18def75a8190733027bbddbadfcbf4e7ff5229a8f6a",
+      "samples": 591,
+      "profile": "Raspberry Pi Zero 2 W-inspired",
+      "cpus": 0.35,
+      "memory": "448m"
+    },
+    {
+      "client_id": "uav-client-4",
+      "partition_filename": "train_uav_client_4.csv",
+      "partition_sha256": "bc87fe1f5c2e300edf63eb910b01ad84e8ef42d514edf576ca29fac71408d0ae",
+      "samples": 2027,
+      "profile": "NVIDIA Jetson Orin Nano 8GB-inspired",
+      "cpus": 1.0,
+      "memory": "768m"
+    },
+    {
+      "client_id": "uav-client-5",
+      "partition_filename": "train_uav_client_5.csv",
+      "partition_sha256": "57f35a61833eb300ea72e2a5eb338687998839c4887f98a5752503b26f5ecd38",
+      "samples": 1254,
+      "profile": "NXP NavQPlus-inspired",
+      "cpus": 0.45,
+      "memory": "512m"
+    }
+  ]
+}

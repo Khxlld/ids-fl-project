@@ -1,0 +1,9 @@
+*
+!src/
+!src/uavids_fl/
+!src/uavids_fl/*.py
+!phase4/
+!phase4/Dockerfile
+!phase4/requirements.txt
+!phase4/app/
+!phase4/app/*.py

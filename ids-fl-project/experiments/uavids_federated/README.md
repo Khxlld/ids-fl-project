@@ -34,3 +34,28 @@ The raw dataset remains in the sibling `../UAVIDS-2025/` directory.
 - `artifacts_phase3/` — fitted training-only preprocessor, feature metadata, and model checkpoints.
 - `results_phase3/PHASE3_COMPARISON_REPORT.md` — concise validation and locked-test conclusions.
 - `results_phase3/*.csv`, `*.json`, and `plots/` — histories, metrics, predictions, hashes, and figures.
+
+## Phase 3 and Phase 4 guide notebooks
+
+- `notebooks/05_phase3_binary_modeling_guide.ipynb` — read-only walkthrough of the frozen preprocessing, MLP, validation decisions, three training paths, and locked-test results.
+- `notebooks/06_phase4_docker_federated_demo_guide.ipynb` — walkthrough of the six-service protocol, client profiles, one round, safe aggregation, GUI events, and measured verification evidence.
+- `build_guide_notebooks.py` — deterministically rebuilds both notebook sources.
+- `execute_guide_notebooks.py` — executes both guides from clean kernels with the experiment root as their working directory.
+- `requirements-guides.txt` — Phase 3 runtime plus notebook build/execution dependencies.
+
+From this directory, rebuild and execute the guides with:
+
+```powershell
+python .\build_guide_notebooks.py
+python .\execute_guide_notebooks.py
+```
+
+## Phase 4 files
+
+- `phase4/docker-compose.yml` and `phase4/Dockerfile` — six-service CPU-only demo topology and image.
+- `phase4/app/` — HTTP control center, isolated client, compatibility contract, and safe update serialization.
+- `phase4/scripts/` — build/run/observe/stop commands for Windows PowerShell.
+- `phase4/README.md` — operator guide and troubleshooting.
+- `phase4/DEVICE_PROFILES.md` — authoritative device evidence and measured Docker limits.
+- `phase4/EVENT_CONTRACT.md` — GUI-facing status/event API.
+- `phase4/results/PHASE4_RESULTS_SUMMARY.md` — measured demonstration results, separate from Phase 3.

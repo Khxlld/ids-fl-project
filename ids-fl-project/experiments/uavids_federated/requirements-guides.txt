@@ -1,0 +1,6 @@
+-r requirements-phase3.txt
+
+# Notebook construction and clean-kernel execution.
+nbformat==5.10.4
+nbconvert==7.17.1
+ipykernel==6.29.5
