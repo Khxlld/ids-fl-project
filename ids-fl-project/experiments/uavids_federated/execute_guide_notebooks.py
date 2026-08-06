@@ -1,4 +1,4 @@
-"""Execute both guide notebooks from clean kernels with the experiment root as cwd."""
+"""Execute all guide notebooks from clean kernels with the experiment root as cwd."""
 
 from __future__ import annotations
 
@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parent
 NOTEBOOKS = [
     ROOT / "notebooks" / "05_phase3_binary_modeling_guide.ipynb",
     ROOT / "notebooks" / "06_phase4_docker_federated_demo_guide.ipynb",
+    ROOT / "notebooks" / "07_phase5_post_quantum_security_guide.ipynb",
 ]
 
 

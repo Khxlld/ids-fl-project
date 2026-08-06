@@ -1,0 +1,3 @@
+direction,messages,mean_plaintext_bytes,mean_protected_bytes,mean_overhead_bytes,mean_expansion_percent
+server_to_client,15,65596.0,88043.8,22447.8,34.221
+client_to_server,15,64279.267,86289.467,22010.2,34.242

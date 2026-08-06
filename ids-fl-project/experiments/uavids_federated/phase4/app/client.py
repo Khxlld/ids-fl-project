@@ -73,12 +73,36 @@ class DemoClient:
         self.expected_spec = state_spec(self.model.state_dict())
         self.run_id: str | None = None
 
+    def _register(self, payload: dict) -> tuple[dict, int]:
+        return json_request(
+            "POST", f"{self.server_url}/api/v1/register", payload, timeout=30
+        )
+
+    def _request_model(self, completed_round: int) -> tuple[dict, int]:
+        return json_request(
+            "GET", f"{self.server_url}/api/v1/model?client_id={self.client_id}", timeout=30
+        )
+
+    def _submit_update(self, payload: dict) -> tuple[dict, int]:
+        return json_request(
+            "POST",
+            f"{self.server_url}/api/v1/updates",
+            payload,
+            timeout=float(self.demo["round_timeout_seconds"]) + 30,
+        )
+
+    def _post_event_payload(self, payload: dict) -> tuple[dict, int]:
+        return json_request(
+            "POST", f"{self.server_url}/api/v1/events", payload, timeout=30
+        )
+
+    def _on_complete(self, completed_round: int) -> None:
+        """Transport-specific completion hook; plain mode needs no action."""
+
     def post_event(self, event_type: str, server_round: int, payload: dict, severity: str = "info") -> None:
         if self.run_id is None:
             return
-        json_request(
-            "POST",
-            f"{self.server_url}/api/v1/events",
+        self._post_event_payload(
             {
                 "run_id": self.run_id,
                 "client_id": self.client_id,
@@ -86,14 +110,11 @@ class DemoClient:
                 "round": server_round,
                 "severity": severity,
                 "payload": payload,
-            },
-            timeout=30,
+            }
         )
 
     def run(self) -> None:
-        registration, _ = json_request(
-            "POST",
-            f"{self.server_url}/api/v1/register",
+        registration, _ = self._register(
             {
                 "client_id": self.client_id,
                 "protocol_version": self.demo["protocol_version"],
@@ -102,8 +123,7 @@ class DemoClient:
                 "partition_sha256": self.record["partition_sha256"],
                 "samples": int(self.record["samples"]),
                 "profile": self.record["profile"],
-            },
-            timeout=30,
+            }
         )
         self.run_id = registration["run_id"]
         self.post_event(
@@ -119,11 +139,7 @@ class DemoClient:
 
         completed_round = 0
         while completed_round < int(self.demo["rounds"]):
-            response, _ = json_request(
-                "GET",
-                f"{self.server_url}/api/v1/model?client_id={self.client_id}",
-                timeout=30,
-            )
+            response, _ = self._request_model(completed_round)
             if not response.get("available"):
                 status = response.get("status", {})
                 if status.get("state") == "failed":
@@ -197,9 +213,7 @@ class DemoClient:
             )
 
             request_started = time.perf_counter()
-            result, _ = json_request(
-                "POST",
-                f"{self.server_url}/api/v1/updates",
+            result, _ = self._submit_update(
                 {
                     "run_id": self.run_id,
                     "round": server_round,
@@ -209,8 +223,7 @@ class DemoClient:
                     "weights": encoded,
                     "weights_sha256": update_hash,
                     "metrics": client_metrics,
-                },
-                timeout=float(self.demo["round_timeout_seconds"]) + 30,
+                }
             )
             request_ack_ms = (time.perf_counter() - request_started) * 1000
             if not result.get("accepted"):
@@ -232,6 +245,7 @@ class DemoClient:
             )
             completed_round = server_round
 
+        self._on_complete(completed_round)
         log("client_complete", client_id=self.client_id, completed_rounds=completed_round)
 
 

@@ -1,0 +1,13 @@
+{
+  "security_version": "uavids-phase5-security-v1",
+  "kem_algorithm": "ML-KEM-768",
+  "signature_algorithm": "ML-DSA-65",
+  "kdf": "HKDF-SHA-256",
+  "aead": "AES-256-GCM",
+  "nonce_strategy": "four-byte-session-prefix-plus-64-bit-directional-sequence",
+  "handshake_ttl_seconds": 60,
+  "maximum_secure_json_bytes": 2097152,
+  "liboqs_version": "0.16.0",
+  "liboqs_python_version": "0.16.0",
+  "cryptography_version": "50.0.0"
+}

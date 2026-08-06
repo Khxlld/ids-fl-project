@@ -35,7 +35,10 @@ The raw dataset remains in the sibling `../UAVIDS-2025/` directory.
 - `results_phase3/PHASE3_COMPARISON_REPORT.md` — concise validation and locked-test conclusions.
 - `results_phase3/*.csv`, `*.json`, and `plots/` — histories, metrics, predictions, hashes, and figures.
 
-## Phase 3 and Phase 4 guide notebooks
+## Phase 3, Phase 4, and Phase 5 guide notebooks
+
+- `notebooks/07_phase5_post_quantum_security_guide.ipynb` — executed threat-model, protected-exchange, attack-rejection, equivalence, and overhead guide.
+- `build_phase5_notebook.py` and `execute_phase5_notebook.py` — deterministic source rebuild and clean-kernel execution.
 
 - `notebooks/05_phase3_binary_modeling_guide.ipynb` — read-only walkthrough of the frozen preprocessing, MLP, validation decisions, three training paths, and locked-test results.
 - `notebooks/06_phase4_docker_federated_demo_guide.ipynb` — walkthrough of the six-service protocol, client profiles, one round, safe aggregation, GUI events, and measured verification evidence.
@@ -49,6 +52,14 @@ From this directory, rebuild and execute the guides with:
 python .\build_guide_notebooks.py
 python .\execute_guide_notebooks.py
 ```
+
+## Phase 5 files
+
+- `phase5/app/` — ML-KEM/ML-DSA handshake, HKDF/AES-GCM sessions, secure server adapter, and client transport.
+- `phase5/docker-compose.yml` and `phase5/Dockerfile` — pinned OQS six-service secure demonstration with runtime-mounted identities.
+- `phase5/README.md` and `phase5/SECURITY_PROTOCOL.md` — commands, threat/trust model, exact protocol, and limitations.
+- `phase5/tests/` and `phase5/results/` — positive/negative tests and secret-free equivalence, timing, size, resource, and rejection evidence.
+- `notebooks/07_phase5_post_quantum_security_guide.ipynb` — executed educational guide based only on saved public evidence.
 
 ## Phase 4 files
 

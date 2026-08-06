@@ -1,0 +1,178 @@
+name: uavids-phase5
+
+x-service-base: &service-base
+  image: uavids-phase5-secure-demo:local
+  init: true
+  read_only: true
+  user: "10001:10001"
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+  tmpfs:
+    - /tmp:rw,noexec,nosuid,size=64m
+  networks:
+    - secure-federated-demo
+  environment: &common-environment
+    DEMO_CONFIG_PATH: /config/demo_config.json
+    SECURITY_CONFIG_PATH: /config/security_config.json
+    TRUST_STORE_PATH: /security/trust_store.json
+    PHASE3_LOCK_PATH: /reference/config/phase3_locked_config.json
+    PREPROCESSOR_PATH: /reference/artifacts/training_only_preprocessor.joblib
+    PYTHONUNBUFFERED: "1"
+    OMP_NUM_THREADS: "1"
+    MKL_NUM_THREADS: "1"
+    OPENBLAS_NUM_THREADS: "1"
+
+x-client-base: &client-base
+  <<: *service-base
+  command: ["python", "-m", "phase5_app.client"]
+  depends_on:
+    control-center:
+      condition: service_healthy
+  restart: "no"
+
+services:
+  control-center:
+    <<: *service-base
+    build:
+      context: ..
+      dockerfile: phase5/Dockerfile
+      args:
+        LIBOQS_VERSION: "0.16.0"
+        LIBOQS_PYTHON_VERSION: "0.16.0"
+    command: ["python", "-m", "phase5_app.server"]
+    hostname: control-center
+    cpus: 1.25
+    mem_limit: 768m
+    environment:
+      <<: *common-environment
+      SERVER_HOST: 0.0.0.0
+      SERVER_PORT: "8080"
+      SERVER_SIGN_SECRET_PATH: /security/sign_secret.key
+      VALIDATION_PATH: /data/validation.csv
+      INITIAL_CHECKPOINT_PATH: /reference/artifacts/federated_global_model.pt
+      RUNTIME_DIR: /runtime
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./config/demo_config.json:/config/demo_config.json:ro
+      - ./config/security_config.json:/config/security_config.json:ro
+      - ./runtime/keys/trust_store.json:/security/trust_store.json:ro
+      - ./runtime/keys/server/sign_secret.key:/security/sign_secret.key:ro
+      - ../config/phase3_locked_config.json:/reference/config/phase3_locked_config.json:ro
+      - ../artifacts_phase3/training_only_preprocessor.joblib:/reference/artifacts/training_only_preprocessor.joblib:ro
+      - ../artifacts_phase3/federated_global_model.pt:/reference/artifacts/federated_global_model.pt:ro
+      - ../partitions/phase2/validation.csv:/data/validation.csv:ro
+      - ./runtime:/runtime
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=2).read()"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+      start_period: 5s
+
+  uav-client-1:
+    <<: *client-base
+    hostname: uav-client-1
+    cpus: 0.65
+    mem_limit: 512m
+    environment:
+      <<: *common-environment
+      CLIENT_ID: uav-client-1
+      SERVER_URL: http://control-center:8080
+      TRAINING_PARTITION_PATH: /data/train.csv
+      CLIENT_SIGN_SECRET_PATH: /security/sign_secret.key
+      SECURITY_ATTACK_TESTS: "${SECURITY_ATTACK_TESTS:-0}"
+    volumes:
+      - ./config/demo_config.json:/config/demo_config.json:ro
+      - ./config/security_config.json:/config/security_config.json:ro
+      - ./runtime/keys/trust_store.json:/security/trust_store.json:ro
+      - ./runtime/keys/clients/uav-client-1/sign_secret.key:/security/sign_secret.key:ro
+      - ../config/phase3_locked_config.json:/reference/config/phase3_locked_config.json:ro
+      - ../artifacts_phase3/training_only_preprocessor.joblib:/reference/artifacts/training_only_preprocessor.joblib:ro
+      - ../partitions/phase2/train_uav_client_1.csv:/data/train.csv:ro
+
+  uav-client-2:
+    <<: *client-base
+    hostname: uav-client-2
+    cpus: 0.55
+    mem_limit: 512m
+    environment:
+      <<: *common-environment
+      CLIENT_ID: uav-client-2
+      SERVER_URL: http://control-center:8080
+      TRAINING_PARTITION_PATH: /data/train.csv
+      CLIENT_SIGN_SECRET_PATH: /security/sign_secret.key
+    volumes:
+      - ./config/demo_config.json:/config/demo_config.json:ro
+      - ./config/security_config.json:/config/security_config.json:ro
+      - ./runtime/keys/trust_store.json:/security/trust_store.json:ro
+      - ./runtime/keys/clients/uav-client-2/sign_secret.key:/security/sign_secret.key:ro
+      - ../config/phase3_locked_config.json:/reference/config/phase3_locked_config.json:ro
+      - ../artifacts_phase3/training_only_preprocessor.joblib:/reference/artifacts/training_only_preprocessor.joblib:ro
+      - ../partitions/phase2/train_uav_client_2.csv:/data/train.csv:ro
+
+  uav-client-3:
+    <<: *client-base
+    hostname: uav-client-3
+    cpus: 0.35
+    mem_limit: 448m
+    environment:
+      <<: *common-environment
+      CLIENT_ID: uav-client-3
+      SERVER_URL: http://control-center:8080
+      TRAINING_PARTITION_PATH: /data/train.csv
+      CLIENT_SIGN_SECRET_PATH: /security/sign_secret.key
+    volumes:
+      - ./config/demo_config.json:/config/demo_config.json:ro
+      - ./config/security_config.json:/config/security_config.json:ro
+      - ./runtime/keys/trust_store.json:/security/trust_store.json:ro
+      - ./runtime/keys/clients/uav-client-3/sign_secret.key:/security/sign_secret.key:ro
+      - ../config/phase3_locked_config.json:/reference/config/phase3_locked_config.json:ro
+      - ../artifacts_phase3/training_only_preprocessor.joblib:/reference/artifacts/training_only_preprocessor.joblib:ro
+      - ../partitions/phase2/train_uav_client_3.csv:/data/train.csv:ro
+
+  uav-client-4:
+    <<: *client-base
+    hostname: uav-client-4
+    cpus: 1.0
+    mem_limit: 768m
+    environment:
+      <<: *common-environment
+      CLIENT_ID: uav-client-4
+      SERVER_URL: http://control-center:8080
+      TRAINING_PARTITION_PATH: /data/train.csv
+      CLIENT_SIGN_SECRET_PATH: /security/sign_secret.key
+    volumes:
+      - ./config/demo_config.json:/config/demo_config.json:ro
+      - ./config/security_config.json:/config/security_config.json:ro
+      - ./runtime/keys/trust_store.json:/security/trust_store.json:ro
+      - ./runtime/keys/clients/uav-client-4/sign_secret.key:/security/sign_secret.key:ro
+      - ../config/phase3_locked_config.json:/reference/config/phase3_locked_config.json:ro
+      - ../artifacts_phase3/training_only_preprocessor.joblib:/reference/artifacts/training_only_preprocessor.joblib:ro
+      - ../partitions/phase2/train_uav_client_4.csv:/data/train.csv:ro
+
+  uav-client-5:
+    <<: *client-base
+    hostname: uav-client-5
+    cpus: 0.45
+    mem_limit: 512m
+    environment:
+      <<: *common-environment
+      CLIENT_ID: uav-client-5
+      SERVER_URL: http://control-center:8080
+      TRAINING_PARTITION_PATH: /data/train.csv
+      CLIENT_SIGN_SECRET_PATH: /security/sign_secret.key
+    volumes:
+      - ./config/demo_config.json:/config/demo_config.json:ro
+      - ./config/security_config.json:/config/security_config.json:ro
+      - ./runtime/keys/trust_store.json:/security/trust_store.json:ro
+      - ./runtime/keys/clients/uav-client-5/sign_secret.key:/security/sign_secret.key:ro
+      - ../config/phase3_locked_config.json:/reference/config/phase3_locked_config.json:ro
+      - ../artifacts_phase3/training_only_preprocessor.joblib:/reference/artifacts/training_only_preprocessor.joblib:ro
+      - ../partitions/phase2/train_uav_client_5.csv:/data/train.csv:ro
+
+networks:
+  secure-federated-demo:
+    driver: bridge

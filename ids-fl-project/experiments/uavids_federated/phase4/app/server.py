@@ -45,6 +45,7 @@ class Coordinator:
         "client_training_completed",
         "client_update_acknowledged",
         "client_protocol_error",
+        "client_security_summary",
     }
 
     def __init__(self) -> None:

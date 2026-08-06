@@ -1,0 +1,8 @@
+category,count
+authentication_failed,2
+malformed_payload,1
+metadata_mismatch,5
+nonce_invalid,1
+replay,1
+signature_invalid,1
+untrusted_identity,1

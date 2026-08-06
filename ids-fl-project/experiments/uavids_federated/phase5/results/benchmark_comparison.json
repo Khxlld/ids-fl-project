@@ -1,0 +1,198 @@
+{
+  "aggregation": {
+    "maximum_independent_secure_difference": 0.0,
+    "maximum_plain_secure_difference": 0.0,
+    "tolerance": 1e-07
+  },
+  "algorithms": {
+    "aead": "AES-256-GCM",
+    "kdf": "HKDF-SHA-256",
+    "kem": "ML-KEM-768",
+    "signature": "ML-DSA-65"
+  },
+  "attack_run_id": "5b65ef3c-a9db-4a7d-ab29-21a50f7dbbdf",
+  "attack_test": {
+    "all_aggregate_archives_identical_to_plain": true,
+    "categories": {
+      "authentication_failed": 2,
+      "malformed_payload": 1,
+      "metadata_mismatch": 5,
+      "nonce_invalid": 1,
+      "replay": 1,
+      "signature_invalid": 1,
+      "untrusted_identity": 1
+    },
+    "completed_training": true,
+    "rejections": 12
+  },
+  "clients": 5,
+  "crypto_operation_timings_ms": {
+    "decapsulation_ms": {
+      "count": 5,
+      "max": 0.253297,
+      "mean": 0.144408,
+      "median": 0.137463,
+      "min": 0.074097
+    },
+    "decrypt_ms": {
+      "count": 142,
+      "max": 1.273899,
+      "mean": 0.097327,
+      "median": 0.059482,
+      "min": 0.037027
+    },
+    "encapsulation_ms": {
+      "count": 5,
+      "max": 4.947335,
+      "mean": 2.370684,
+      "median": 1.747609,
+      "min": 1.476692
+    },
+    "encrypt_ms": {
+      "count": 202,
+      "max": 0.266379,
+      "mean": 0.065469,
+      "median": 0.057951,
+      "min": 0.011484
+    },
+    "server_signature_verification_ms": {
+      "count": 5,
+      "max": 1.043709,
+      "mean": 0.479897,
+      "median": 0.297642,
+      "min": 0.268998
+    },
+    "sign_ms": {
+      "count": 5,
+      "max": 4.323781,
+      "mean": 1.293552,
+      "median": 0.532875,
+      "min": 0.386204
+    },
+    "signing_ms": {
+      "count": 5,
+      "max": 0.921952,
+      "mean": 0.494742,
+      "median": 0.350226,
+      "min": 0.236302
+    },
+    "verify_ms": {
+      "count": 5,
+      "max": 1.160429,
+      "mean": 0.628108,
+      "median": 0.468659,
+      "min": 0.372104
+    }
+  },
+  "final_validation_metrics": {
+    "accuracy": 0.9664410813222771,
+    "attack_f1": 0.9783803854399981,
+    "attack_precision": 0.9763105682116989,
+    "attack_recall": 0.9804589975033609,
+    "balanced_accuracy": 0.9493803643741041,
+    "fn": 814,
+    "fnr": 0.01954100249663914,
+    "fp": 991,
+    "fpr": 0.08169826875515251,
+    "log_loss": 0.09393461488906998,
+    "macro_f1": 0.9517156255979627,
+    "normal_f1": 0.9250508657559274,
+    "normal_precision": 0.931899941437296,
+    "normal_recall": 0.9183017312448475,
+    "pr_auc": 0.9971752534827799,
+    "roc_auc": 0.9911421211711484,
+    "rows": 53786,
+    "threshold": 0.42,
+    "tn": 11139,
+    "tp": 40842
+  },
+  "message_sizes": [
+    {
+      "direction": "server_to_client",
+      "mean_expansion_percent": 34.221,
+      "mean_overhead_bytes": 22447.8,
+      "mean_plaintext_bytes": 65596.0,
+      "mean_protected_bytes": 88043.8,
+      "messages": 15
+    },
+    {
+      "direction": "client_to_server",
+      "mean_expansion_percent": 34.242,
+      "mean_overhead_bytes": 22010.2,
+      "mean_plaintext_bytes": 64279.267,
+      "mean_protected_bytes": 86289.467,
+      "messages": 15
+    }
+  ],
+  "plain_run_id": "00647f41-ff4f-49e1-8101-1867e3683453",
+  "resource_peaks": {
+    "plain": {
+      "control-center": {
+        "peak_cpu_percent": 78.61,
+        "peak_memory_mib": 415.2
+      },
+      "uav-client-1": {
+        "peak_cpu_percent": 68.11,
+        "peak_memory_mib": 281.4
+      },
+      "uav-client-2": {
+        "peak_cpu_percent": 56.35,
+        "peak_memory_mib": 282.8
+      },
+      "uav-client-3": {
+        "peak_cpu_percent": 36.36,
+        "peak_memory_mib": 277.2
+      },
+      "uav-client-4": {
+        "peak_cpu_percent": 97.46,
+        "peak_memory_mib": 340.8
+      },
+      "uav-client-5": {
+        "peak_cpu_percent": 46.47,
+        "peak_memory_mib": 273.3
+      }
+    },
+    "secure": {
+      "control-center": {
+        "peak_cpu_percent": 63.29,
+        "peak_memory_mib": 263.6
+      },
+      "uav-client-1": {
+        "peak_cpu_percent": 69.13,
+        "peak_memory_mib": 274.2
+      },
+      "uav-client-2": {
+        "peak_cpu_percent": 61.52,
+        "peak_memory_mib": 272.6
+      },
+      "uav-client-3": {
+        "peak_cpu_percent": 36.8,
+        "peak_memory_mib": 272.5
+      },
+      "uav-client-4": {
+        "peak_cpu_percent": 101.46,
+        "peak_memory_mib": 274.2
+      },
+      "uav-client-5": {
+        "peak_cpu_percent": 47.52,
+        "peak_memory_mib": 274.1
+      }
+    }
+  },
+  "rounds": 3,
+  "runtime_seconds": {
+    "plain_compose_to_api_ready": 14.189316,
+    "plain_compose_to_terminal": 44.936032,
+    "plain_coordinator": 32.349819,
+    "secure_completed_repetitions": [
+      24.695957,
+      27.582403
+    ],
+    "secure_compose_to_api_ready": 9.650717,
+    "secure_compose_to_terminal": 36.901957,
+    "secure_coordinator": 27.582403
+  },
+  "samples_per_round": 6148,
+  "scope": "demonstration timing only; not a rigorous performance conclusion",
+  "secure_run_id": "23795a6c-4d27-4d27-96e1-1da6954d7c9c"
+}

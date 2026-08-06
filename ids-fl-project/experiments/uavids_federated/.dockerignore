@@ -7,3 +7,16 @@
 !phase4/requirements.txt
 !phase4/app/
 !phase4/app/*.py
+!phase4/tests/
+!phase4/tests/*.py
+!phase5/
+!phase5/Dockerfile
+!phase5/requirements.txt
+!phase5/app/
+!phase5/app/*.py
+!phase5/config/
+!phase5/config/*.json
+!phase5/tests/
+!phase5/tests/*.py
+!tests/
+!tests/*.py

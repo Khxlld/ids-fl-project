@@ -1,0 +1,110 @@
+[
+  {
+    "client_id": null,
+    "event_type": "security_message_rejected",
+    "payload": {
+      "category": "untrusted_identity",
+      "endpoint": "/api/v2/secure/hello"
+    },
+    "round": 0
+  },
+  {
+    "client_id": null,
+    "event_type": "security_message_rejected",
+    "payload": {
+      "category": "metadata_mismatch",
+      "endpoint": "/api/v2/secure/session"
+    },
+    "round": 0
+  },
+  {
+    "client_id": null,
+    "event_type": "security_message_rejected",
+    "payload": {
+      "category": "metadata_mismatch",
+      "endpoint": "/api/v2/secure/session"
+    },
+    "round": 0
+  },
+  {
+    "client_id": null,
+    "event_type": "security_message_rejected",
+    "payload": {
+      "category": "signature_invalid",
+      "endpoint": "/api/v2/secure/session"
+    },
+    "round": 0
+  },
+  {
+    "client_id": "uav-client-1",
+    "event_type": "security_message_rejected",
+    "payload": {
+      "category": "authentication_failed",
+      "endpoint": "/api/v2/secure/probe"
+    },
+    "round": 0
+  },
+  {
+    "client_id": "uav-client-1",
+    "event_type": "security_message_rejected",
+    "payload": {
+      "category": "metadata_mismatch",
+      "endpoint": "/api/v2/secure/probe"
+    },
+    "round": 0
+  },
+  {
+    "client_id": "uav-client-1",
+    "event_type": "security_message_rejected",
+    "payload": {
+      "category": "authentication_failed",
+      "endpoint": "/api/v2/secure/probe"
+    },
+    "round": 0
+  },
+  {
+    "client_id": "uav-client-1",
+    "event_type": "security_message_rejected",
+    "payload": {
+      "category": "metadata_mismatch",
+      "endpoint": "/api/v2/secure/probe"
+    },
+    "round": 0
+  },
+  {
+    "client_id": "uav-client-1",
+    "event_type": "security_message_rejected",
+    "payload": {
+      "category": "metadata_mismatch",
+      "endpoint": "/api/v2/secure/probe"
+    },
+    "round": 0
+  },
+  {
+    "client_id": "uav-client-1",
+    "event_type": "security_message_rejected",
+    "payload": {
+      "category": "malformed_payload",
+      "endpoint": "/api/v2/secure/probe"
+    },
+    "round": 0
+  },
+  {
+    "client_id": "uav-client-1",
+    "event_type": "security_message_rejected",
+    "payload": {
+      "category": "replay",
+      "endpoint": "/api/v2/secure/probe"
+    },
+    "round": 0
+  },
+  {
+    "client_id": "uav-client-1",
+    "event_type": "security_message_rejected",
+    "payload": {
+      "category": "nonce_invalid",
+      "endpoint": "/api/v2/secure/probe"
+    },
+    "round": 0
+  }
+]

@@ -12,6 +12,7 @@ kaggle.json
 !experiments/edgeiiot_federated/artifacts/*.csv
 !experiments/edgeiiot_federated/artifacts_clean/*.csv
 !experiments/uavids_federated/phase4/results/*.csv
+!experiments/uavids_federated/phase5/results/*.csv
 
 # Python / Jupyter
 __pycache__/
@@ -34,6 +35,7 @@ venv/
 artifacts/test_raw.csv
 artifacts/federated_cache/
 experiments/uavids_federated/phase4/runtime/
+experiments/uavids_federated/phase5/runtime/
 
 # OS/editor
 .DS_Store
