@@ -61,6 +61,15 @@ python .\execute_guide_notebooks.py
 - `phase5/tests/` and `phase5/results/` — positive/negative tests and secret-free equivalence, timing, size, resource, and rejection evidence.
 - `notebooks/07_phase5_post_quantum_security_guide.ipynb` — executed educational guide based only on saved public evidence.
 
+## GUI integration handoff
+
+- `gui_integration/backend.py` — stable binary inference and federated-telemetry HTTP adapter for the presentation frontend.
+- `gui_integration/GUI_MINIMUM_REQUIREMENTS.md` — minimum honest, presentation-ready information requirements.
+- `gui_integration/api/openapi.json` — machine-readable frontend contract.
+- `gui_integration/examples/` — six label-free replay inputs and actual adapter response/event examples.
+- `gui_integration/frontend/vanilla_integration.js` — framework-neutral connection and polling example.
+- `gui_integration/scripts/` — start and end-to-end verification commands.
+
 ## Phase 4 files
 
 - `phase4/docker-compose.yml` and `phase4/Dockerfile` — six-service CPU-only demo topology and image.

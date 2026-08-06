@@ -1,0 +1,6 @@
+{
+  "schema_version": "uavids-gui-health-v1",
+  "ok": true,
+  "api_version": "uavids-gui-api-v1",
+  "model_available": true
+}

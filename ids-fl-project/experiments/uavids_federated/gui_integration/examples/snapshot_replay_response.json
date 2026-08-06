@@ -1,0 +1,174 @@
+{
+  "schema_version": "uavids-gui-snapshot-v1",
+  "generated_utc": "2026-08-06T16:49:01.265341Z",
+  "api_version": "uavids-gui-api-v1",
+  "presentation_mode": "replay",
+  "backend": {
+    "available": true,
+    "started_utc": "2026-08-06T16:48:59.236377Z",
+    "inference_mode": "live_model",
+    "federated_upstream_available": false
+  },
+  "model": {
+    "available": true,
+    "model_id": "federated_fedavg:5652da686897",
+    "model_version": "uavids-phase3-v1",
+    "task": "binary_intrusion_detection",
+    "labels": [
+      "Normal",
+      "Attack"
+    ],
+    "positive_class": "Attack",
+    "feature_count": 15,
+    "features": [
+      "FlowDuration/s",
+      "TxPackets",
+      "RxPackets",
+      "LostPackets",
+      "TxBytes",
+      "RxBytes",
+      "TxPacketRate/s",
+      "RxPacketRate/s",
+      "TxByteRate/s",
+      "RxByteRate/s",
+      "MeanDelay/s",
+      "MeanJitter/s",
+      "Throughput/Kbps",
+      "PacketDropRate",
+      "AverageHopCount"
+    ],
+    "decision_threshold": 0.42,
+    "frozen_validation_metrics": {
+      "macro_f1": 0.9467174966764969,
+      "attack_precision": 0.975742015980037,
+      "attack_recall": 0.9762339158824659,
+      "fpr": 0.08334707337180544
+    },
+    "metrics_note": "Saved validation evidence; not live prediction accuracy."
+  },
+  "inference": {
+    "records_processed": 6,
+    "normal_count": 3,
+    "attack_count": 3,
+    "latest_prediction": {
+      "schema_version": "uavids-gui-prediction-v1",
+      "prediction_id": "1a477723-8ea0-4524-8967-00746acad550",
+      "timestamp_utc": "2026-08-06T16:49:01.263488Z",
+      "record_id": "replay-06",
+      "source": "recorded-validation-sample",
+      "label": "Attack",
+      "confidence": 1.0,
+      "attack_probability": 1.0,
+      "decision_threshold": 0.42,
+      "missing_features_imputed": 0,
+      "model_id": "federated_fedavg:5652da686897",
+      "model_version": "uavids-phase3-v1",
+      "inference_mode": "live_model",
+      "replayed": true
+    },
+    "recent_alerts": [
+      {
+        "schema_version": "uavids-gui-prediction-v1",
+        "prediction_id": "1a477723-8ea0-4524-8967-00746acad550",
+        "timestamp_utc": "2026-08-06T16:49:01.263488Z",
+        "record_id": "replay-06",
+        "source": "recorded-validation-sample",
+        "label": "Attack",
+        "confidence": 1.0,
+        "attack_probability": 1.0,
+        "decision_threshold": 0.42,
+        "missing_features_imputed": 0,
+        "model_id": "federated_fedavg:5652da686897",
+        "model_version": "uavids-phase3-v1",
+        "inference_mode": "live_model",
+        "replayed": true
+      },
+      {
+        "schema_version": "uavids-gui-prediction-v1",
+        "prediction_id": "3485978c-baa0-49c2-a4c9-524d7d0b9a39",
+        "timestamp_utc": "2026-08-06T16:49:01.258215Z",
+        "record_id": "replay-04",
+        "source": "recorded-validation-sample",
+        "label": "Attack",
+        "confidence": 1.0,
+        "attack_probability": 1.0,
+        "decision_threshold": 0.42,
+        "missing_features_imputed": 0,
+        "model_id": "federated_fedavg:5652da686897",
+        "model_version": "uavids-phase3-v1",
+        "inference_mode": "live_model",
+        "replayed": true
+      },
+      {
+        "schema_version": "uavids-gui-prediction-v1",
+        "prediction_id": "d9b6ac2d-1ba2-4a9d-aed8-a5093706b4bf",
+        "timestamp_utc": "2026-08-06T16:49:01.252062Z",
+        "record_id": "replay-02",
+        "source": "recorded-validation-sample",
+        "label": "Attack",
+        "confidence": 1.0,
+        "attack_probability": 1.0,
+        "decision_threshold": 0.42,
+        "missing_features_imputed": 0,
+        "model_id": "federated_fedavg:5652da686897",
+        "model_version": "uavids-phase3-v1",
+        "inference_mode": "live_model",
+        "replayed": true
+      }
+    ]
+  },
+  "federated": {
+    "data_mode": "replay",
+    "upstream_available": false,
+    "run_id": "23795a6c-4d27-4d27-96e1-1da6954d7c9c",
+    "state": "completed",
+    "current_round": 3,
+    "total_rounds": 3,
+    "updates_received": 5,
+    "updates_expected": 5,
+    "clients": [
+      {
+        "client_id": "uav-client-1",
+        "state": "complete"
+      },
+      {
+        "client_id": "uav-client-2",
+        "state": "complete"
+      },
+      {
+        "client_id": "uav-client-3",
+        "state": "complete"
+      },
+      {
+        "client_id": "uav-client-4",
+        "state": "complete"
+      },
+      {
+        "client_id": "uav-client-5",
+        "state": "complete"
+      }
+    ],
+    "local_data_statement": "Each client trains from its own mounted partition; raw training rows are not sent to the server.",
+    "global_model_metrics": {
+      "macro_f1": 0.9517156255979627,
+      "attack_precision": 0.9763105682116989,
+      "attack_recall": 0.9804589975033609,
+      "fpr": 0.08169826875515251,
+      "source": "recorded_phase5_demo_validation_telemetry",
+      "note": "Recorded validation telemetry, not live prediction accuracy."
+    },
+    "security": {
+      "mode": "secure",
+      "status": "recorded_verified",
+      "algorithms": {
+        "aead": "AES-256-GCM",
+        "kdf": "HKDF-SHA-256",
+        "kem": "ML-KEM-768",
+        "signature": "ML-DSA-65"
+      },
+      "authenticated_clients": 5,
+      "rejected_messages": 12,
+      "note": "ML-KEM establishes key material; ML-DSA authenticates clients; AES-GCM protects model exchanges."
+    }
+  }
+}

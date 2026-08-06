@@ -1,0 +1,489 @@
+{
+  "schema_version": "uavids-gui-federated-events-v1",
+  "data_mode": "replay",
+  "run_id": "23795a6c-4d27-4d27-96e1-1da6954d7c9c",
+  "events": [
+    {
+      "schema_version": "uavids-gui-recorded-federated-event-v1",
+      "seq": 1,
+      "recorded": true,
+      "run_id": "23795a6c-4d27-4d27-96e1-1da6954d7c9c",
+      "source": "control-center",
+      "event_type": "server_started",
+      "severity": "info",
+      "round": 0,
+      "client_id": null,
+      "payload": {
+        "contract_hash": "dd2281ef2a1ec98a9c2c6197067fe8029b76026e6f9710e1dddcfd10a2df7d01",
+        "expected_clients": [
+          "uav-client-1",
+          "uav-client-2",
+          "uav-client-3",
+          "uav-client-4",
+          "uav-client-5"
+        ],
+        "initial_model_bytes": 47880,
+        "local_epochs": 2,
+        "mode": "demo_nonresearch",
+        "rounds": 3
+      }
+    },
+    {
+      "schema_version": "uavids-gui-recorded-federated-event-v1",
+      "seq": 2,
+      "recorded": true,
+      "run_id": "23795a6c-4d27-4d27-96e1-1da6954d7c9c",
+      "source": "control-center",
+      "event_type": "client_registered",
+      "severity": "info",
+      "round": 0,
+      "client_id": "uav-client-4",
+      "payload": {
+        "profile": "NVIDIA Jetson Orin Nano 8GB-inspired",
+        "registered_utc": "2026-08-04T16:15:31.642489Z",
+        "samples": 2027
+      }
+    },
+    {
+      "schema_version": "uavids-gui-recorded-federated-event-v1",
+      "seq": 3,
+      "recorded": true,
+      "run_id": "23795a6c-4d27-4d27-96e1-1da6954d7c9c",
+      "source": "control-center",
+      "event_type": "all_clients_ready",
+      "severity": "info",
+      "round": 0,
+      "client_id": null,
+      "payload": {
+        "client_count": 5
+      }
+    },
+    {
+      "schema_version": "uavids-gui-recorded-federated-event-v1",
+      "seq": 4,
+      "recorded": true,
+      "run_id": "23795a6c-4d27-4d27-96e1-1da6954d7c9c",
+      "source": "control-center",
+      "event_type": "round_started",
+      "severity": "info",
+      "round": 1,
+      "client_id": null,
+      "payload": {
+        "expected_clients": [
+          "uav-client-1",
+          "uav-client-2",
+          "uav-client-3",
+          "uav-client-4",
+          "uav-client-5"
+        ],
+        "model_bytes": 47880,
+        "model_sha256": "0b4b620b12ca6adeae9e7eec0b847823751f5c23dfca7f4fa3bc3f053aebdf40"
+      }
+    },
+    {
+      "schema_version": "uavids-gui-recorded-federated-event-v1",
+      "seq": 5,
+      "recorded": true,
+      "run_id": "23795a6c-4d27-4d27-96e1-1da6954d7c9c",
+      "source": "control-center",
+      "event_type": "global_model_distributed",
+      "severity": "info",
+      "round": 1,
+      "client_id": "uav-client-4",
+      "payload": {
+        "model_bytes": 47880,
+        "model_sha256": "0b4b620b12ca6adeae9e7eec0b847823751f5c23dfca7f4fa3bc3f053aebdf40"
+      }
+    },
+    {
+      "schema_version": "uavids-gui-recorded-federated-event-v1",
+      "seq": 6,
+      "recorded": true,
+      "run_id": "23795a6c-4d27-4d27-96e1-1da6954d7c9c",
+      "source": "uav-client-4",
+      "event_type": "client_training_started",
+      "severity": "info",
+      "round": 1,
+      "client_id": "uav-client-4",
+      "payload": {
+        "epochs": 2,
+        "global_model_sha256": "0b4b620b12ca6adeae9e7eec0b847823751f5c23dfca7f4fa3bc3f053aebdf40",
+        "samples": 2027
+      }
+    },
+    {
+      "schema_version": "uavids-gui-recorded-federated-event-v1",
+      "seq": 7,
+      "recorded": true,
+      "run_id": "23795a6c-4d27-4d27-96e1-1da6954d7c9c",
+      "source": "uav-client-4",
+      "event_type": "client_training_completed",
+      "severity": "info",
+      "round": 1,
+      "client_id": "uav-client-4",
+      "payload": {
+        "accuracy": 0.9955599407992106,
+        "attack_recall": 0.9983570646221248,
+        "fpr": 0.029850746268656716,
+        "loss": 0.02237027475392592,
+        "macro_f1": 0.9874906143607993,
+        "training_ms": 1049.558,
+        "update_bytes": 47851,
+        "update_sha256": "44809ee83a96362bd24d483ba70e187668905bf7ddf2f9e486ec4050592a6868"
+      }
+    },
+    {
+      "schema_version": "uavids-gui-recorded-federated-event-v1",
+      "seq": 8,
+      "recorded": true,
+      "run_id": "23795a6c-4d27-4d27-96e1-1da6954d7c9c",
+      "source": "control-center",
+      "event_type": "update_rejected",
+      "severity": "error",
+      "round": 1,
+      "client_id": "uav-client-1",
+      "payload": {
+        "reason": "incompatible contract_hash"
+      }
+    },
+    {
+      "schema_version": "uavids-gui-recorded-federated-event-v1",
+      "seq": 9,
+      "recorded": true,
+      "run_id": "23795a6c-4d27-4d27-96e1-1da6954d7c9c",
+      "source": "control-center",
+      "event_type": "client_update_received",
+      "severity": "info",
+      "round": 1,
+      "client_id": "uav-client-4",
+      "payload": {
+        "http_content_bytes": 64269,
+        "receive_ms": 0.084,
+        "samples": 2027,
+        "update_bytes": 47851,
+        "update_sha256": "44809ee83a96362bd24d483ba70e187668905bf7ddf2f9e486ec4050592a6868"
+      }
+    },
+    {
+      "schema_version": "uavids-gui-recorded-federated-event-v1",
+      "seq": 10,
+      "recorded": true,
+      "run_id": "23795a6c-4d27-4d27-96e1-1da6954d7c9c",
+      "source": "control-center",
+      "event_type": "server_waiting_for_clients",
+      "severity": "info",
+      "round": 1,
+      "client_id": null,
+      "payload": {
+        "missing_clients": [
+          "uav-client-1",
+          "uav-client-2",
+          "uav-client-3",
+          "uav-client-5"
+        ]
+      }
+    },
+    {
+      "schema_version": "uavids-gui-recorded-federated-event-v1",
+      "seq": 11,
+      "recorded": true,
+      "run_id": "23795a6c-4d27-4d27-96e1-1da6954d7c9c",
+      "source": "control-center",
+      "event_type": "aggregation_started",
+      "severity": "info",
+      "round": 1,
+      "client_id": null,
+      "payload": {
+        "sample_counts": {
+          "uav-client-1": 1230,
+          "uav-client-2": 1046,
+          "uav-client-3": 591,
+          "uav-client-4": 2027,
+          "uav-client-5": 1254
+        },
+        "total_samples": 6148
+      }
+    },
+    {
+      "schema_version": "uavids-gui-recorded-federated-event-v1",
+      "seq": 12,
+      "recorded": true,
+      "run_id": "23795a6c-4d27-4d27-96e1-1da6954d7c9c",
+      "source": "control-center",
+      "event_type": "aggregation_completed",
+      "severity": "info",
+      "round": 1,
+      "client_id": null,
+      "payload": {
+        "aggregation_ms": 2.052,
+        "model_sha256": "14b78eaddf7eed1d7f36fb6e82e186b11d41a3a1755d3863127050208cd0458b",
+        "total_samples": 6148
+      }
+    },
+    {
+      "schema_version": "uavids-gui-recorded-federated-event-v1",
+      "seq": 13,
+      "recorded": true,
+      "run_id": "23795a6c-4d27-4d27-96e1-1da6954d7c9c",
+      "source": "control-center",
+      "event_type": "round_metrics",
+      "severity": "info",
+      "round": 1,
+      "client_id": null,
+      "payload": {
+        "accuracy": 0.9630387089577214,
+        "attack_f1": 0.9761327346507551,
+        "attack_precision": 0.9763437244824439,
+        "attack_recall": 0.9759218359900135,
+        "balanced_accuracy": 0.9473591043099284,
+        "fn": 1003,
+        "fnr": 0.024078164009986556,
+        "fp": 985,
+        "fpr": 0.08120362737015664,
+        "log_loss": 0.09698100018011445,
+        "macro_f1": 0.9471239503223295,
+        "normal_f1": 0.918115165993904,
+        "normal_precision": 0.9174349687191308,
+        "normal_recall": 0.9187963726298434,
+        "pr_auc": 0.9969947869317964,
+        "roc_auc": 0.9905705641353174,
+        "rows": 53786,
+        "threshold": 0.42,
+        "tn": 11145,
+        "tp": 40653
+      }
+    },
+    {
+      "schema_version": "uavids-gui-recorded-federated-event-v1",
+      "seq": 14,
+      "recorded": true,
+      "run_id": "23795a6c-4d27-4d27-96e1-1da6954d7c9c",
+      "source": "control-center",
+      "event_type": "round_completed",
+      "severity": "info",
+      "round": 1,
+      "client_id": null,
+      "payload": {
+        "round_ms": 3445.828
+      }
+    },
+    {
+      "schema_version": "uavids-gui-recorded-federated-event-v1",
+      "seq": 15,
+      "recorded": true,
+      "run_id": "23795a6c-4d27-4d27-96e1-1da6954d7c9c",
+      "source": "control-center",
+      "event_type": "demo_completed",
+      "severity": "info",
+      "round": 3,
+      "client_id": null,
+      "payload": {
+        "final_metrics": {
+          "accuracy": 0.9664410813222771,
+          "attack_f1": 0.9783803854399981,
+          "attack_precision": 0.9763105682116989,
+          "attack_recall": 0.9804589975033609,
+          "balanced_accuracy": 0.9493803643741041,
+          "fn": 814,
+          "fnr": 0.01954100249663914,
+          "fp": 991,
+          "fpr": 0.08169826875515251,
+          "log_loss": 0.09393461488906998,
+          "macro_f1": 0.9517156255979627,
+          "normal_f1": 0.9250508657559274,
+          "normal_precision": 0.931899941437296,
+          "normal_recall": 0.9183017312448475,
+          "pr_auc": 0.9971752534827799,
+          "roc_auc": 0.9911421211711484,
+          "rows": 53786,
+          "threshold": 0.42,
+          "tn": 11139,
+          "tp": 40842
+        },
+        "rounds": 3,
+        "total_runtime_seconds": 20.559772
+      }
+    },
+    {
+      "schema_version": "uavids-gui-recorded-federated-event-v1",
+      "seq": 16,
+      "recorded": true,
+      "run_id": "23795a6c-4d27-4d27-96e1-1da6954d7c9c",
+      "source": "control-center",
+      "event_type": "security_message_rejected",
+      "severity": "info",
+      "round": 0,
+      "client_id": null,
+      "payload": {
+        "category": "untrusted_identity",
+        "endpoint": "/api/v2/secure/hello"
+      }
+    },
+    {
+      "schema_version": "uavids-gui-recorded-federated-event-v1",
+      "seq": 17,
+      "recorded": true,
+      "run_id": "23795a6c-4d27-4d27-96e1-1da6954d7c9c",
+      "source": "control-center",
+      "event_type": "security_message_rejected",
+      "severity": "info",
+      "round": 0,
+      "client_id": null,
+      "payload": {
+        "category": "metadata_mismatch",
+        "endpoint": "/api/v2/secure/session"
+      }
+    },
+    {
+      "schema_version": "uavids-gui-recorded-federated-event-v1",
+      "seq": 18,
+      "recorded": true,
+      "run_id": "23795a6c-4d27-4d27-96e1-1da6954d7c9c",
+      "source": "control-center",
+      "event_type": "security_message_rejected",
+      "severity": "info",
+      "round": 0,
+      "client_id": null,
+      "payload": {
+        "category": "metadata_mismatch",
+        "endpoint": "/api/v2/secure/session"
+      }
+    },
+    {
+      "schema_version": "uavids-gui-recorded-federated-event-v1",
+      "seq": 19,
+      "recorded": true,
+      "run_id": "23795a6c-4d27-4d27-96e1-1da6954d7c9c",
+      "source": "control-center",
+      "event_type": "security_message_rejected",
+      "severity": "info",
+      "round": 0,
+      "client_id": null,
+      "payload": {
+        "category": "signature_invalid",
+        "endpoint": "/api/v2/secure/session"
+      }
+    },
+    {
+      "schema_version": "uavids-gui-recorded-federated-event-v1",
+      "seq": 20,
+      "recorded": true,
+      "run_id": "23795a6c-4d27-4d27-96e1-1da6954d7c9c",
+      "source": "control-center",
+      "event_type": "security_message_rejected",
+      "severity": "info",
+      "round": 0,
+      "client_id": "uav-client-1",
+      "payload": {
+        "category": "authentication_failed",
+        "endpoint": "/api/v2/secure/probe"
+      }
+    },
+    {
+      "schema_version": "uavids-gui-recorded-federated-event-v1",
+      "seq": 21,
+      "recorded": true,
+      "run_id": "23795a6c-4d27-4d27-96e1-1da6954d7c9c",
+      "source": "control-center",
+      "event_type": "security_message_rejected",
+      "severity": "info",
+      "round": 0,
+      "client_id": "uav-client-1",
+      "payload": {
+        "category": "metadata_mismatch",
+        "endpoint": "/api/v2/secure/probe"
+      }
+    },
+    {
+      "schema_version": "uavids-gui-recorded-federated-event-v1",
+      "seq": 22,
+      "recorded": true,
+      "run_id": "23795a6c-4d27-4d27-96e1-1da6954d7c9c",
+      "source": "control-center",
+      "event_type": "security_message_rejected",
+      "severity": "info",
+      "round": 0,
+      "client_id": "uav-client-1",
+      "payload": {
+        "category": "authentication_failed",
+        "endpoint": "/api/v2/secure/probe"
+      }
+    },
+    {
+      "schema_version": "uavids-gui-recorded-federated-event-v1",
+      "seq": 23,
+      "recorded": true,
+      "run_id": "23795a6c-4d27-4d27-96e1-1da6954d7c9c",
+      "source": "control-center",
+      "event_type": "security_message_rejected",
+      "severity": "info",
+      "round": 0,
+      "client_id": "uav-client-1",
+      "payload": {
+        "category": "metadata_mismatch",
+        "endpoint": "/api/v2/secure/probe"
+      }
+    },
+    {
+      "schema_version": "uavids-gui-recorded-federated-event-v1",
+      "seq": 24,
+      "recorded": true,
+      "run_id": "23795a6c-4d27-4d27-96e1-1da6954d7c9c",
+      "source": "control-center",
+      "event_type": "security_message_rejected",
+      "severity": "info",
+      "round": 0,
+      "client_id": "uav-client-1",
+      "payload": {
+        "category": "metadata_mismatch",
+        "endpoint": "/api/v2/secure/probe"
+      }
+    },
+    {
+      "schema_version": "uavids-gui-recorded-federated-event-v1",
+      "seq": 25,
+      "recorded": true,
+      "run_id": "23795a6c-4d27-4d27-96e1-1da6954d7c9c",
+      "source": "control-center",
+      "event_type": "security_message_rejected",
+      "severity": "info",
+      "round": 0,
+      "client_id": "uav-client-1",
+      "payload": {
+        "category": "malformed_payload",
+        "endpoint": "/api/v2/secure/probe"
+      }
+    },
+    {
+      "schema_version": "uavids-gui-recorded-federated-event-v1",
+      "seq": 26,
+      "recorded": true,
+      "run_id": "23795a6c-4d27-4d27-96e1-1da6954d7c9c",
+      "source": "control-center",
+      "event_type": "security_message_rejected",
+      "severity": "info",
+      "round": 0,
+      "client_id": "uav-client-1",
+      "payload": {
+        "category": "replay",
+        "endpoint": "/api/v2/secure/probe"
+      }
+    },
+    {
+      "schema_version": "uavids-gui-recorded-federated-event-v1",
+      "seq": 27,
+      "recorded": true,
+      "run_id": "23795a6c-4d27-4d27-96e1-1da6954d7c9c",
+      "source": "control-center",
+      "event_type": "security_message_rejected",
+      "severity": "info",
+      "round": 0,
+      "client_id": "uav-client-1",
+      "payload": {
+        "category": "nonce_invalid",
+        "endpoint": "/api/v2/secure/probe"
+      }
+    }
+  ],
+  "last_seq": 27
+}

@@ -1,0 +1,16 @@
+{
+  "schema_version": "uavids-gui-prediction-v1",
+  "prediction_id": "84b717a5-032f-4b6f-926a-c3bb0f8563ea",
+  "timestamp_utc": "2026-08-06T16:49:01.248329Z",
+  "record_id": "replay-01",
+  "source": "recorded-validation-sample",
+  "label": "Normal",
+  "confidence": 0.9993654389400035,
+  "attack_probability": 0.0006345610599964857,
+  "decision_threshold": 0.42,
+  "missing_features_imputed": 0,
+  "model_id": "federated_fedavg:5652da686897",
+  "model_version": "uavids-phase3-v1",
+  "inference_mode": "live_model",
+  "replayed": true
+}

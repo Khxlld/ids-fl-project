@@ -1,0 +1,233 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "UAVIDS GUI Integration API",
+    "version": "1.0.0",
+    "description": "Stable binary IDS inference and federated-demo telemetry boundary."
+  },
+  "servers": [{"url": "http://127.0.0.1:8090/api/gui/v1"}],
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "getHealth",
+        "responses": {
+          "200": {
+            "description": "Backend and model are available",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Health"}}}
+          }
+        }
+      }
+    },
+    "/snapshot": {
+      "get": {
+        "operationId": "getSnapshot",
+        "responses": {
+          "200": {
+            "description": "Complete presentation snapshot",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Snapshot"}}}
+          }
+        }
+      }
+    },
+    "/predictions": {
+      "post": {
+        "operationId": "createPrediction",
+        "requestBody": {
+          "required": true,
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/PredictionRequest"}}}
+        },
+        "responses": {
+          "200": {
+            "description": "Binary prediction",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Prediction"}}}
+          },
+          "400": {"$ref": "#/components/responses/BadRequest"}
+        }
+      }
+    },
+    "/replay/next": {
+      "post": {
+        "operationId": "replayNext",
+        "requestBody": {
+          "required": false,
+          "content": {"application/json": {"schema": {"type": "object", "maxProperties": 0}}}
+        },
+        "responses": {
+          "200": {
+            "description": "Next replay prediction",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ReplayResponse"}}}
+          }
+        }
+      }
+    },
+    "/events": {
+      "get": {
+        "operationId": "getInferenceEvents",
+        "parameters": [{"$ref": "#/components/parameters/AfterSequence"}],
+        "responses": {
+          "200": {
+            "description": "Inference events after cursor",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/EventPage"}}}
+          }
+        }
+      }
+    },
+    "/federated/events": {
+      "get": {
+        "operationId": "getFederatedEvents",
+        "parameters": [{"$ref": "#/components/parameters/AfterSequence"}],
+        "responses": {
+          "200": {
+            "description": "Live or recorded federated/security events after cursor",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/FederatedEventPage"}}}
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "AfterSequence": {
+        "name": "after_seq",
+        "in": "query",
+        "required": false,
+        "schema": {"type": "integer", "minimum": 0, "default": 0}
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Invalid request",
+        "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+      }
+    },
+    "schemas": {
+      "FeatureVector": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "FlowDuration/s", "TxPackets", "RxPackets", "LostPackets", "TxBytes", "RxBytes",
+          "TxPacketRate/s", "RxPacketRate/s", "TxByteRate/s", "RxByteRate/s", "MeanDelay/s",
+          "MeanJitter/s", "Throughput/Kbps", "PacketDropRate", "AverageHopCount"
+        ],
+        "properties": {
+          "FlowDuration/s": {"type": ["number", "null"]},
+          "TxPackets": {"type": ["number", "null"]},
+          "RxPackets": {"type": ["number", "null"]},
+          "LostPackets": {"type": ["number", "null"]},
+          "TxBytes": {"type": ["number", "null"]},
+          "RxBytes": {"type": ["number", "null"]},
+          "TxPacketRate/s": {"type": ["number", "null"]},
+          "RxPacketRate/s": {"type": ["number", "null"]},
+          "TxByteRate/s": {"type": ["number", "null"]},
+          "RxByteRate/s": {"type": ["number", "null"]},
+          "MeanDelay/s": {"type": ["number", "null"]},
+          "MeanJitter/s": {"type": ["number", "null"]},
+          "Throughput/Kbps": {"type": ["number", "null"]},
+          "PacketDropRate": {"type": ["number", "null"]},
+          "AverageHopCount": {"type": ["number", "null"]}
+        }
+      },
+      "PredictionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["features"],
+        "properties": {
+          "record_id": {"type": "string", "minLength": 1, "maxLength": 128},
+          "source": {"type": ["string", "null"], "maxLength": 128},
+          "features": {"$ref": "#/components/schemas/FeatureVector"}
+        }
+      },
+      "Prediction": {
+        "type": "object",
+        "required": [
+          "schema_version", "prediction_id", "timestamp_utc", "record_id", "source", "label",
+          "confidence", "attack_probability", "decision_threshold", "missing_features_imputed",
+          "model_id", "model_version", "inference_mode", "replayed"
+        ],
+        "properties": {
+          "schema_version": {"const": "uavids-gui-prediction-v1"},
+          "prediction_id": {"type": "string"},
+          "timestamp_utc": {"type": "string", "format": "date-time"},
+          "record_id": {"type": "string"},
+          "source": {"type": ["string", "null"]},
+          "label": {"enum": ["Normal", "Attack"]},
+          "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+          "attack_probability": {"type": "number", "minimum": 0, "maximum": 1},
+          "decision_threshold": {"type": "number", "minimum": 0, "maximum": 1},
+          "missing_features_imputed": {"type": "integer", "minimum": 0},
+          "model_id": {"type": "string"},
+          "model_version": {"type": "string"},
+          "inference_mode": {"const": "live_model"},
+          "replayed": {"type": "boolean"}
+        }
+      },
+      "ReplayResponse": {
+        "type": "object",
+        "required": ["schema_version", "position", "total_records", "wrapped", "prediction"],
+        "properties": {
+          "schema_version": {"const": "uavids-gui-replay-v1"},
+          "position": {"type": "integer", "minimum": 1},
+          "total_records": {"type": "integer", "minimum": 1},
+          "wrapped": {"type": "boolean"},
+          "prediction": {"$ref": "#/components/schemas/Prediction"}
+        }
+      },
+      "Health": {
+        "type": "object",
+        "required": ["schema_version", "ok", "api_version", "model_available"],
+        "properties": {
+          "schema_version": {"const": "uavids-gui-health-v1"},
+          "ok": {"type": "boolean"},
+          "api_version": {"const": "uavids-gui-api-v1"},
+          "model_available": {"type": "boolean"}
+        }
+      },
+      "Snapshot": {
+        "type": "object",
+        "required": ["schema_version", "generated_utc", "api_version", "presentation_mode", "backend", "model", "inference", "federated"],
+        "properties": {
+          "schema_version": {"const": "uavids-gui-snapshot-v1"},
+          "generated_utc": {"type": "string", "format": "date-time"},
+          "api_version": {"const": "uavids-gui-api-v1"},
+          "presentation_mode": {"enum": ["live", "replay"]},
+          "backend": {"type": "object"},
+          "model": {"type": "object"},
+          "inference": {"type": "object"},
+          "federated": {"type": "object"}
+        }
+      },
+      "EventPage": {
+        "type": "object",
+        "required": ["schema_version", "events", "last_seq"],
+        "properties": {
+          "schema_version": {"const": "uavids-gui-events-v1"},
+          "events": {"type": "array", "items": {"type": "object"}},
+          "last_seq": {"type": "integer", "minimum": 0}
+        }
+      },
+      "FederatedEventPage": {
+        "type": "object",
+        "required": ["schema_version", "data_mode", "run_id", "events", "last_seq"],
+        "properties": {
+          "schema_version": {"const": "uavids-gui-federated-events-v1"},
+          "data_mode": {"enum": ["live", "replay"]},
+          "run_id": {"type": ["string", "null"]},
+          "events": {"type": "array", "items": {"type": "object"}},
+          "last_seq": {"type": "integer", "minimum": 0}
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": ["schema_version", "error"],
+        "properties": {
+          "schema_version": {"const": "uavids-gui-error-v1"},
+          "error": {
+            "type": "object",
+            "required": ["code", "message"],
+            "properties": {"code": {"type": "string"}, "message": {"type": "string"}}
+          }
+        }
+      }
+    }
+  }
+}

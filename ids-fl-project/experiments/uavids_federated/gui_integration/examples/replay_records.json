@@ -1,0 +1,128 @@
+[
+  {
+    "record_id": "replay-01",
+    "source": "recorded-validation-sample",
+    "features": {
+      "FlowDuration/s": 176.62,
+      "TxPackets": 7.0,
+      "RxPackets": 5.0,
+      "LostPackets": 1.0,
+      "TxBytes": 318.0,
+      "RxBytes": 222.0,
+      "TxPacketRate/s": 0.0396330999999999,
+      "RxPacketRate/s": 0.0283092999999999,
+      "TxByteRate/s": 1.80047,
+      "RxByteRate/s": 1.25693,
+      "MeanDelay/s": 1.63115,
+      "MeanJitter/s": 0.574721,
+      "Throughput/Kbps": 0.0100555,
+      "PacketDropRate": 0.142857,
+      "AverageHopCount": 0.0
+    }
+  },
+  {
+    "record_id": "replay-02",
+    "source": "recorded-validation-sample",
+    "features": {
+      "FlowDuration/s": 3492.91,
+      "TxPackets": 4297.0,
+      "RxPackets": 4293.0,
+      "LostPackets": 4.0,
+      "TxBytes": 326572.0,
+      "RxBytes": 326268.0,
+      "TxPacketRate/s": 1.23021,
+      "RxPacketRate/s": 1.22906,
+      "TxByteRate/s": 93.4958,
+      "RxByteRate/s": 93.4087,
+      "MeanDelay/s": 0.0137674,
+      "MeanJitter/s": 0.0088453799999999,
+      "Throughput/Kbps": 0.7472699999999999,
+      "PacketDropRate": 0.0009308819999999,
+      "AverageHopCount": 0.0384347
+    }
+  },
+  {
+    "record_id": "replay-03",
+    "source": "recorded-validation-sample",
+    "features": {
+      "FlowDuration/s": 85.5124,
+      "TxPackets": 3.0,
+      "RxPackets": 3.0,
+      "LostPackets": 0.0,
+      "TxBytes": 126.0,
+      "RxBytes": 126.0,
+      "TxPacketRate/s": 0.0350825999999999,
+      "RxPacketRate/s": 0.0350825999999999,
+      "TxByteRate/s": 1.47347,
+      "RxByteRate/s": 1.47347,
+      "MeanDelay/s": 1.35021,
+      "MeanJitter/s": 0.659054,
+      "Throughput/Kbps": 0.0117877999999999,
+      "PacketDropRate": 0.0,
+      "AverageHopCount": 0.0
+    }
+  },
+  {
+    "record_id": "replay-04",
+    "source": "recorded-validation-sample",
+    "features": {
+      "FlowDuration/s": 3488.4,
+      "TxPackets": 5772.0,
+      "RxPackets": 5763.0,
+      "LostPackets": 9.0,
+      "TxBytes": 438672.0,
+      "RxBytes": 437988.0,
+      "TxPacketRate/s": 1.65462,
+      "RxPacketRate/s": 1.65204,
+      "TxByteRate/s": 125.751,
+      "RxByteRate/s": 125.555,
+      "MeanDelay/s": 0.00992866,
+      "MeanJitter/s": 0.0065548899999999,
+      "Throughput/Kbps": 1.00444,
+      "PacketDropRate": 0.00155925,
+      "AverageHopCount": 0.0321012999999999
+    }
+  },
+  {
+    "record_id": "replay-05",
+    "source": "recorded-validation-sample",
+    "features": {
+      "FlowDuration/s": 2.07986,
+      "TxPackets": 1.0,
+      "RxPackets": 1.0,
+      "LostPackets": 0.0,
+      "TxBytes": 30.0,
+      "RxBytes": 30.0,
+      "TxPacketRate/s": 0.4808029999999999,
+      "RxPacketRate/s": 0.4808029999999999,
+      "TxByteRate/s": 14.4241,
+      "RxByteRate/s": 14.4241,
+      "MeanDelay/s": 2.07986,
+      "MeanJitter/s": 0.0,
+      "Throughput/Kbps": 0.115393,
+      "PacketDropRate": 0.0,
+      "AverageHopCount": 0.0
+    }
+  },
+  {
+    "record_id": "replay-06",
+    "source": "recorded-validation-sample",
+    "features": {
+      "FlowDuration/s": 3492.91,
+      "TxPackets": 4258.0,
+      "RxPackets": 4256.0,
+      "LostPackets": 2.0,
+      "TxBytes": 323608.0,
+      "RxBytes": 323456.0,
+      "TxPacketRate/s": 1.21904,
+      "RxPacketRate/s": 1.21847,
+      "TxByteRate/s": 92.6472,
+      "RxByteRate/s": 92.6037,
+      "MeanDelay/s": 0.0131977,
+      "MeanJitter/s": 0.0101486,
+      "Throughput/Kbps": 0.7408299999999999,
+      "PacketDropRate": 0.0004697039999999,
+      "AverageHopCount": 0.0357142999999999
+    }
+  }
+]

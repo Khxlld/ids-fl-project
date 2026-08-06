@@ -1,0 +1,16 @@
+{
+  "schema_version": "uavids-gui-prediction-v1",
+  "prediction_id": "d9b6ac2d-1ba2-4a9d-aed8-a5093706b4bf",
+  "timestamp_utc": "2026-08-06T16:49:01.252062Z",
+  "record_id": "replay-02",
+  "source": "recorded-validation-sample",
+  "label": "Attack",
+  "confidence": 1.0,
+  "attack_probability": 1.0,
+  "decision_threshold": 0.42,
+  "missing_features_imputed": 0,
+  "model_id": "federated_fedavg:5652da686897",
+  "model_version": "uavids-phase3-v1",
+  "inference_mode": "live_model",
+  "replayed": true
+}
