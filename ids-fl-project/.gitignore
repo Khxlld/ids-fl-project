@@ -21,6 +21,7 @@ __pycache__/
 .ipynb_checkpoints/
 .venv/
 venv/
+.venv-gui/
 *.egg-info/
 
 # Generated models and preprocessing objects

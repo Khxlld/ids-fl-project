@@ -1,0 +1,74 @@
+/* UAVIDS operations console.
+   Committed single dark theme: this is a presentation surface shown on a projector,
+   so contrast is fixed rather than following the viewer's OS preference. */
+
+:root {
+  color-scheme: dark;
+
+  /* Surfaces, layered darkest -> lightest */
+  --bg: #080a0d;
+  --panel: #0e1217;
+  --panel-raised: #141920;
+  --rule: #1c232c;
+  --rule-strong: #2a3441;
+
+  /* Ink */
+  --ink: #e9eef4;
+  --ink-dim: #93a1b1;
+  --ink-mute: #5d6b7a;
+
+  /* Reserved status palette - never reused as a series color */
+  --ok: #0ca30c;
+  --ok-bright: #35c435;
+  --warn: #fab219;
+  --serious: #ec835a;
+  --crit: #d03b3b;
+  --crit-bright: #f05a5a;
+
+  /* Series / chrome accents */
+  --accent: #3987e5;
+  --accent-dim: #1c4f8f;
+  --violet: #9085e9;
+
+  --mono: ui-monospace, 'SF Mono', 'Cascadia Mono', 'Roboto Mono', Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+}
+
+body {
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Scrollbars kept inside the console idiom rather than left as OS default. */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--rule-strong);
+  border-radius: 0;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-mute);
+}
