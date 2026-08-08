@@ -32,6 +32,12 @@ venv/
 *.h5
 *.model
 
+# Small, frozen deployment artifacts required by the UAVIDS GUI adapter and
+# Docker demo. The adapter hash-checks both before loading them. Other model
+# checkpoints and preprocessing objects remain excluded by the rules above.
+!experiments/uavids_federated/artifacts_phase3/federated_global_model.pt
+!experiments/uavids_federated/artifacts_phase3/training_only_preprocessor.joblib
+
 # Generated experiment data/cache
 artifacts/test_raw.csv
 artifacts/federated_cache/

@@ -4,6 +4,8 @@ This folder is the stable boundary for the presentation GUI. The frontend does n
 
 The primary path performs genuine binary inference with the frozen Phase 3 FedAvg model and training-only preprocessor. The secondary path normalizes the existing Phase 4/5 status and event APIs. If Docker is unavailable, federated telemetry switches explicitly to verified recorded evidence while inference continues to use the real model.
 
+Use the `phase4-docker-demo` branch. The two required deployment artifacts are versioned under `artifacts_phase3/`; the adapter verifies their locked SHA-256 hashes before loading them.
+
 ## Quick start: dependable replay presentation
 
 Run from `experiments/uavids_federated`:

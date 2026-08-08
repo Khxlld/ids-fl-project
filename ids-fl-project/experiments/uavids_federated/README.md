@@ -31,7 +31,7 @@ The raw dataset remains in the sibling `../UAVIDS-2025/` directory.
 - `generate_phase3_report.py` — rebuilds the combined report from saved Phase 3 outputs.
 - `requirements-phase3.txt` — exact packages used by the deterministic reference run.
 - `config/phase3_locked_config.json` — frozen feature, preprocessing, model, optimization, threshold, and artifact policy.
-- `artifacts_phase3/` — fitted training-only preprocessor, feature metadata, and model checkpoints.
+- `artifacts_phase3/` — feature metadata plus the hash-locked FedAvg checkpoint and fitted preprocessor required for deployment; other research checkpoints remain local.
 - `results_phase3/PHASE3_COMPARISON_REPORT.md` — concise validation and locked-test conclusions.
 - `results_phase3/*.csv`, `*.json`, and `plots/` — histories, metrics, predictions, hashes, and figures.
 
