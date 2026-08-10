@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en" data-app-ready="false">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Presentation console for the UAVIDS federated intrusion-detection prototype.">
+  <title>UAVIDS Federated Defense Console</title>
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#mainContent">Skip to presentation content</a>
+
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-lockup" aria-label="UAVIDS Federated Defense Console">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 48 48" role="img">
+            <path d="M24 4 39 10v11c0 10.1-5.9 18.2-15 23-9.1-4.8-15-12.9-15-23V10L24 4Z" fill="none" stroke="currentColor" stroke-width="2.4"/>
+            <circle cx="24" cy="23" r="4.2" fill="currentColor"/>
+            <circle cx="14" cy="17" r="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/>
+            <circle cx="34" cy="17" r="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/>
+            <path d="m17 18.5 4.2 2.7m9.8-2.7-4.2 2.7M24 27.5v7" fill="none" stroke="currentColor" stroke-width="1.8"/>
+          </svg>
+        </div>
+        <div>
+          <p class="eyebrow">UAVIDS / FEDERATED DEFENSE</p>
+          <h1>Intrusion Detection Control Room</h1>
+        </div>
+      </div>
+
+      <div class="mode-cluster" aria-label="Data source controls">
+        <span class="connection-dot" id="connectionDot" aria-hidden="true"></span>
+        <div>
+          <p class="mode-title" id="modeTitle">Recorded Demo</p>
+          <p class="mode-detail" id="modeDetail">Loading verified evidence…</p>
+        </div>
+        <div class="mode-switch" role="group" aria-label="Choose live or recorded data">
+          <button type="button" class="mode-button" id="liveModeButton">Live adapter</button>
+          <button type="button" class="mode-button active" id="replayModeButton">Recorded demo</button>
+        </div>
+      </div>
+
+      <div class="header-meta">
+        <div class="meta-pair">
+          <span>MODEL</span>
+          <strong id="headerModel">Unavailable</strong>
+        </div>
+        <div class="meta-pair align-right">
+          <span>SESSION CLOCK</span>
+          <strong id="sessionClock">00:00:00</strong>
+        </div>
+      </div>
+    </header>
+
+    <div class="command-deck">
+      <nav class="view-nav" aria-label="Presentation views">
+        <button type="button" class="view-button active" data-view="monitor">
+          <span class="nav-index">01</span><span>IDS Monitor</span>
+        </button>
+        <button type="button" class="view-button" data-view="federation">
+          <span class="nav-index">02</span><span>Federation</span>
+        </button>
+        <button type="button" class="view-button" data-view="security">
+          <span class="nav-index">03</span><span>Security</span>
+        </button>
+        <button type="button" class="view-button" data-view="evidence">
+          <span class="nav-index">04</span><span>Evidence</span>
+        </button>
+      </nav>
+
+      <div class="replay-controls" id="replayControls" aria-label="Recorded demonstration controls">
+        <button type="button" class="icon-button" id="replayPrevious" aria-label="Previous replay stage" title="Previous stage">‹</button>
+        <button type="button" class="primary-control" id="replayPlay" aria-label="Play recorded demonstration">
+          <span id="replayPlayIcon">▶</span>
+          <span id="replayPlayLabel">Play</span>
+        </button>
+        <button type="button" class="icon-button" id="replayNext" aria-label="Next replay stage" title="Next stage">›</button>
+        <button type="button" class="text-button" id="replayRestart">Restart</button>
+        <label class="speed-control">Speed
+          <select id="replaySpeed" aria-label="Replay speed">
+            <option value="0.5">0.5×</option>
+            <option value="1" selected>1×</option>
+            <option value="2">2×</option>
+          </select>
+        </label>
+        <div class="stage-meter" aria-label="Replay stage progress">
+          <span id="stageCounter">1 / 10</span>
+          <span class="stage-track"><span id="stageFill"></span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="status-banner hidden" id="statusBanner" role="status" aria-live="polite">
+      <span id="statusBannerText"></span>
+      <button type="button" id="statusBannerAction">Use recorded demo</button>
+    </div>
+
+    <main id="mainContent">
+      <section class="view active" id="view-monitor" aria-labelledby="monitorTitle">
+        <div class="view-heading">
+          <div>
+            <p class="eyebrow">DEPLOYED IDS / PRIMARY VIEW</p>
+            <h2 id="monitorTitle">See the global model decide</h2>
+          </div>
+          <p class="view-summary">Binary inference only: <strong>Normal</strong> or <strong>Attack</strong>. Saved metrics never masquerade as live accuracy.</p>
+        </div>
+
+        <div class="monitor-grid">
+          <article class="panel verdict-panel state-empty" id="verdictPanel">
+            <div class="panel-topline">
+              <span class="panel-label">LATEST VERDICT</span>
+              <span class="source-chip" id="predictionSourceChip">No sample yet</span>
+            </div>
+            <div class="verdict-core">
+              <div class="probability-orbit" id="probabilityOrbit" style="--probability:0">
+                <div class="orbit-center">
+                  <span id="confidenceValue">—</span>
+                  <small>confidence</small>
+                </div>
+              </div>
+              <div class="verdict-copy">
+                <p class="verdict-kicker" id="verdictKicker">Awaiting inference</p>
+                <h3 id="verdictLabel">No verdict</h3>
+                <p id="verdictExplanation">Use the verified sample control to exercise the deployed binary model.</p>
+              </div>
+            </div>
+            <div class="verdict-details">
+              <div><span>Record</span><strong id="latestRecord">Unavailable</strong></div>
+              <div><span>Source</span><strong id="latestSource">Unavailable</strong></div>
+              <div><span>Attack probability</span><strong id="attackProbability">Unavailable</strong></div>
+              <div><span>Inference latency</span><strong title="The GUI API does not currently expose per-record inference latency.">Not supplied</strong></div>
+            </div>
+            <button type="button" class="analyze-button" id="analyzeNextButton">
+              <span>Analyze next verified record</span>
+              <span aria-hidden="true">→</span>
+            </button>
+          </article>
+
+          <article class="panel activity-panel">
+            <div class="panel-topline">
+              <div>
+                <span class="panel-label">DETECTION ACTIVITY</span>
+                <p class="panel-subtitle">Attack probability against the frozen 0.42 threshold</p>
+              </div>
+              <span class="source-chip" id="inferenceModeChip">Unavailable</span>
+            </div>
+            <div class="chart-shell">
+              <svg id="probabilityChart" viewBox="0 0 640 230" role="img" aria-label="Attack probability history">
+                <line class="chart-grid" x1="48" y1="24" x2="620" y2="24"></line>
+                <line class="chart-grid" x1="48" y1="105" x2="620" y2="105"></line>
+                <line class="chart-grid" x1="48" y1="206" x2="620" y2="206"></line>
+                <text class="chart-axis" x="8" y="29">100%</text>
+                <text class="chart-axis" x="16" y="110">42%</text>
+                <text class="chart-axis" x="25" y="211">0%</text>
+                <line class="threshold-line" x1="48" y1="122" x2="620" y2="122"></line>
+                <text class="threshold-label" x="504" y="114">Attack threshold</text>
+                <g id="probabilitySeries"></g>
+              </svg>
+              <p class="empty-chart" id="emptyChart">No inference history in this session.</p>
+            </div>
+            <div class="counter-row">
+              <div class="counter-card"><span>Analyzed</span><strong id="recordsProcessed">0</strong></div>
+              <div class="counter-card normal"><span>Normal</span><strong id="normalCount">0</strong></div>
+              <div class="counter-card attack"><span>Attack</span><strong id="attackCount">0</strong></div>
+              <div class="counter-card"><span>Threshold</span><strong id="thresholdValue">0.42</strong></div>
+            </div>
+          </article>
+
+          <article class="panel alerts-panel">
+            <div class="panel-topline">
+              <div>
+                <span class="panel-label">RECENT THREAT ALERTS</span>
+                <p class="panel-subtitle">Only binary Attack predictions appear here</p>
+              </div>
+              <span class="alert-count" id="alertCount">0</span>
+            </div>
+            <div class="alert-list" id="alertList" aria-live="polite">
+              <div class="empty-state">
+                <span class="empty-symbol">✓</span>
+                <strong>No attack alerts yet</strong>
+                <p>Alerts will appear when the model crosses its frozen threshold.</p>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <article class="story-rail" aria-label="Project explanation">
+          <div class="rail-step">
+            <span class="rail-number">01</span>
+            <div><strong>Five local clients</strong><small>Separate source-based partitions</small></div>
+          </div>
+          <span class="rail-arrow" aria-hidden="true">→</span>
+          <div class="rail-step secure">
+            <span class="rail-number">02</span>
+            <div><strong>Protected updates</strong><small>Identity, encryption, replay checks</small></div>
+          </div>
+          <span class="rail-arrow" aria-hidden="true">→</span>
+          <div class="rail-step">
+            <span class="rail-number">03</span>
+            <div><strong>FedAvg control center</strong><small>Sample-weighted global model</small></div>
+          </div>
+          <span class="rail-arrow" aria-hidden="true">→</span>
+          <div class="rail-step result">
+            <span class="rail-number">04</span>
+            <div><strong>Deployed binary IDS</strong><small>Normal / Attack at threshold 0.42</small></div>
+          </div>
+        </article>
+      </section>
+
+      <section class="view" id="view-federation" aria-labelledby="federationTitle">
+        <div class="view-heading">
+          <div>
+            <p class="eyebrow">FEDERATED LEARNING / FIVE CLIENTS</p>
+            <h2 id="federationTitle">Local training, shared improvement</h2>
+          </div>
+          <p class="view-summary" id="localDataStatement">Each client trains from its own partition; raw training rows are not sent to the server.</p>
+        </div>
+
+        <div class="federation-layout">
+          <article class="panel federation-canvas">
+            <div class="federation-topbar">
+              <div>
+                <span class="panel-label">ACTIVE FEDERATION</span>
+                <p class="panel-subtitle" id="federationRunId">Run unavailable</p>
+              </div>
+              <div class="round-badge">
+                <span>ROUND</span>
+                <strong><span id="currentRound">0</span><small>/</small><span id="totalRounds">3</span></strong>
+              </div>
+            </div>
+
+            <div class="federation-diagram">
+              <div class="client-stack" id="clientStack"></div>
+
+              <div class="exchange-lane" aria-label="Protected model exchange">
+                <div class="lane-line outbound"><span>Global model</span><i></i></div>
+                <div class="security-gate">
+                  <span class="gate-icon" aria-hidden="true">◆</span>
+                  <strong id="exchangeMode">Secure exchange</strong>
+                  <small>Model messages only</small>
+                </div>
+                <div class="lane-line inbound"><i></i><span>Local updates</span></div>
+              </div>
+
+              <div class="coordinator-node" id="coordinatorNode">
+                <span class="node-label">CONTROL CENTER</span>
+                <div class="server-glyph" aria-hidden="true"><i></i><i></i><i></i></div>
+                <h3>FedAvg</h3>
+                <p id="aggregationState">Waiting for updates</p>
+                <div class="update-meter">
+                  <span><strong id="updatesReceived">0</strong> / <span id="updatesExpected">5</span> updates</span>
+                  <div><i id="updateFill"></i></div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <aside class="federation-sidebar">
+            <article class="panel stage-card">
+              <span class="panel-label">CURRENT STORY STAGE</span>
+              <p class="stage-index" id="replayStageIndex">STAGE 01</p>
+              <h3 id="replayStageTitle">Control center online</h3>
+              <p id="replayStageCaption">Loading the recorded secure demonstration.</p>
+            </article>
+
+            <article class="panel metric-context">
+              <div class="panel-topline">
+                <span class="panel-label">GLOBAL VALIDATION TELEMETRY</span>
+                <span class="source-chip" id="metricsModeChip">Recorded</span>
+              </div>
+              <div class="metric-context-grid">
+                <div><strong id="demoMacroF1">Unavailable</strong><span>Macro-F1</span></div>
+                <div><strong id="demoAttackRecall">Unavailable</strong><span>Attack recall</span></div>
+                <div><strong id="demoFpr">Unavailable</strong><span>False-positive rate</span></div>
+              </div>
+              <p class="metric-note" id="metricsNote">Validation telemetry, not live prediction accuracy.</p>
+            </article>
+
+            <article class="panel compact-event-panel">
+              <div class="panel-topline"><span class="panel-label">FEDERATION EVENT TRAIL</span><span id="federatedEventCount">0 events</span></div>
+              <div class="compact-events" id="federatedEventList"></div>
+            </article>
+          </aside>
+        </div>
+      </section>
+
+      <section class="view" id="view-security" aria-labelledby="securityTitle">
+        <div class="view-heading">
+          <div>
+            <p class="eyebrow">POST-QUANTUM-SECURED COMMUNICATION</p>
+            <h2 id="securityTitle">Trust the sender. Protect the update.</h2>
+          </div>
+          <p class="view-summary">Security is applied to federated model messages. Rejected inputs stop before FedAvg.</p>
+        </div>
+
+        <div class="security-overview">
+          <article class="panel security-path-panel">
+            <div class="panel-topline">
+              <span class="panel-label">ONE PROTECTED EXCHANGE</span>
+              <span class="security-mode-badge" id="securityModeBadge">Secure mode</span>
+            </div>
+            <div class="security-path">
+              <div class="security-step">
+                <span class="step-code">ML-DSA-65</span>
+                <strong>Authenticate</strong>
+                <p>Prove the approved client identity.</p>
+              </div>
+              <span class="path-arrow" aria-hidden="true">→</span>
+              <div class="security-step">
+                <span class="step-code">ML-KEM-768</span>
+                <strong>Establish keys</strong>
+                <p>Create shared material for the session.</p>
+              </div>
+              <span class="path-arrow" aria-hidden="true">→</span>
+              <div class="security-step">
+                <span class="step-code">HKDF-SHA-256</span>
+                <strong>Separate directions</strong>
+                <p>Derive independent message keys.</p>
+              </div>
+              <span class="path-arrow" aria-hidden="true">→</span>
+              <div class="security-step">
+                <span class="step-code">AES-256-GCM</span>
+                <strong>Protect payload</strong>
+                <p>Encrypt and authenticate model traffic.</p>
+              </div>
+            </div>
+            <div class="metadata-rail">
+              <span>Bound context</span>
+              <strong>run</strong><i></i><strong>round</strong><i></i><strong>sender</strong><i></i><strong>recipient</strong><i></i><strong>type</strong><i></i><strong>sequence</strong>
+            </div>
+          </article>
+
+          <article class="panel security-scorecard">
+            <span class="panel-label">SECURE RUN STATUS</span>
+            <div class="secure-score">
+              <strong id="authenticatedClients">5 / 5</strong>
+              <span>authenticated clients</span>
+            </div>
+            <div class="secure-divider"></div>
+            <div class="secure-score rejected">
+              <strong id="rejectedMessages">12</strong>
+              <span>messages rejected</span>
+            </div>
+            <p class="blocked-statement"><span>✓</span> Rejected updates did not enter aggregation.</p>
+          </article>
+        </div>
+
+        <div class="security-lower-grid">
+          <article class="panel rejection-panel">
+            <div class="panel-topline">
+              <div><span class="panel-label">CONTROLLED REJECTION EVIDENCE</span><p class="panel-subtitle">Counts from the verified attack-test run</p></div>
+            </div>
+            <div class="rejection-bars" id="rejectionBars"></div>
+          </article>
+
+          <article class="panel security-events-panel">
+            <div class="panel-topline"><span class="panel-label">LATEST SECURITY EVENTS</span><span class="source-chip" id="securityEventMode">Recorded</span></div>
+            <div class="security-event-list" id="securityEventList"></div>
+          </article>
+
+          <article class="panel scope-panel">
+            <span class="panel-label">WHAT THIS SECURITY MEANS</span>
+            <div class="scope-column protected">
+              <h3>Protected</h3>
+              <ul>
+                <li>Model payload confidentiality</li>
+                <li>Approved client identity</li>
+                <li>Tamper and replay rejection</li>
+                <li>Run, round and recipient binding</li>
+              </ul>
+            </div>
+            <div class="scope-column limited">
+              <h3>Not claimed</h3>
+              <ul>
+                <li>Malicious-update detection</li>
+                <li>Secure aggregation</li>
+                <li>Hidden HTTP metadata</li>
+                <li>Production PKI or readiness</li>
+              </ul>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="view" id="view-evidence" aria-labelledby="evidenceTitle">
+        <div class="view-heading">
+          <div>
+            <p class="eyebrow">VERIFIED PROJECT EVIDENCE</p>
+            <h2 id="evidenceTitle">What the prototype genuinely demonstrates</h2>
+          </div>
+          <p class="view-summary">Locked-test model results are separated from demonstration validation and security benchmarks.</p>
+        </div>
+
+        <div class="evidence-layout">
+          <article class="panel comparison-panel">
+            <div class="panel-topline">
+              <div><span class="panel-label">LOCKED-TEST MACRO-F1</span><p class="panel-subtitle">53,949 held-out flows • higher is better</p></div>
+              <span class="source-chip">Locked test</span>
+            </div>
+            <div class="comparison-bars">
+              <div class="comparison-row local">
+                <div><strong>Local-only mean</strong><span>Five isolated models</span></div>
+                <div class="comparison-track"><i id="localComparisonBar"></i></div>
+                <b id="localComparisonValue">89.69%</b>
+              </div>
+              <div class="comparison-row federated">
+                <div><strong>Federated FedAvg</strong><span>Five collaborative clients</span></div>
+                <div class="comparison-track"><i id="federatedComparisonBar"></i></div>
+                <b id="federatedComparisonValue">95.02%</b>
+              </div>
+              <div class="comparison-row centralized">
+                <div><strong>Centralized</strong><span>Pooled-data reference</span></div>
+                <div class="comparison-track"><i id="centralizedComparisonBar"></i></div>
+                <b id="centralizedComparisonValue">97.75%</b>
+              </div>
+            </div>
+            <p class="comparison-conclusion"><strong>Mixed but useful:</strong> federation improves the average isolated model by <span id="federatedGain">5.33 points</span>, while centralized pooling remains <span id="centralizedGap">2.73 points</span> higher.</p>
+          </article>
+
+          <article class="panel locked-metrics-panel">
+            <div class="panel-topline"><span class="panel-label">FEDERATED LOCKED TEST</span><span class="source-chip">Not live accuracy</span></div>
+            <div class="evidence-kpis">
+              <div><strong id="lockedAccuracy">96.50%</strong><span>Accuracy</span></div>
+              <div><strong id="lockedAttackPrecision">97.80%</strong><span>Attack precision</span></div>
+              <div><strong id="lockedAttackRecall">97.67%</strong><span>Attack recall</span></div>
+              <div class="warning"><strong id="lockedFpr">7.49%</strong><span>False-positive rate</span></div>
+            </div>
+            <p class="metric-note" id="lockedTestNote">Source-disjoint locked test within UAVIDS-2025.</p>
+          </article>
+
+          <article class="panel equivalence-panel">
+            <span class="panel-label">PLAIN VS SECURE</span>
+            <div class="equivalence-hero">
+              <strong id="aggregationDifference">0.0</strong>
+              <span>maximum aggregation difference</span>
+            </div>
+            <div class="equivalence-detail">
+              <div><span>Tolerance</span><strong>1e-7</strong></div>
+              <div><span>Secure envelope expansion</span><strong id="messageExpansion">34.2%</strong></div>
+              <div><span>Training completed</span><strong>5 clients × 3 rounds</strong></div>
+            </div>
+            <p>Security changed message protection, not the FedAvg result.</p>
+          </article>
+
+          <article class="panel overhead-panel">
+            <div class="panel-topline"><span class="panel-label">DESCRIPTIVE CRYPTO TIMINGS</span><span class="source-chip">Measured host</span></div>
+            <div class="timing-list" id="timingList"></div>
+            <p class="metric-note">Operation means only; not a general system-performance conclusion.</p>
+          </article>
+
+          <article class="panel limitations-panel">
+            <span class="panel-label">RESPONSIBLE CLAIMS</span>
+            <ul>
+              <li>Clients are source-based logical partitions, not verified physical UAVs.</li>
+              <li>The shared preprocessor used pooled training-client features.</li>
+              <li>Binary detection does not identify a specific attack family.</li>
+              <li>Communication security does not stop an authenticated poisoned update.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <p><strong>Data boundary:</strong> the browser receives presentation-safe API fields only—never training CSVs, model tensors, private keys, signatures or ciphertext.</p>
+      <p id="footerSource">Source: verified recorded project evidence</p>
+    </footer>
+  </div>
+
+  <noscript>This presentation console requires JavaScript. Enable it and reload the page.</noscript>
+</body>
+</html>
