@@ -7,7 +7,9 @@ and cryptographic details stay behind the adapter.
 from __future__ import annotations
 
 import argparse
+import csv
 import hashlib
+import io
 import json
 import math
 import os
@@ -62,6 +64,116 @@ def sha256_path(path: Path) -> str:
         for block in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def load_presentation_evidence(project_root: Path) -> dict:
+    """Load a small public view of authoritative Phase 3 and Phase 5 evidence.
+
+    The complete result artifacts stay server-side.  A malformed or incomplete
+    evidence set must not prevent frozen-model inference from starting.
+    """
+
+    try:
+        phase3_path = project_root / "results_phase3" / "locked_test_evaluation_record.json"
+        phase5_path = project_root / "phase5" / "results" / "benchmark_comparison.json"
+        phase3 = read_json(phase3_path)
+        phase5 = read_json(phase5_path)
+
+        if phase3["evaluation_stage"] != "final_locked_test":
+            raise ValueError("unexpected Phase 3 evidence stage")
+        if not phase3["lock_unchanged_after_evaluation"]:
+            raise ValueError("Phase 3 lock changed after evaluation")
+        if phase3["model_or_threshold_revised_after_test"]:
+            raise ValueError("model or threshold changed after locked test")
+        lock_path = project_root.joinpath(
+            *phase3["lock_config_path"].replace("\\", "/").split("/")
+        )
+        if sha256_path(lock_path) != phase3["lock_config_sha256"]:
+            raise ValueError("Phase 3 lock evidence hash mismatch")
+        lock = read_json(lock_path)
+
+        metrics = phase3["metrics"]
+        federated = metrics["federated_fedavg"]
+        centralized = metrics["centralized"]
+        local_summary = phase3["local_only_summary"]
+        local_models = []
+        for model_name, values in metrics.items():
+            if not model_name.startswith("local/"):
+                continue
+            local_models.append(
+                {
+                    "client_id": model_name.removeprefix("local/"),
+                    "macro_f1": values["macro_f1"],
+                }
+            )
+        local_models.sort(key=lambda item: item["client_id"])
+
+        attack_test = phase5["attack_test"]
+        aggregation = phase5["aggregation"]
+        return {
+            "schema_version": "uavids-gui-evidence-v1",
+            "available": True,
+            "locked_test": {
+                "source": "results_phase3/locked_test_evaluation_record.json",
+                "rows": federated["rows"],
+                "assessment": phase3["federation_assessment"],
+                "federated_fedavg": {
+                    "threshold": federated["threshold"],
+                    "macro_f1": federated["macro_f1"],
+                    "attack_precision": federated["attack_precision"],
+                    "attack_recall": federated["attack_recall"],
+                    "fpr": federated["fpr"],
+                    "tn": federated["tn"],
+                    "fp": federated["fp"],
+                    "fn": federated["fn"],
+                    "tp": federated["tp"],
+                },
+                "centralized": {"macro_f1": centralized["macro_f1"]},
+                "local_only": {
+                    **local_summary,
+                    "clients": local_models,
+                },
+                "macro_f1_deltas": {
+                    "fedavg_vs_local_mean": federated["macro_f1"]
+                    - local_summary["mean_macro_f1"],
+                    "fedavg_vs_centralized": federated["macro_f1"]
+                    - centralized["macro_f1"],
+                },
+            },
+            "security_test": {
+                "source": "phase5/results/benchmark_comparison.json",
+                "algorithms": phase5["algorithms"],
+                "authenticated_clients": phase5["clients"],
+                "rejected_messages": attack_test["rejections"],
+                "rejection_categories": attack_test["categories"],
+                "completed_training": attack_test["completed_training"],
+                "rejected_updates_excluded_from_aggregation": attack_test[
+                    "all_aggregate_archives_identical_to_plain"
+                ],
+                "maximum_plain_secure_difference": aggregation[
+                    "maximum_plain_secure_difference"
+                ],
+                "tolerance": aggregation["tolerance"],
+                "scope": phase5["scope"],
+            },
+            "technical": {
+                "architecture": [
+                    len(lock["features"]),
+                    *lock["selected_candidate"]["hidden_layers"],
+                    1,
+                ],
+                "checkpoint_sha256": lock["model_artifacts"]["federated_fedavg"]["sha256"],
+                "preprocessor_fit_rows": lock["preprocessor"]["fit_rows"],
+                "preprocessor_fit_scope": lock["preprocessor"]["fit_scope"],
+                "privacy_limitation": lock["privacy_limitation"],
+            },
+        }
+    except (OSError, KeyError, TypeError, ValueError, json.JSONDecodeError):
+        return {
+            "schema_version": "uavids-gui-evidence-v1",
+            "available": False,
+            "message": "Verified research evidence is unavailable.",
+        }
 
 
 class FrozenBinaryIDS:
@@ -189,6 +301,73 @@ class FrozenBinaryIDS:
                 "fpr": validation["fpr"],
             },
             "metrics_note": "Saved validation evidence; not live prediction accuracy.",
+        }
+
+
+class LockedTestDemoPool:
+    """Hash-described presentation subset reconstructed from the locked test split."""
+
+    def __init__(self, project_root: Path, features: tuple[str, ...]):
+        self.path = Path(__file__).resolve().parent / "examples" / "locked_test_demo_pool.json"
+        payload = read_json(self.path)
+        if payload.get("schema_version") != "uavids-locked-test-demo-pool-v1":
+            raise RuntimeError("unsupported locked-test demonstration pool")
+        if payload.get("partition") != "locked_test":
+            raise RuntimeError("demonstration pool is not from the locked test split")
+        if tuple(payload.get("approved_model_features", ())) != features:
+            raise RuntimeError("demonstration pool feature contract mismatch")
+
+        phase2 = read_json(project_root / "results_phase2" / "partition_manifest.json")
+        expected_test_hash = phase2["artifact_checksums"]["partition::test"]["sha256"]
+        if payload.get("source_hashes", {}).get("test_sha256") != expected_test_hash:
+            raise RuntimeError("demonstration pool test provenance mismatch")
+
+        records = payload.get("records")
+        if not isinstance(records, list) or not records:
+            raise RuntimeError("demonstration pool must contain records")
+        raw_columns = list(records[0].get("raw_row", {}))
+        expected_raw_columns = [
+            "FlowID", "FlowDuration/s", "SrcAddr", "SrcPort", "DstAddr", "DstPort",
+            "Protocol", "TxPackets", "RxPackets", "LostPackets", "TxBytes", "RxBytes",
+            "TxPacketRate/s", "RxPacketRate/s", "TxByteRate/s", "RxByteRate/s",
+            "MeanDelay/s", "MeanJitter/s", "Throughput/Kbps", "MeanPacketSize",
+            "PacketDropRate", "AverageHopCount", "label",
+        ]
+        if raw_columns != expected_raw_columns:
+            raise RuntimeError("demonstration pool original-row contract mismatch")
+
+        grouped: dict[str, list[dict]] = {}
+        for record in records:
+            raw = record.get("raw_row", {})
+            if list(raw) != raw_columns or not set(features) <= set(raw):
+                raise RuntimeError("malformed demonstration record")
+            grouped.setdefault(raw.get("label"), []).append(record)
+        expected_labels = {"Normal Traffic", "Blackhole Attack", "Flooding Attack", "Sybil Attack", "Wormhole Attack"}
+        if set(grouped) != expected_labels:
+            raise RuntimeError("demonstration pool label mismatch")
+
+        self.payload = payload
+        self.records = grouped
+        self.raw_columns = raw_columns
+        self.asset_sha256 = sha256_path(self.path)
+
+    @property
+    def attack_types(self) -> list[str]:
+        return ["Blackhole Attack", "Flooding Attack", "Sybil Attack", "Wormhole Attack"]
+
+    def catalog(self) -> dict:
+        return {
+            "schema_version": "uavids-gui-demo-catalog-v1",
+            "dataset": self.payload["dataset"],
+            "partition": self.payload["partition"],
+            "selection_policy": self.payload["selection_policy"],
+            "pool_sha256": self.asset_sha256,
+            "source_hashes": self.payload["source_hashes"],
+            "counts": self.payload["counts"],
+            "attack_types": self.attack_types,
+            "clients": list(CLIENT_IDS),
+            "full_row_export_columns": len(self.raw_columns),
+            "note": "Controlled replay of held-out network-flow records; not live packet capture or a new evaluation.",
         }
 
 
@@ -359,6 +538,8 @@ class GuiBackend:
     ):
         self.started_utc = utc_now()
         self.ids = FrozenBinaryIDS(project_root)
+        self.evidence = load_presentation_evidence(project_root)
+        self.demo_pool = LockedTestDemoPool(project_root, self.ids.features)
         self.telemetry = FederatedTelemetry(project_root, upstream_url)
         path = replay_path or Path(__file__).resolve().parent / "examples" / "replay_records.json"
         records = read_json(path)
@@ -374,8 +555,23 @@ class GuiBackend:
         self.alerts: deque[dict] = deque(maxlen=20)
         self.events: deque[dict] = deque(maxlen=1000)
         self.sequence = 0
+        self.demo_session_id = str(uuid.uuid4())
+        self.demo_cursors = {label: 0 for label in self.demo_pool.records}
+        self.demo_records_processed = 0
+        self.demo_normal_count = 0
+        self.demo_attack_count = 0
+        self.demo_alerts: list[dict] = []
+        self.demo_export_rows: list[dict] = []
 
-    def _record_prediction(self, prediction: dict, *, replayed: bool) -> dict:
+    def _record_prediction(
+        self,
+        prediction: dict,
+        *,
+        replayed: bool,
+        demo_record: dict | None = None,
+        target_client_id: str | None = None,
+        demo_kind: str | None = None,
+    ) -> dict:
         with self._lock:
             self.records_processed += 1
             if prediction["label"] == "Attack":
@@ -383,6 +579,47 @@ class GuiBackend:
             else:
                 self.normal_count += 1
             prediction = {**prediction, "replayed": replayed}
+            if demo_record is not None:
+                raw = demo_record["raw_row"]
+                ground_truth_attack = raw["label"] != "Normal Traffic"
+                predicted_attack = prediction["label"] == "Attack"
+                if ground_truth_attack and predicted_attack:
+                    outcome = "detected"
+                elif ground_truth_attack:
+                    outcome = "missed"
+                elif predicted_attack:
+                    outcome = "false_alarm"
+                else:
+                    outcome = "correct_normal"
+                prediction = {
+                    **prediction,
+                    "dataset": {
+                        "dataset": "UAVIDS-2025",
+                        "partition": "locked_test",
+                        "partition_row_index": demo_record["partition_row_index"],
+                        "flow_id": raw["FlowID"],
+                        "ground_truth_label": raw["label"],
+                        "recorded_source": raw["SrcAddr"],
+                        "recorded_destination": raw["DstAddr"],
+                        "protocol": raw["Protocol"],
+                        "tx_packets": raw["TxPackets"],
+                        "rx_packets": raw["RxPackets"],
+                        "lost_packets": raw["LostPackets"],
+                        "throughput_kbps": raw["Throughput/Kbps"],
+                        "packet_drop_rate": raw["PacketDropRate"],
+                    },
+                    "demo": {
+                        "session_id": self.demo_session_id,
+                        "kind": demo_kind,
+                        "target_client_id": target_client_id,
+                        "outcome": outcome,
+                    },
+                }
+                self.demo_records_processed += 1
+                if predicted_attack:
+                    self.demo_attack_count += 1
+                else:
+                    self.demo_normal_count += 1
             self.latest_prediction = prediction
             self.sequence += 1
             event = {
@@ -397,6 +634,16 @@ class GuiBackend:
             self.events.append(event)
             if prediction["label"] == "Attack":
                 self.alerts.appendleft(prediction)
+                if demo_record is not None:
+                    self.demo_alerts.insert(0, prediction)
+                    self.demo_export_rows.append(
+                        {
+                            "raw_row": dict(demo_record["raw_row"]),
+                            "partition_row_index": demo_record["partition_row_index"],
+                            "target_client_id": target_client_id,
+                            "prediction": prediction,
+                        }
+                    )
             return prediction
 
     def predict(self, request: Any, *, replayed: bool = False) -> dict:
@@ -415,6 +662,116 @@ class GuiBackend:
             "wrapped": self.replay_index == 0,
             "prediction": prediction,
         }
+
+    def demo_catalog(self) -> dict:
+        return {**self.demo_pool.catalog(), "session": self._demo_snapshot()}
+
+    def _demo_snapshot(self) -> dict:
+        return {
+            "schema_version": "uavids-gui-demo-session-v1",
+            "session_id": self.demo_session_id,
+            "records_processed": self.demo_records_processed,
+            "normal_count": self.demo_normal_count,
+            "attack_count": self.demo_attack_count,
+            "recent_alerts": list(self.demo_alerts),
+            "remaining": {
+                label: len(records) - self.demo_cursors[label]
+                for label, records in self.demo_pool.records.items()
+            },
+        }
+
+    def _next_demo_record(self, label: str) -> dict:
+        records = self.demo_pool.records[label]
+        position = self.demo_cursors[label]
+        if position >= len(records):
+            raise RequestError("demo_pool_exhausted", f"no unused {label} demonstration rows remain")
+        self.demo_cursors[label] = position + 1
+        return records[position]
+
+    def _score_demo_record(self, record: dict, *, target_client_id: str | None, kind: str) -> dict:
+        raw = record["raw_row"]
+        request = {
+            "record_id": f"test-flow-{raw['FlowID']}",
+            "source": raw["SrcAddr"],
+            "features": {name: raw[name] for name in self.ids.features},
+        }
+        prediction = self.ids.predict(request)
+        expected = record["locked_evidence"]
+        if abs(prediction["attack_probability"] - expected["attack_probability"]) > 2e-6:
+            raise RuntimeError("runtime prediction does not agree with locked test evidence")
+        if int(prediction["label"] == "Attack") != expected["prediction"]:
+            raise RuntimeError("runtime label does not agree with locked test evidence")
+        return self._record_prediction(
+            prediction,
+            replayed=True,
+            demo_record=record,
+            target_client_id=target_client_id,
+            demo_kind=kind,
+        )
+
+    def demo_next_normal(self, payload: dict) -> dict:
+        if payload:
+            raise RequestError("invalid_request", "normal traffic request body must be empty")
+        with self._lock:
+            record = self._next_demo_record("Normal Traffic")
+            return self._score_demo_record(record, target_client_id=None, kind="baseline_normal")
+
+    def demo_attack(self, payload: dict) -> dict:
+        if not isinstance(payload, dict) or set(payload) != {"client_id", "attack_type"}:
+            raise RequestError("invalid_request", "attack request requires client_id and attack_type only")
+        client_id = payload["client_id"]
+        attack_type = payload["attack_type"]
+        if client_id not in CLIENT_IDS:
+            raise RequestError("invalid_client", "client_id is not an approved logical client")
+        if attack_type not in self.demo_pool.attack_types:
+            raise RequestError("invalid_attack_type", "attack_type is not available in the demonstration pool")
+        with self._lock:
+            record = self._next_demo_record(attack_type)
+            return self._score_demo_record(
+                record,
+                target_client_id=client_id,
+                kind="controlled_attack",
+            )
+
+    def demo_reset(self, payload: dict) -> dict:
+        if payload:
+            raise RequestError("invalid_request", "reset request body must be empty")
+        with self._lock:
+            self.demo_session_id = str(uuid.uuid4())
+            self.demo_cursors = {label: 0 for label in self.demo_pool.records}
+            self.demo_records_processed = 0
+            self.demo_normal_count = 0
+            self.demo_attack_count = 0
+            self.demo_alerts.clear()
+            self.demo_export_rows.clear()
+            return {**self._demo_snapshot(), "last_event_seq": self.sequence}
+
+    def demo_alert_csv(self) -> bytes:
+        output = io.StringIO(newline="")
+        extra = [
+            "partition_row_index", "controlled_target_client", "prediction_timestamp_utc",
+            "model_id", "attack_probability", "decision_threshold", "predicted_label", "outcome",
+        ]
+        writer = csv.DictWriter(output, fieldnames=[*self.demo_pool.raw_columns, *extra], lineterminator="\r\n")
+        writer.writeheader()
+        with self._lock:
+            rows = list(self.demo_export_rows)
+        for item in rows:
+            prediction = item["prediction"]
+            writer.writerow(
+                {
+                    **item["raw_row"],
+                    "partition_row_index": item["partition_row_index"],
+                    "controlled_target_client": item["target_client_id"] or "",
+                    "prediction_timestamp_utc": prediction["timestamp_utc"],
+                    "model_id": prediction["model_id"],
+                    "attack_probability": prediction["attack_probability"],
+                    "decision_threshold": prediction["decision_threshold"],
+                    "predicted_label": prediction["label"],
+                    "outcome": prediction["demo"]["outcome"],
+                }
+            )
+        return output.getvalue().encode("utf-8-sig")
 
     def snapshot(self) -> dict:
         federated = self.telemetry.snapshot()
@@ -438,7 +795,9 @@ class GuiBackend:
                 "federated_upstream_available": federated["upstream_available"],
             },
             "model": self.ids.public_metadata(),
+            "evidence": self.evidence,
             "inference": inference,
+            "dataset_demo": self._demo_snapshot(),
             "federated": federated,
         }
 
@@ -478,6 +837,20 @@ class GuiRequestHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Cache-Control", "no-store")
+        cors = self._cors_origin()
+        if cors:
+            self.send_header("Access-Control-Allow-Origin", cors)
+            self.send_header("Vary", "Origin")
+        self.end_headers()
+        self.wfile.write(body)
+
+    def _send_bytes(self, status: int, body: bytes, content_type: str, filename: str | None = None) -> None:
+        self.send_response(status)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "no-store")
+        if filename:
+            self.send_header("Content-Disposition", f'attachment; filename="{filename}"')
         cors = self._cors_origin()
         if cors:
             self.send_header("Access-Control-Allow-Origin", cors)
@@ -545,6 +918,15 @@ class GuiRequestHandler(BaseHTTPRequestHandler):
                 )
             elif parsed.path == "/api/gui/v1/snapshot":
                 self._send(HTTPStatus.OK, self.server.backend.snapshot())
+            elif parsed.path == "/api/gui/v1/demo/catalog":
+                self._send(HTTPStatus.OK, self.server.backend.demo_catalog())
+            elif parsed.path == "/api/gui/v1/demo/alerts.csv":
+                self._send_bytes(
+                    HTTPStatus.OK,
+                    self.server.backend.demo_alert_csv(),
+                    "text/csv; charset=utf-8",
+                    "uavids-detected-alerts.csv",
+                )
             elif parsed.path == "/api/gui/v1/events":
                 after = int(parse_qs(parsed.query).get("after_seq", ["0"])[0])
                 if after < 0:
@@ -574,12 +956,19 @@ class GuiRequestHandler(BaseHTTPRequestHandler):
                 if payload:
                     raise RequestError("invalid_request", "replay request body must be empty")
                 result = self.server.backend.replay_next()
+            elif self.path == "/api/gui/v1/demo/traffic/next":
+                result = self.server.backend.demo_next_normal(payload)
+            elif self.path == "/api/gui/v1/demo/attacks":
+                result = self.server.backend.demo_attack(payload)
+            elif self.path == "/api/gui/v1/demo/reset":
+                result = self.server.backend.demo_reset(payload)
             else:
                 self._error(HTTPStatus.NOT_FOUND, "not_found", "endpoint not found")
                 return
             self._send(HTTPStatus.OK, result)
         except RequestError as exc:
-            self._error(HTTPStatus.BAD_REQUEST, exc.code, str(exc))
+            status = HTTPStatus.CONFLICT if exc.code == "demo_pool_exhausted" else HTTPStatus.BAD_REQUEST
+            self._error(status, exc.code, str(exc))
         except Exception:
             self._error(HTTPStatus.INTERNAL_SERVER_ERROR, "internal_error", "request failed safely")
 

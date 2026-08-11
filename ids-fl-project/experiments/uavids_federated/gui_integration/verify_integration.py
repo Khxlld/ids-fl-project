@@ -2,14 +2,24 @@
 
 from __future__ import annotations
 
+import csv
+import io
 import json
 import threading
+from concurrent.futures import ThreadPoolExecutor
 import urllib.error
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
-from backend import FederatedTelemetry, GuiBackend, create_server, sha256_path
+from backend import (
+    FederatedTelemetry,
+    GuiBackend,
+    create_server,
+    load_presentation_evidence,
+    sha256_path,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -63,6 +73,14 @@ def main() -> None:
     preprocessor = ROOT.joinpath(*lock["preprocessor"]["path"].replace("\\", "/").split("/"))
     before = {path.name: sha256_path(path) for path in (lock_path, checkpoint, preprocessor)}
 
+    with TemporaryDirectory() as temporary:
+        unavailable = load_presentation_evidence(Path(temporary))
+        assert unavailable == {
+            "schema_version": "uavids-gui-evidence-v1",
+            "available": False,
+            "message": "Verified research evidence is unavailable.",
+        }
+
     backend = GuiBackend(upstream_url="http://127.0.0.1:1")
     server = create_server(backend, "127.0.0.1", 0, (ORIGIN,))
     thread = threading.Thread(target=server.serve_forever, daemon=True)
@@ -77,6 +95,30 @@ def main() -> None:
         assert status == 200 and snapshot["presentation_mode"] == "replay"
         assert snapshot["backend"]["inference_mode"] == "live_model"
         assert snapshot["model"]["labels"] == ["Normal", "Attack"]
+        evidence = snapshot["evidence"]
+        assert evidence["available"] is True
+        phase3 = json.loads(
+            (ROOT / "results_phase3" / "locked_test_evaluation_record.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        phase5 = json.loads(
+            (ROOT / "phase5" / "results" / "benchmark_comparison.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        locked = evidence["locked_test"]
+        expected_fedavg = phase3["metrics"]["federated_fedavg"]
+        for key in ("threshold", "macro_f1", "attack_precision", "attack_recall", "fpr", "tn", "fp", "fn", "tp"):
+            assert locked["federated_fedavg"][key] == expected_fedavg[key]
+        assert locked["rows"] == expected_fedavg["rows"] == 53949
+        assert locked["centralized"]["macro_f1"] == phase3["metrics"]["centralized"]["macro_f1"]
+        assert locked["local_only"]["mean_macro_f1"] == phase3["local_only_summary"]["mean_macro_f1"]
+        assert len(locked["local_only"]["clients"]) == 5
+        security_evidence = evidence["security_test"]
+        assert security_evidence["algorithms"] == phase5["algorithms"]
+        assert security_evidence["rejected_messages"] == phase5["attack_test"]["rejections"] == 12
+        assert security_evidence["maximum_plain_secure_difference"] == phase5["aggregation"]["maximum_plain_secure_difference"]
         assert len(snapshot["federated"]["clients"]) == 5
         assert snapshot["federated"]["security"]["mode"] == "secure"
 
@@ -94,8 +136,77 @@ def main() -> None:
         assert snapshot["inference"]["attack_count"] == 3
         assert len(snapshot["inference"]["recent_alerts"]) == 3
 
+        status, _, catalog = request(base, "/api/gui/v1/demo/catalog")
+        assert status == 200 and catalog["partition"] == "locked_test"
+        assert catalog["counts"] == {
+            "Normal Traffic": 250,
+            "Blackhole Attack": 50,
+            "Flooding Attack": 50,
+            "Sybil Attack": 50,
+            "Wormhole Attack": 50,
+        }
+        assert catalog["full_row_export_columns"] == 23
+
+        status, _, reset = request(base, "/api/gui/v1/demo/reset", method="POST", payload={})
+        assert status == 200 and reset["records_processed"] == 0
+        status, _, normal = request(base, "/api/gui/v1/demo/traffic/next", method="POST", payload={})
+        assert status == 200
+        assert normal["dataset"]["partition"] == "locked_test"
+        assert normal["dataset"]["ground_truth_label"] == "Normal Traffic"
+        assert normal["label"] == "Normal" and normal["demo"]["outcome"] == "correct_normal"
+        assert "raw_row" not in json.dumps(normal)
+
+        status, _, error = request(
+            base,
+            "/api/gui/v1/demo/attacks",
+            method="POST",
+            payload={"client_id": "unknown", "attack_type": "Wormhole Attack"},
+        )
+        assert status == 400 and error["error"]["code"] == "invalid_client"
+
+        request(base, "/api/gui/v1/demo/reset", method="POST", payload={})
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            concurrent = list(
+                executor.map(
+                    lambda client_id: backend.demo_attack(
+                        {"client_id": client_id, "attack_type": "Blackhole Attack"}
+                    ),
+                    [f"uav-client-{index}" for index in range(1, 6)],
+                )
+            )
+        assert len({item["prediction_id"] for item in concurrent}) == 5
+        assert len({item["dataset"]["flow_id"] for item in concurrent}) == 5
+
+        request(base, "/api/gui/v1/demo/reset", method="POST", payload={})
+        wormholes = []
+        for _ in range(6):
+            status, _, attack = request(
+                base,
+                "/api/gui/v1/demo/attacks",
+                method="POST",
+                payload={"client_id": "uav-client-3", "attack_type": "Wormhole Attack"},
+            )
+            assert status == 200 and attack["dataset"]["ground_truth_label"] == "Wormhole Attack"
+            wormholes.append(attack)
+        missed = [item for item in wormholes if item["demo"]["outcome"] == "missed"]
+        assert len(missed) == 1 and missed[0]["label"] == "Normal"
+
+        status, _, demo_snapshot = request(base, "/api/gui/v1/snapshot")
+        assert status == 200 and len(demo_snapshot["dataset_demo"]["recent_alerts"]) == 5
+        assert all(item["label"] == "Attack" for item in demo_snapshot["dataset_demo"]["recent_alerts"])
+        assert "raw_row" not in json.dumps(demo_snapshot)
+
+        csv_rows = list(csv.DictReader(io.StringIO(backend.demo_alert_csv().decode("utf-8-sig"))))
+        assert len(csv_rows) == 5
+        assert len(csv_rows[0]) == 31
+        assert all(row["label"] == "Wormhole Attack" for row in csv_rows)
+        assert all(row["controlled_target_client"] == "uav-client-3" for row in csv_rows)
+
         status, _, events = request(base, "/api/gui/v1/events?after_seq=0")
-        assert status == 200 and len(events["events"]) == 6 and events["last_seq"] == 6
+        assert status == 200 and len(events["events"]) == 18 and events["last_seq"] == 18
+        controlled = [event for event in events["events"] if event["payload"].get("demo", {}).get("kind") == "controlled_attack"]
+        assert len(controlled) == 11
+        assert any(event["payload"]["demo"]["outcome"] == "missed" for event in controlled)
         status, _, federated = request(base, "/api/gui/v1/federated/events?after_seq=0")
         assert status == 200 and federated["data_mode"] == "replay" and federated["events"]
 
@@ -148,7 +259,11 @@ def main() -> None:
     after = {path.name: sha256_path(path) for path in (lock_path, checkpoint, preprocessor)}
     assert after == before
     forbidden_suffixes = {".csv", ".pt", ".pth", ".pkl", ".joblib", ".key", ".pem"}
-    files = [path for path in HANDOFF.rglob("*") if path.is_file() and "__pycache__" not in path.parts]
+    ignored_parts = {"__pycache__", ".venv-gui", "node_modules"}
+    files = [
+        path for path in HANDOFF.rglob("*")
+        if path.is_file() and not ignored_parts.intersection(path.parts)
+    ]
     assert not [path for path in files if path.suffix.lower() in forbidden_suffixes]
     assert max(path.stat().st_size for path in files) < 2 * 1024 * 1024
     private_key_marker = b"-----BEGIN " + b"PRIVATE KEY-----"
@@ -170,6 +285,24 @@ def main() -> None:
         "federated_events_replay_response.json",
     }
     assert required_examples <= {path.name for path in (HANDOFF / "examples").iterdir()}
+
+    ammar = HANDOFF / "Ammar_Attempt"
+    dashboard_html = (ammar / "index.html").read_text(encoding="utf-8")
+    dashboard_js = (ammar / "app.js").read_text(encoding="utf-8")
+    dashboard_css = (ammar / "styles.css").read_text(encoding="utf-8")
+    for removed in (
+        "section-federation",
+        "fed-topology",
+        "renderFederation",
+        "Full round metrics",
+        "Frozen validation metrics",
+        "Per-client training telemetry",
+    ):
+        assert removed not in dashboard_html + dashboard_js
+    for removed_style in (".fed-layout", ".fed-detail", ".node-box", ".meter-fill"):
+        assert removed_style not in dashboard_css
+    assert "locked-test-metrics" in dashboard_html
+    assert "technical-details" in dashboard_html
     print(
         json.dumps(
             {

@@ -54,6 +54,12 @@ The adapter automatically reports `presentation_mode: "live"` while the upstream
 5. Optionally poll `/events` and `/federated/events` using their independent `after_seq` cursors for activity timelines.
 6. Ignore unknown response fields so compatible additions do not break the GUI.
 
+The Ammar presentation dashboard also uses the additive `/demo/*` endpoints.
+They replay a checksum-traceable subset of the locked test split through the
+same frozen model. Dataset attack families are ground truth only, and a selected
+logical client is controlled target context—not per-client inference or real
+network delivery. See `Ammar_Attempt/README.md` for the presentation workflow.
+
 Use [frontend/vanilla_integration.js](frontend/vanilla_integration.js) as a framework-neutral example. The minimum information to display is in [GUI_MINIMUM_REQUIREMENTS.md](GUI_MINIMUM_REQUIREMENTS.md), and precise semantics are in [API_CONTRACT.md](API_CONTRACT.md). [api/openapi.json](api/openapi.json) is the machine-readable contract.
 
 ## Verify

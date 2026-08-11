@@ -3,7 +3,7 @@
   "info": {
     "title": "UAVIDS GUI Integration API",
     "version": "1.0.0",
-    "description": "Stable binary IDS inference and federated-demo telemetry boundary."
+    "description": "Stable binary IDS inference, held-out dataset demonstration, and federated-demo telemetry boundary."
   },
   "servers": [{"url": "http://127.0.0.1:8090/api/gui/v1"}],
   "paths": {
@@ -83,6 +83,39 @@
           }
         }
       }
+    },
+    "/demo/catalog": {
+      "get": {
+        "operationId": "getDemoCatalog",
+        "responses": {"200": {"description": "Locked-test pool provenance, counts, and current session", "content": {"application/json": {"schema": {"type": "object"}}}}}
+      }
+    },
+    "/demo/traffic/next": {
+      "post": {
+        "operationId": "nextNormalDemoFlow",
+        "requestBody": {"required": false, "content": {"application/json": {"schema": {"type": "object", "maxProperties": 0}}}},
+        "responses": {"200": {"description": "Runtime prediction for the next held-out Normal flow", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Prediction"}}}}, "409": {"description": "Normal demonstration pool exhausted"}}
+      }
+    },
+    "/demo/attacks": {
+      "post": {
+        "operationId": "sendControlledAttackFlow",
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DemoAttackRequest"}}}},
+        "responses": {"200": {"description": "Runtime prediction for the next matching held-out attack flow", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Prediction"}}}}, "400": {"$ref": "#/components/responses/BadRequest"}, "409": {"description": "Selected attack pool exhausted"}}
+      }
+    },
+    "/demo/reset": {
+      "post": {
+        "operationId": "resetDemoSession",
+        "requestBody": {"required": false, "content": {"application/json": {"schema": {"type": "object", "maxProperties": 0}}}},
+        "responses": {"200": {"description": "New controlled-demonstration session"}}
+      }
+    },
+    "/demo/alerts.csv": {
+      "get": {
+        "operationId": "exportDemoAlerts",
+        "responses": {"200": {"description": "Detected alerts with all 23 original dataset columns and prediction metadata", "content": {"text/csv": {"schema": {"type": "string"}}}}}
+      }
     }
   },
   "components": {
@@ -137,6 +170,15 @@
           "features": {"$ref": "#/components/schemas/FeatureVector"}
         }
       },
+      "DemoAttackRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["client_id", "attack_type"],
+        "properties": {
+          "client_id": {"enum": ["uav-client-1", "uav-client-2", "uav-client-3", "uav-client-4", "uav-client-5"]},
+          "attack_type": {"enum": ["Blackhole Attack", "Flooding Attack", "Sybil Attack", "Wormhole Attack"]}
+        }
+      },
       "Prediction": {
         "type": "object",
         "required": [
@@ -158,7 +200,9 @@
           "model_id": {"type": "string"},
           "model_version": {"type": "string"},
           "inference_mode": {"const": "live_model"},
-          "replayed": {"type": "boolean"}
+          "replayed": {"type": "boolean"},
+          "dataset": {"type": "object", "description": "Limited provenance for adapter-selected locked-test flows; absent for ordinary predictions."},
+          "demo": {"type": "object", "description": "Controlled-demonstration context and outcome; absent for ordinary predictions."}
         }
       },
       "ReplayResponse": {
@@ -184,7 +228,7 @@
       },
       "Snapshot": {
         "type": "object",
-        "required": ["schema_version", "generated_utc", "api_version", "presentation_mode", "backend", "model", "inference", "federated"],
+        "required": ["schema_version", "generated_utc", "api_version", "presentation_mode", "backend", "model", "evidence", "inference", "dataset_demo", "federated"],
         "properties": {
           "schema_version": {"const": "uavids-gui-snapshot-v1"},
           "generated_utc": {"type": "string", "format": "date-time"},
@@ -192,7 +236,20 @@
           "presentation_mode": {"enum": ["live", "replay"]},
           "backend": {"type": "object"},
           "model": {"type": "object"},
+          "evidence": {
+            "type": "object",
+            "required": ["schema_version", "available"],
+            "properties": {
+              "schema_version": {"const": "uavids-gui-evidence-v1"},
+              "available": {"type": "boolean"},
+              "locked_test": {"type": "object"},
+              "security_test": {"type": "object"},
+              "technical": {"type": "object"},
+              "message": {"type": "string"}
+            }
+          },
           "inference": {"type": "object"},
+          "dataset_demo": {"type": "object"},
           "federated": {"type": "object"}
         }
       },

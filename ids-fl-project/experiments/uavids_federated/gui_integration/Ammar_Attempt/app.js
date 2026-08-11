@@ -2,13 +2,12 @@
    RASID — Federated Intrusion Detection Console
 
    Talks only to the documented GUI adapter (uavids-gui-api-v1). It never loads
-   checkpoints, preprocessing objects, datasets, or cryptographic material, and
+   checkpoints, preprocessing objects, full dataset rows, or cryptographic material, and
    it never computes a verdict, a probability, or a metric in the browser.
 
    Honesty rules enforced here:
-     - Every verdict comes from POST /predictions or POST /replay/next.
-     - The injector emits model INPUT only. A profile names the traffic shape the
-       operator selected; the model is binary and never identifies an attack family.
+     - Every dashboard verdict comes from a locked-test demo endpoint and the frozen model.
+     - Dataset attack families are ground truth only; the model remains binary.
      - Backend counters (adapter process lifetime) and session counters (this tab)
        are displayed separately and never summed.
      - presentation_mode / inference_mode / replayed stay visible and distinct.
@@ -27,11 +26,12 @@ const API_BASE =
 const SNAPSHOT_POLL_MS = 1000;
 const EVENT_POLL_MS = 1200;
 const RECORDED_RELEASE_MS = 650;   // pacing for the all-at-once recorded batch
-const TIMELINE_MAX = 60;
+const TIMELINE_MAX = 240;
+const TIMELINE_WINDOW_MS = 5 * 60 * 1000;
 const REQUEST_TIMEOUT_MS = 4000;
 
 // Rate histogram: 40 buckets of 3 s = a rolling two-minute window. At the
-// injector's default 1.5 s interval a bucket holds ~2 verdicts, so bars have
+// traffic replay's default 1.5 s interval a bucket holds ~2 verdicts, so bars have
 // visible height within seconds of a demo starting, and 40 of them across a
 // full-width panel gives the dense spiky profile of the Grafana reference.
 const VOLUME_BUCKET_MS = 3000;
@@ -80,128 +80,18 @@ async function request(path, options = {}) {
 const api = {
   health:          ()   => request('/health'),
   snapshot:        ()   => request('/snapshot'),
-  predict:         (b)  => request('/predictions', { method: 'POST', body: JSON.stringify(b) }),
-  replayNext:      ()   => request('/replay/next', { method: 'POST', body: '{}' }),
   events:          (n)  => request('/events?after_seq=' + n),
   federatedEvents: (n)  => request('/federated/events?after_seq=' + n),
+  demoCatalog:     ()   => request('/demo/catalog'),
+  demoNextNormal:  ()   => request('/demo/traffic/next', { method: 'POST', body: '{}' }),
+  demoReset:       ()   => request('/demo/reset', { method: 'POST', body: '{}' }),
 };
-
-/* ── Traffic profiles ───────────────────────────────────────────────────
-   Sampling envelopes are measured from the committed validation fixture
-   gui_integration/examples/replay_records.json — rows 01/03/05 (which the frozen
-   model scores Normal) and rows 02/04/06 (which it scores Attack). Feature
-   magnitudes are not invented.
-
-   Derived features are computed, not sampled, using relationships that hold
-   exactly in that fixture, so an emitted vector is internally self-consistent
-   rather than 15 unrelated random numbers.
-   ------------------------------------------------------------------------ */
-
-const PROFILES = [
-  {
-    id: 'normal',
-    name: 'NORMAL TRAFFIC',
-    desc: 'A normal traffic, handful of packets, seperated and not consecutive',
-  },
-  {
-    id: 'borderline',
-    name: 'COINFLIP',
-    desc: 'Sometimes the packet is malicious, sometimes not',
-  },
-  {
-    id: 'flood',
-    name: 'FLOOD ATTACK',
-    desc: 'Lots of packets are sent to the drone. Also known as a DOS attack',
-  },
-];
-
-/** Plain-language name for a profile id, for status text. */
-function profileLabel(profileId) {
-  const profile = PROFILES.find((p) => p.id === profileId);
-  return profile ? profile.name.toLowerCase() : profileId;
-}
-
-const NORMAL_ENV = {
-  duration: [2.0, 180.0], packets: [1, 8], packetSize: [30, 46],
-  delay: [1.3, 2.1], jitter: [0.0, 0.66], hop: [0.0, 0.0], lossRate: [0.0, 0.15],
-};
-const FLOOD_ENV = {
-  duration: [3400, 3500], packets: [4200, 5850], packetSize: [76, 76],
-  delay: [0.0095, 0.014], jitter: [0.006, 0.0105], hop: [0.031, 0.039], lossRate: [0.0003, 0.0017],
-};
-
-const uniform = (lo, hi) => lo + Math.random() * (hi - lo);
-const lerp = (lo, hi, t) => lo * (1 - t) + hi * t;
-const logLerp = (lo, hi, t) =>
-  Math.exp(Math.log(Math.max(lo, 1e-6)) * (1 - t) + Math.log(Math.max(hi, 1e-6)) * t);
-const sig = (v, d = 6) => (v === 0 ? 0 : Number(v.toPrecision(d)));
-
-function drawEnvelope(profileId) {
-  if (profileId === 'normal' || profileId === 'flood') {
-    const e = profileId === 'normal' ? NORMAL_ENV : FLOOD_ENV;
-    return {
-      duration: uniform(...e.duration),
-      packets: Math.round(uniform(...e.packets)),
-      packetSize: uniform(...e.packetSize),
-      delay: uniform(...e.delay),
-      jitter: uniform(...e.jitter),
-      hop: uniform(...e.hop),
-      lossRate: uniform(...e.lossRate),
-    };
-  }
-  // Borderline. Duration, packet count, delay and jitter each span two or more
-  // orders of magnitude between the clusters, so they blend geometrically — the
-  // linear midpoint would collapse back onto the normal cluster. Packet size and
-  // hop count are near-linear and blend linearly.
-  const t = uniform(0.35, 0.65);
-  return {
-    duration: logLerp(uniform(...NORMAL_ENV.duration), uniform(...FLOOD_ENV.duration), t),
-    packets: Math.max(1, Math.round(logLerp(uniform(...NORMAL_ENV.packets), uniform(...FLOOD_ENV.packets), t))),
-    packetSize: lerp(uniform(...NORMAL_ENV.packetSize), uniform(...FLOOD_ENV.packetSize), t),
-    delay: logLerp(uniform(...NORMAL_ENV.delay), uniform(...FLOOD_ENV.delay), t),
-    jitter: logLerp(uniform(...NORMAL_ENV.jitter), uniform(...FLOOD_ENV.jitter), t),
-    hop: lerp(uniform(...NORMAL_ENV.hop), uniform(...FLOOD_ENV.hop), t),
-    lossRate: lerp(uniform(...NORMAL_ENV.lossRate), uniform(...FLOOD_ENV.lossRate), t),
-  };
-}
-
-function generateVector(profileId) {
-  const d = drawEnvelope(profileId);
-  const flowDuration = sig(d.duration);
-  const txPackets = Math.max(1, d.packets);
-  const lostPackets = Math.min(txPackets, Math.round(txPackets * d.lossRate));
-  const rxPackets = Math.max(0, txPackets - lostPackets);
-  const txBytes = Math.round(txPackets * d.packetSize);
-  const rxBytes = Math.round(rxPackets * d.packetSize);
-
-  return {
-    'FlowDuration/s': flowDuration,
-    TxPackets: txPackets,
-    RxPackets: rxPackets,
-    LostPackets: lostPackets,
-    TxBytes: txBytes,
-    RxBytes: rxBytes,
-    'TxPacketRate/s': sig(txPackets / flowDuration),
-    'RxPacketRate/s': sig(rxPackets / flowDuration),
-    'TxByteRate/s': sig(txBytes / flowDuration),
-    'RxByteRate/s': sig(rxBytes / flowDuration),
-    'MeanDelay/s': sig(d.delay),
-    'MeanJitter/s': sig(d.jitter),
-    'Throughput/Kbps': sig((rxBytes * 8) / 1000 / flowDuration),
-    PacketDropRate: sig(txPackets === 0 ? 0 : lostPackets / txPackets),
-    AverageHopCount: sig(d.hop),
-  };
-}
-
-const READOUT_FEATURES = [
-  'FlowDuration/s', 'TxPackets', 'RxPackets', 'LostPackets',
-  'MeanDelay/s', 'MeanJitter/s', 'Throughput/Kbps', 'PacketDropRate',
-];
 
 /* ── State ──────────────────────────────────────────────────────────── */
 
 const state = {
   snapshot: null,
+  demoCatalog: null,
   error: null,
   connected: false,
 
@@ -209,17 +99,11 @@ const state = {
   history: [],            // recent predictions for the timeline
   volume: [],             // { t: epoch ms, attack: bool } for the rate histogram
   seenPredictions: new Set(),
-  sessionRecords: 0,
-  sessionPackets: 0,
-  lastVector: null,
-  lastProfile: null,
-
-  // injector
-  profile: 'normal',
+  // locked-test traffic replay
   intervalMs: 1500,
-  streaming: false,
-  streamTimer: null,
   busy: false,
+  trafficRunning: false,
+  trafficTimer: null,
 
   // event feeds
   inferenceCursor: 0,
@@ -229,13 +113,7 @@ const state = {
   pendingFederated: [],   // buffered recorded batch awaiting paced release
   federatedPaced: false,
 
-  // derived from federated events
-  selectedClient: null,   // client_id selected in the topology
-  clientInfo: {},         // client_id -> { profile, samples }
-  clientTraining: {},     // client_id -> latest client_training_completed payload
-  roundMetrics: [],       // { round, ...metrics }
-  rejections: {},         // category -> count
-
+  alertsExpanded: false,
   severityFilter: 'all',
   view: 'dashboard',
 };
@@ -360,11 +238,12 @@ function renderTimeline(container, history, threshold) {
   container.textContent = '';
   if (!history.length) {
     container.appendChild(el('div', 'chart-empty',
-      'No verdicts yet. Inject traffic or replay the fixture to populate the timeline.'));
+      'No test flows scored yet. Press Start Traffic to begin the locked-test replay.'));
     return;
   }
 
-  const W = 620, H = 220;
+  // Wide viewBox for the full-width presentation panel.
+  const W = 1100, H = 300;
   const padL = 34, padR = 12, padT = 12, padB = 26;
   const plotW = W - padL - padR, plotH = H - padT - padB;
   const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img' });
@@ -372,7 +251,7 @@ function renderTimeline(container, history, threshold) {
     `Attack probability for the last ${history.length} verdicts against the ${threshold} decision threshold`);
 
   const y = (v) => padT + (1 - v) * plotH;
-  const slot = plotW / TIMELINE_MAX;
+  const slot = plotW / Math.max(1, history.length);
   const barW = Math.max(3, Math.min(14, slot - 2));   // 2px surface gap between bars
 
   // Recessive gridlines
@@ -404,8 +283,29 @@ function renderTimeline(container, history, threshold) {
       `<br><span class="tip-k">record</span> ${p.record_id}` +
       `<br><span class="tip-k">source</span> ${p.source || '—'}` +
       `<br><span class="tip-k">time</span> ${clockOf(p.timestamp_utc)}` +
-      (p.replayed ? '<br><span class="tip-k">replayed fixture input</span>' : ''));
+      (p.dataset ? `<br><span class="tip-k">ground truth</span> ${p.dataset.ground_truth_label}` : '') +
+      (p.demo && p.demo.target_client_id
+        ? `<br><span class="tip-k">controlled target</span> ${p.demo.target_client_id}` : '') +
+      (p.demo ? `<br><span class="tip-k">outcome</span> ${p.demo.outcome.replace('_', ' ')}` : ''));
     svg.appendChild(bar);
+
+    if (p.demo && p.demo.kind === 'controlled_attack') {
+      const markerX = cx + barW / 2;
+      svg.appendChild(svgEl('line', {
+        x1: markerX, y1: padT, x2: markerX, y2: y(0),
+        stroke: cssVar('--mark-attack'), 'stroke-width': 2, 'stroke-dasharray': '3 3',
+      }));
+      const marker = svgEl('path', {
+        d: `M ${markerX - 6} ${padT + 1} L ${markerX + 6} ${padT + 1} L ${markerX} ${padT + 11} Z`,
+        fill: cssVar('--mark-attack'),
+      });
+      attachTip(marker, () =>
+        `<strong>Controlled ${p.dataset.ground_truth_label}</strong>` +
+        `<br><span class="tip-k">target</span> ${p.demo.target_client_id}` +
+        `<br><span class="tip-k">model verdict</span> ${p.label}` +
+        `<br><span class="tip-k">outcome</span> ${p.demo.outcome.replace('_', ' ')}`);
+      svg.appendChild(marker);
+    }
   });
 
   // Threshold rule on top, with a surface halo so it stays readable over bars
@@ -441,14 +341,14 @@ function renderTimeline(container, history, threshold) {
     x: padL, y: H - 6, fill: cssVar('--ink-muted'), 'font-size': 10.5,
     'font-family': 'system-ui, sans-serif',
   });
-  older.textContent = 'older';
+  older.textContent = clockOf(history[0].timestamp_utc);
   svg.appendChild(older);
 
   const newer = svgEl('text', {
     x: W - padR, y: H - 6, 'text-anchor': 'end',
     fill: cssVar('--ink-muted'), 'font-size': 10.5, 'font-family': 'system-ui, sans-serif',
   });
-  newer.textContent = 'latest';
+  newer.textContent = clockOf(history[history.length - 1].timestamp_utc);
   svg.appendChild(newer);
 
   container.appendChild(svg);
@@ -625,7 +525,7 @@ function renderRejectionChart(container, rejections) {
       x: labelW - 12, y: yTop + rowH / 2 + 4, 'text-anchor': 'end',
       fill: cssVar('--ink-2'), 'font-size': 12.5, 'font-family': 'ui-monospace, monospace',
     });
-    label.textContent = category;
+    label.textContent = category.replace(/_/g, ' ');
     svg.appendChild(label);
 
     const bar = svgEl('rect', {
@@ -649,60 +549,32 @@ function renderRejectionChart(container, rejections) {
   container.appendChild(svg);
 }
 
-/* ── Derived state from federated events ────────────────────────────── */
-
-function mineFederatedEvent(event) {
-  const type = event.event_type;
-  const payload = event.payload || {};
-  const cid = event.client_id;
-
-  if (type === 'client_registered' && cid) {
-    state.clientInfo[cid] = {
-      profile: payload.profile || null,
-      samples: typeof payload.samples === 'number' ? payload.samples : null,
-    };
-  }
-
-  if (type === 'aggregation_started' && payload.sample_counts) {
-    for (const [id, samples] of Object.entries(payload.sample_counts)) {
-      state.clientInfo[id] = { ...(state.clientInfo[id] || {}), samples };
-    }
-  }
-
-  if (type === 'client_training_completed' && cid) {
-    state.clientTraining[cid] = { ...payload, round: event.round };
-  }
-
-  if (type === 'round_metrics') {
-    const existing = state.roundMetrics.findIndex((r) => r.round === event.round);
-    const record = { round: event.round, ...payload };
-    if (existing >= 0) state.roundMetrics[existing] = record;
-    else state.roundMetrics.push(record);
-    state.roundMetrics.sort((a, b) => a.round - b.round);
-  }
-
-  if (type === 'demo_completed' && payload.final_metrics) {
-    const record = { round: event.round, final: true, ...payload.final_metrics };
-    const existing = state.roundMetrics.findIndex((r) => r.final);
-    if (existing >= 0) state.roundMetrics[existing] = record;
-    else state.roundMetrics.push(record);
-  }
-
-  if (type === 'security_message_rejected') {
-    const category = payload.category || 'unspecified';
-    state.rejections[category] = (state.rejections[category] || 0) + 1;
-  }
-}
-
 /* ── Prediction recording ───────────────────────────────────────────── */
 
 function recordPrediction(prediction, options = {}) {
   if (!prediction || !prediction.prediction_id) return;
+  // This dashboard now visualises only traceable locked-test demonstration rows.
+  if (!prediction.dataset || !prediction.demo) return;
+  const activeSession = state.snapshot && state.snapshot.dataset_demo
+    ? state.snapshot.dataset_demo.session_id : null;
+  if (activeSession && prediction.demo.session_id !== activeSession) return;
   if (state.seenPredictions.has(prediction.prediction_id)) return;
   state.seenPredictions.add(prediction.prediction_id);
 
   state.history.push(prediction);
-  if (state.history.length > TIMELINE_MAX) state.history.shift();
+  state.history.sort((left, right) => {
+    const a = Date.parse(left.timestamp_utc);
+    const b = Date.parse(right.timestamp_utc);
+    return (isNaN(a) ? 0 : a) - (isNaN(b) ? 0 : b);
+  });
+  const cutoff = Date.now() - TIMELINE_WINDOW_MS;
+  state.history = state.history.filter((item) => {
+    const stamped = Date.parse(item.timestamp_utc);
+    return isNaN(stamped) || stamped >= cutoff;
+  });
+  if (state.history.length > TIMELINE_MAX) {
+    state.history.splice(0, state.history.length - TIMELINE_MAX);
+  }
 
   // Arrival time drives the rate histogram. Fall back to now when the adapter
   // sends no timestamp, so a verdict is never silently dropped from the counts.
@@ -715,14 +587,7 @@ function recordPrediction(prediction, options = {}) {
     state.volume.splice(0, state.volume.length - VOLUME_MAX_POINTS);
   }
 
-  if (options.fromThisTab) {
-    state.sessionRecords += 1;
-    if (options.vector) {
-      const tx = options.vector.TxPackets || 0;
-      const rx = options.vector.RxPackets || 0;
-      state.sessionPackets += tx + rx;
-    }
-  }
+  if (options.fromThisTab) state.sessionRecords += 1;
 }
 
 /* ── Rendering: sidebar status ──────────────────────────────────────────
@@ -809,7 +674,7 @@ function renderVerdict() {
 function renderKpis() {
   const snap = state.snapshot;
   if (!snap) return;
-  const inf = snap.inference;
+  const inf = snap.dataset_demo || snap.inference;
   const total = inf.records_processed || 0;
 
   $('k-records').textContent = num(total);
@@ -818,10 +683,10 @@ function renderKpis() {
   // One send is one flow record, so this counts sends. sessionPackets is the
   // number of packets those records *describe* — a flood record summarises
   // thousands of them, so showing it here made one click look like thousands.
-  $('k-packets').textContent = num(state.sessionRecords);
-  $('k-packets-sub').textContent = state.sessionPackets
-    ? `this browser session · describing ${num(state.sessionPackets)} packets`
-    : 'this browser session only';
+  const remaining = inf.remaining ? inf.remaining['Normal Traffic'] : null;
+  $('k-packets').textContent = num(remaining);
+  $('k-packets-sub').textContent = 'locked-test demonstration pool';
+  if ($('traffic-remaining')) $('traffic-remaining').textContent = num(remaining);
 
   $('k-attack-rate').textContent = total
     ? pct(inf.attack_count / total) + ' of records' : 'no records yet';
@@ -843,12 +708,47 @@ function confidenceBand(probability) {
     CONFIDENCE_BANDS[CONFIDENCE_BANDS.length - 1];
 }
 
-const ALERT_COLUMNS = ['Time', 'Record', 'Sent as', 'Attack confidence', 'Probability', 'Over threshold', 'Input'];
+const ALERT_COLUMNS = [
+  'Time / Flow', 'Controlled target', 'Dataset label', 'Recorded route',
+  'Packets Tx / Rx / lost', 'Throughput', 'Drop rate', 'P(Attack)',
+];
+const ALERT_DEFAULT_LIMIT = 10;
+
+function availableAlerts() {
+  return (state.snapshot && state.snapshot.dataset_demo && state.snapshot.dataset_demo.recent_alerts) || [];
+}
+
+function csvCell(value) {
+  return '"' + String(value == null ? '' : value).replace(/"/g, '""') + '"';
+}
+
+function exportAlerts() {
+  const alerts = availableAlerts();
+  if (!alerts.length) return;
+  const anchor = document.createElement('a');
+  anchor.href = API_BASE + '/demo/alerts.csv';
+  anchor.download = 'uavids-detected-alerts.csv';
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+}
 
 function renderAlerts() {
   const table = $('alert-table');
   table.textContent = '';
-  const alerts = (state.snapshot && state.snapshot.inference.recent_alerts) || [];
+  const alerts = availableAlerts();
+  const shown = state.alertsExpanded ? alerts : alerts.slice(0, ALERT_DEFAULT_LIMIT);
+  const summary = $('alert-summary');
+  const toggle = $('btn-alert-history');
+  const exportButton = $('btn-alert-export');
+
+  summary.textContent = alerts.length > ALERT_DEFAULT_LIMIT && !state.alertsExpanded
+    ? `latest ${ALERT_DEFAULT_LIMIT} of ${alerts.length}`
+    : `${alerts.length} alert${alerts.length === 1 ? '' : 's'}`;
+  toggle.hidden = alerts.length <= ALERT_DEFAULT_LIMIT;
+  toggle.textContent = state.alertsExpanded ? `Show latest ${ALERT_DEFAULT_LIMIT}` : 'Show full history';
+  toggle.setAttribute('aria-expanded', String(state.alertsExpanded));
+  exportButton.disabled = alerts.length === 0;
 
   const head = el('tr');
   for (const column of ALERT_COLUMNS) head.appendChild(el('th', null, column));
@@ -865,289 +765,37 @@ function renderAlerts() {
 
   const threshold = (state.snapshot && state.snapshot.model.decision_threshold) || 0.42;
 
-  for (const alert of alerts) {
+  for (const alert of shown) {
     const probability = alert.attack_probability;
-    const band = confidenceBand(probability);
+    const dataset = alert.dataset || {};
+    const demo = alert.demo || {};
     const row = el('tr');
 
-    row.appendChild(el('td', 'mono', clockOf(alert.timestamp_utc)));
-    row.appendChild(el('td', 'mono cell-id', alert.record_id));
-    row.appendChild(el('td', 'mono', alert.source || '—'));
-
-    const confidence = el('td');
-    const chip = el('span', 'conf-chip ' + band.cls, band.label);
-    confidence.appendChild(chip);
-    confidence.appendChild(el('span', 'conf-pct mono', pct(probability, 1)));
-    row.appendChild(confidence);
-
-    row.appendChild(el('td', 'mono', probability.toFixed(4)));
-    row.appendChild(el('td', 'mono', '+' + (probability - threshold).toFixed(4)));
-
-    const input = el('td');
-    input.appendChild(el('span', 'row-tag', alert.replayed ? 'replayed' : 'injected'));
-    if (alert.missing_features_imputed) {
-      input.appendChild(el('span', 'row-tag row-tag-warn',
-        alert.missing_features_imputed + ' imputed'));
-    }
-    row.appendChild(input);
+    const time = el('td');
+    time.appendChild(el('span', 'mono', clockOf(alert.timestamp_utc)));
+    time.appendChild(el('span', 'cell-sub mono', 'Flow ' + (dataset.flow_id ?? '—')));
+    row.appendChild(time);
+    row.appendChild(el('td', 'mono', demo.target_client_id || 'baseline'));
+    const truth = el('td');
+    truth.appendChild(el('span', 'row-tag ' +
+      (dataset.ground_truth_label === 'Normal Traffic' ? '' : 'row-tag-warn'),
+    dataset.ground_truth_label || '—'));
+    if (demo.outcome === 'false_alarm') truth.appendChild(el('span', 'cell-sub', 'false alarm'));
+    row.appendChild(truth);
+    row.appendChild(el('td', 'mono route-cell',
+      `${dataset.recorded_source || '—'} → ${dataset.recorded_destination || '—'}`));
+    row.appendChild(el('td', 'mono',
+      `${num(dataset.tx_packets)} / ${num(dataset.rx_packets)} / ${num(dataset.lost_packets)}`));
+    row.appendChild(el('td', 'mono',
+      typeof dataset.throughput_kbps === 'number' ? dataset.throughput_kbps.toFixed(3) + ' Kbps' : '—'));
+    row.appendChild(el('td', 'mono', pct(dataset.packet_drop_rate, 1)));
+    const probabilityCell = el('td');
+    probabilityCell.appendChild(el('span', 'conf-chip conf-very-high', pct(probability, 1)));
+    probabilityCell.appendChild(el('span', 'cell-sub mono', `threshold ${threshold}`));
+    row.appendChild(probabilityCell);
 
     table.appendChild(row);
   }
-}
-
-/* ── Federated network topology ─────────────────────────────────────────
-   Hub and spokes: five clients around one control center, with no client-to-
-   client edges — that absence is the architecture, not a simplification.
-
-   Node state uses the status palette. Every node carries its state as text
-   beside the color, so the encoding never rests on hue alone.
-   ------------------------------------------------------------------------ */
-
-/* Configured container profiles from phase4/DEVICE_PROFILES.md. These are fixed
-   deployment facts, not run telemetry, and the detail panel labels them as such.
-   Device-inspired resource caps — not hardware emulation. */
-const DEVICE_PROFILES = {
-  'uav-client-1': { device: 'Raspberry Pi 4 Model B',   cpu: '0.65 CPU', memory: '512 MiB' },
-  'uav-client-2': { device: 'NVIDIA Jetson Nano',       cpu: '0.55 CPU', memory: '512 MiB' },
-  'uav-client-3': { device: 'Raspberry Pi Zero 2 W',    cpu: '0.35 CPU', memory: '448 MiB' },
-  'uav-client-4': { device: 'NVIDIA Jetson Orin Nano',  cpu: '1.00 CPU', memory: '768 MiB' },
-  'uav-client-5': { device: 'NXP NavQPlus',             cpu: '0.45 CPU', memory: '512 MiB' },
-};
-
-const STATE_BUCKET = {
-  complete: 'complete',
-  round_complete: 'complete',
-  error: 'error',
-  waiting: 'wait',
-};
-
-function stateBucket(clientState) {
-  return STATE_BUCKET[clientState] || 'active';
-}
-
-const BUCKET_COLORS = {
-  complete: { stroke: '--ok',        fill: '--ok-soft' },
-  active:   { stroke: '--accent',    fill: '--accent-soft' },
-  wait:     { stroke: '--ink-muted', fill: '--idle-soft' },
-  error:    { stroke: '--crit',      fill: '--crit-soft' },
-};
-
-function renderTopology() {
-  const container = $('fed-topology');
-  container.textContent = '';
-  const fed = state.snapshot && state.snapshot.federated;
-
-  if (!fed || !fed.clients.length) {
-    container.appendChild(el('div', 'chart-empty', 'Federated telemetry unavailable.'));
-    return;
-  }
-
-  const W = 560, H = 400;
-  const cx = W / 2, cy = H / 2;
-  const orbit = 148;
-  const nodeW = 116, nodeH = 52;
-  const hubW = 132, hubH = 60;
-
-  const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, role: 'group' });
-  svg.setAttribute('aria-label',
-    `Federated topology: ${fed.clients.length} clients connected to one control center`);
-
-  // One vertex at the top, the rest stepped evenly around the circle.
-  const clients = fed.clients;
-  const step = (Math.PI * 2) / clients.length;
-  const positions = clients.map((client, index) => {
-    const angle = -Math.PI / 2 + index * step;
-    return { client, x: cx + Math.cos(angle) * orbit, y: cy + Math.sin(angle) * orbit };
-  });
-
-  // Edges first, so nodes paint over their endpoints.
-  for (const { client, x, y } of positions) {
-    const bucket = stateBucket(client.state);
-    const active = bucket === 'complete' || bucket === 'active';
-    svg.appendChild(svgEl('line', {
-      x1: cx, y1: cy, x2: x, y2: y,
-      stroke: cssVar(active ? BUCKET_COLORS[bucket].stroke : '--line'),
-      'stroke-width': active ? 2 : 1.5,
-      'stroke-dasharray': bucket === 'wait' ? '4 4' : 'none',
-      opacity: active ? 0.55 : 1,
-    }));
-  }
-
-  // Hub
-  svg.appendChild(svgEl('rect', {
-    x: cx - hubW / 2, y: cy - hubH / 2, width: hubW, height: hubH,
-    fill: cssVar('--surface'), stroke: cssVar('--ink'), 'stroke-width': 2,
-  }));
-  const hubLabel = svgEl('text', {
-    x: cx, y: cy - 4, 'text-anchor': 'middle', fill: cssVar('--ink'),
-    'font-size': 13, 'font-weight': 700, 'font-family': 'system-ui, sans-serif',
-  });
-  hubLabel.textContent = 'CONTROL CENTER';
-  svg.appendChild(hubLabel);
-
-  const hubSub = svgEl('text', {
-    x: cx, y: cy + 13, 'text-anchor': 'middle', fill: cssVar('--ink-muted'),
-    'font-size': 11, 'font-family': 'system-ui, sans-serif',
-  });
-  hubSub.textContent = 'FedAvg aggregator';
-  svg.appendChild(hubSub);
-
-  // Client nodes
-  for (const { client, x, y } of positions) {
-    const bucket = stateBucket(client.state);
-    const colors = BUCKET_COLORS[bucket];
-    const selected = state.selectedClient === client.client_id;
-
-    const group = svgEl('g', {
-      class: 'node-box', tabindex: '0', role: 'button',
-      'aria-label': `${client.client_id}, state ${client.state}`,
-    });
-
-    group.appendChild(svgEl('rect', {
-      class: 'node-face',
-      x: x - nodeW / 2, y: y - nodeH / 2, width: nodeW, height: nodeH,
-      fill: cssVar(colors.fill),
-      stroke: cssVar(selected ? '--ink' : colors.stroke),
-      'stroke-width': selected ? 3 : 2,
-    }));
-
-    const idLabel = svgEl('text', {
-      x, y: y - 5, 'text-anchor': 'middle', fill: cssVar('--ink'),
-      'font-size': 12.5, 'font-weight': 700, 'font-family': 'ui-monospace, monospace',
-      'pointer-events': 'none',
-    });
-    idLabel.textContent = client.client_id.replace('uav-', '');
-    group.appendChild(idLabel);
-
-    const stateLabel = svgEl('text', {
-      x, y: y + 12, 'text-anchor': 'middle', fill: cssVar('--ink-2'),
-      'font-size': 10.5, 'font-family': 'system-ui, sans-serif', 'pointer-events': 'none',
-    });
-    stateLabel.textContent = client.state.replace(/_/g, ' ');
-    group.appendChild(stateLabel);
-
-    const select = () => {
-      state.selectedClient = client.client_id;
-      renderTopology();
-      renderClientDetail();
-    };
-    group.addEventListener('click', select);
-    group.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); select(); }
-    });
-
-    const info = state.clientInfo[client.client_id] || {};
-    attachTip(group, () =>
-      `<strong>${client.client_id}</strong><br>` +
-      `<span class="tip-k">state</span> ${client.state.replace(/_/g, ' ')}` +
-      (info.samples != null ? `<br><span class="tip-k">local rows</span> ${num(info.samples)}` : '') +
-      '<br><span class="tip-k">click for detail</span>');
-
-    svg.appendChild(group);
-  }
-
-  container.appendChild(svg);
-}
-
-function detailRow(list, key, value, absentText) {
-  list.appendChild(el('dt', null, key));
-  const present = value !== null && value !== undefined && value !== '';
-  list.appendChild(el('dd', present ? null : 'absent',
-    present ? String(value) : (absentText || 'not reported in this run')));
-}
-
-function renderClientDetail() {
-  const container = $('client-detail');
-  container.textContent = '';
-  const fed = state.snapshot && state.snapshot.federated;
-  const client = fed && fed.clients.find((c) => c.client_id === state.selectedClient);
-
-  if (!client) {
-    container.appendChild(el('div', 'detail-empty',
-      'Select a node in the network to inspect that client.'));
-    return;
-  }
-
-  const info = state.clientInfo[client.client_id] || {};
-  const training = state.clientTraining[client.client_id] || {};
-  const configured = DEVICE_PROFILES[client.client_id];
-  const bucket = stateBucket(client.state);
-
-  const head = el('div', 'detail-head');
-  head.appendChild(el('div', 'detail-id', client.client_id));
-  const chipClass = { complete: 'chip-complete', error: 'chip-error', wait: 'chip-wait' }[bucket]
-    || 'chip-active';
-  head.appendChild(el('span', 'chip ' + chipClass, client.state.replace(/_/g, ' ')));
-  container.appendChild(head);
-
-  // Configured deployment facts — constant across runs.
-  if (configured) {
-    const group = el('div', 'detail-group');
-    group.appendChild(el('h3', null, 'Configured profile'));
-    const list = el('dl', 'detail-rows');
-    detailRow(list, 'Device inspiration', configured.device);
-    detailRow(list, 'CPU limit', configured.cpu);
-    detailRow(list, 'Memory limit', configured.memory);
-    group.appendChild(list);
-    container.appendChild(group);
-  }
-
-  // Reported by the current run — may be absent in a recorded excerpt.
-  const reported = el('div', 'detail-group');
-  reported.appendChild(el('h3', null, 'Reported by this run'));
-  const list = el('dl', 'detail-rows');
-  detailRow(list, 'Local rows', info.samples != null ? num(info.samples) : null);
-
-  // A recorded excerpt carries training telemetry for only some clients. Six
-  // identical "not reported" rows read as a broken panel, so collapse the whole
-  // absent block into one statement instead.
-  const hasTraining = ['round', 'macro_f1', 'loss', 'training_ms', 'update_bytes']
-    .some((key) => training[key] != null);
-
-  if (hasTraining) {
-    detailRow(list, 'Round', training.round != null ? String(training.round) : null);
-    detailRow(list, 'Local macro F1', training.macro_f1 != null ? fixed(training.macro_f1) : null);
-    detailRow(list, 'Local loss', training.loss != null ? fixed(training.loss) : null);
-    detailRow(list, 'Training time',
-      training.training_ms != null ? training.training_ms.toFixed(0) + ' ms' : null);
-    detailRow(list, 'Update size',
-      training.update_bytes != null ? num(training.update_bytes) + ' B' : null);
-  }
-  reported.appendChild(list);
-
-  if (!hasTraining) {
-    reported.appendChild(el('p', 'detail-absent',
-      state.snapshot && state.snapshot.presentation_mode === 'live'
-        ? 'No training round reported for this client yet.'
-        : 'This client’s per-round training telemetry is not part of the recorded excerpt. A live federated run reports it for all five.'));
-  }
-  container.appendChild(reported);
-
-  container.appendChild(el('p', 'detail-note',
-    'Configured profile is a fixed container resource cap from the deployment ' +
-    'documentation. Run values come from this run’s federated events; a recorded ' +
-    'excerpt does not carry every client’s telemetry.'));
-}
-
-function renderFederation() {
-  const fed = state.snapshot && state.snapshot.federated;
-  renderTopology();
-  renderClientDetail();
-  if (!fed) return;
-
-  $('fed-round').textContent = 'round ' + fed.current_round + ' of ' + fed.total_rounds;
-  $('updates-text').textContent = fed.updates_received + ' / ' + fed.updates_expected;
-  const ratio = fed.updates_expected ? fed.updates_received / fed.updates_expected : 0;
-  $('updates-meter').style.width = Math.round(ratio * 100) + '%';
-  $('local-data-statement').textContent = fed.local_data_statement || '';
-}
-
-function renderRejections() {
-  renderRejectionChart($('reject-chart'), state.rejections);
-  const fed = state.snapshot && state.snapshot.federated;
-  const reported = fed && fed.security ? fed.security.rejected_messages : null;
-  const mined = Object.values(state.rejections).reduce((a, b) => a + b, 0);
-  $('reject-total').textContent = (reported != null ? reported : mined) + ' total';
 }
 
 function renderVolume() {
@@ -1160,14 +808,10 @@ function renderVolume() {
 }
 
 function renderDashboard() {
-  renderVerdict();
   renderKpis();
   renderTimeline($('timeline-chart'), state.history,
     state.snapshot ? state.snapshot.model.decision_threshold : 0.42);
-  renderVolume();
   renderAlerts();
-  renderFederation();
-  renderRejections();
   renderConsole();
 }
 
@@ -1179,16 +823,17 @@ function renderModelIdentity() {
   const snap = state.snapshot;
   if (!snap) return;
 
+  const technical = snap.evidence && snap.evidence.technical;
+  const architecture = technical && Array.isArray(technical.architecture)
+    ? technical.architecture.join('–') : '—';
+
   const rows = [
     ['Model ID', snap.model.model_id],
     ['Version', snap.model.model_version],
-    ['Task', snap.model.task],
-    ['Labels', snap.model.labels.join(' · ')],
-    ['Positive class', snap.model.positive_class],
-    ['Decision threshold', String(snap.model.decision_threshold)],
-    ['Inference mode', snap.backend.inference_mode],
-    ['Adapter started', clockOf(snap.backend.started_utc)],
-    ['API version', snap.api_version],
+    ['Architecture', architecture],
+    ['Binary labels', snap.model.labels.join(' / ')],
+    ['Frozen threshold', String(snap.model.decision_threshold)],
+    ['Checkpoint SHA-256', technical ? technical.checkpoint_sha256 : '—'],
   ];
 
   for (const [key, value] of rows) {
@@ -1197,13 +842,10 @@ function renderModelIdentity() {
   }
 }
 
-function renderFrozenMetrics() {
-  const container = $('frozen-metrics');
+function renderLockedTestMetrics(locked) {
+  const container = $('locked-test-metrics');
   container.textContent = '';
-  const snap = state.snapshot;
-  if (!snap) return;
-
-  const metrics = snap.model.frozen_validation_metrics || {};
+  const metrics = locked.federated_fedavg;
   const rows = [
     ['Macro F1', metrics.macro_f1],
     ['Attack precision', metrics.attack_precision],
@@ -1214,26 +856,16 @@ function renderFrozenMetrics() {
   for (const [key, value] of rows) {
     const tile = el('div', 'metric');
     tile.appendChild(el('div', 'metric-key', key));
-    tile.appendChild(el('div', 'metric-val', typeof value === 'number' ? value.toFixed(4) : '—'));
+    tile.appendChild(el('div', 'metric-val', pct(value, 2)));
     container.appendChild(tile);
   }
-
-  $('metrics-source').textContent = snap.model.metrics_note ? 'saved evidence' : '';
+  $('locked-test-rows').textContent = num(locked.rows) + ' locked-test flows';
 }
 
-function renderConfusionMatrix() {
+function renderConfusionMatrix(locked) {
   const container = $('confusion-matrix');
   container.textContent = '';
-
-  const source = state.roundMetrics.find((r) => r.final) ||
-    state.roundMetrics[state.roundMetrics.length - 1];
-
-  if (!source || source.tp == null) {
-    container.appendChild(el('div', 'chart-empty',
-      'No round_metrics event received yet — the confusion matrix arrives with the federated event feed.'));
-    $('cm-rows').textContent = '';
-    return;
-  }
+  const source = locked.federated_fedavg;
 
   container.appendChild(el('div', 'cm-h', ''));
   container.appendChild(el('div', 'cm-h', 'predicted attack'));
@@ -1254,98 +886,38 @@ function renderConfusionMatrix() {
     }
   }
 
-  $('cm-rows').textContent = num(source.rows) + ' validation rows';
+  $('cm-rows').textContent = num(locked.rows) + ' flows';
 }
 
-const ROUND_METRIC_COLUMNS = [
-  ['macro_f1', 'Macro F1'], ['accuracy', 'Accuracy'], ['balanced_accuracy', 'Balanced acc.'],
-  ['attack_precision', 'Atk precision'], ['attack_recall', 'Atk recall'], ['attack_f1', 'Atk F1'],
-  ['normal_precision', 'Nrm precision'], ['normal_recall', 'Nrm recall'], ['normal_f1', 'Nrm F1'],
-  ['roc_auc', 'ROC AUC'], ['pr_auc', 'PR AUC'], ['log_loss', 'Log loss'],
-  ['fpr', 'FPR'], ['fnr', 'FNR'],
-];
-
-function renderRoundMetricsTable() {
-  const table = $('round-metrics-table');
-  table.textContent = '';
-
-  if (!state.roundMetrics.length) {
-    const body = document.createElement('tbody');
-    const row = document.createElement('tr');
-    const cell = document.createElement('td');
-    cell.textContent = 'Waiting for round_metrics events from the federated feed.';
-    cell.style.color = cssVar('--ink-muted');
-    row.appendChild(cell);
-    body.appendChild(row);
-    table.appendChild(body);
-    $('round-metrics-tag').textContent = '';
-    return;
+function renderComparison(locked) {
+  const container = $('comparison-bars');
+  container.textContent = '';
+  const entries = [
+    ['Local-only mean', locked.local_only.mean_macro_f1, 'comparison-local'],
+    ['Federated FedAvg', locked.federated_fedavg.macro_f1, 'comparison-federated'],
+    ['Centralized', locked.centralized.macro_f1, 'comparison-centralized'],
+  ];
+  for (const [label, value, className] of entries) {
+    const row = el('div', 'comparison-row ' + className);
+    row.appendChild(el('div', 'comparison-label', label));
+    const track = el('div', 'comparison-track');
+    const bar = el('div', 'comparison-fill');
+    bar.style.width = Math.max(0, Math.min(100, value * 100)) + '%';
+    track.appendChild(bar);
+    row.appendChild(track);
+    row.appendChild(el('div', 'comparison-value', pct(value, 2)));
+    container.appendChild(row);
   }
 
-  const head = document.createElement('thead');
-  const headRow = document.createElement('tr');
-  headRow.appendChild(el('th', null, 'Metric'));
-  for (const record of state.roundMetrics) {
-    headRow.appendChild(el('th', null, record.final ? 'final' : 'round ' + record.round));
-  }
-  head.appendChild(headRow);
-  table.appendChild(head);
-
-  const body = document.createElement('tbody');
-  for (const [key, label] of ROUND_METRIC_COLUMNS) {
-    const row = document.createElement('tr');
-    row.appendChild(el('td', 'name', label));
-    for (const record of state.roundMetrics) {
-      row.appendChild(el('td', 'num', fixed(record[key])));
-    }
-    body.appendChild(row);
-  }
-  table.appendChild(body);
-
-  $('round-metrics-tag').textContent = state.roundMetrics.length + ' evaluations';
-}
-
-function renderClientTable() {
-  const table = $('client-table');
-  table.textContent = '';
-
-  const ids = Object.keys({ ...state.clientInfo, ...state.clientTraining }).sort();
-  if (!ids.length) {
-    const body = document.createElement('tbody');
-    const row = document.createElement('tr');
-    const cell = document.createElement('td');
-    cell.textContent = 'Waiting for client events from the federated feed.';
-    cell.style.color = cssVar('--ink-muted');
-    row.appendChild(cell);
-    body.appendChild(row);
-    table.appendChild(body);
-    return;
-  }
-
-  const columns = ['Client', 'Device profile', 'Local rows', 'Round', 'Local macro F1',
-    'Local loss', 'Train ms', 'Update bytes'];
-  const head = document.createElement('thead');
-  const headRow = document.createElement('tr');
-  for (const c of columns) headRow.appendChild(el('th', null, c));
-  head.appendChild(headRow);
-  table.appendChild(head);
-
-  const body = document.createElement('tbody');
-  for (const id of ids) {
-    const info = state.clientInfo[id] || {};
-    const training = state.clientTraining[id] || {};
-    const row = document.createElement('tr');
-    row.appendChild(el('td', 'name', id));
-    row.appendChild(el('td', null, info.profile || '—'));
-    row.appendChild(el('td', 'num', info.samples != null ? num(info.samples) : '—'));
-    row.appendChild(el('td', 'num', training.round != null ? String(training.round) : '—'));
-    row.appendChild(el('td', 'num', fixed(training.macro_f1)));
-    row.appendChild(el('td', 'num', fixed(training.loss)));
-    row.appendChild(el('td', 'num', training.training_ms != null ? training.training_ms.toFixed(1) : '—'));
-    row.appendChild(el('td', 'num', training.update_bytes != null ? num(training.update_bytes) : '—'));
-    body.appendChild(row);
-  }
-  table.appendChild(body);
+  const gain = locked.macro_f1_deltas.fedavg_vs_local_mean * 100;
+  const gap = Math.abs(locked.macro_f1_deltas.fedavg_vs_centralized * 100);
+  const conclusion = $('comparison-conclusion');
+  conclusion.textContent = '';
+  const lead = el('strong', null, 'Mixed result. ');
+  conclusion.appendChild(lead);
+  conclusion.appendChild(document.createTextNode(
+    `FedAvg improved on the isolated-client mean by ${gain.toFixed(2)} percentage points, ` +
+    `but remained ${gap.toFixed(2)} points below centralized pooling.`));
 }
 
 function renderFeatureList() {
@@ -1357,39 +929,96 @@ function renderFeatureList() {
   $('feature-count').textContent = snap.model.feature_count + ' inputs';
 }
 
-function renderSecurity() {
-  const container = $('security-kv');
+function appendKv(container, rows) {
   container.textContent = '';
-  const fed = state.snapshot && state.snapshot.federated;
-  if (!fed || !fed.security) return;
-
-  const security = fed.security;
-  const algorithms = security.algorithms || {};
-  const rows = [
-    ['Mode', security.mode],
-    ['Status', security.status],
-    ['Key establishment', algorithms.kem || 'not reported'],
-    ['Client authentication', algorithms.signature || 'not reported'],
-    ['Payload protection', algorithms.aead || 'not reported'],
-    ['Key derivation', algorithms.kdf || 'not reported'],
-    ['Authenticated clients', String(security.authenticated_clients)],
-    ['Rejected messages', String(security.rejected_messages)],
-  ];
-
   for (const [key, value] of rows) {
     container.appendChild(el('dt', null, key));
     container.appendChild(el('dd', null, value == null ? '—' : String(value)));
   }
 }
 
-function renderAiData() {
+function renderTechnicalDetails(evidence) {
   renderModelIdentity();
-  renderFrozenMetrics();
-  renderConfusionMatrix();
-  renderRoundMetricsTable();
-  renderClientTable();
   renderFeatureList();
-  renderSecurity();
+  const technical = evidence.technical;
+  appendKv($('preprocessing-details'), [
+    ['Fit rows', num(technical.preprocessor_fit_rows)],
+    ['Fit scope', technical.preprocessor_fit_scope],
+    ['Privacy limitation', technical.privacy_limitation],
+  ]);
+
+  const list = $('client-score-list');
+  list.textContent = '';
+  for (const client of evidence.locked_test.local_only.clients) {
+    const row = el('div', 'client-score-row');
+    row.appendChild(el('span', 'mono', client.client_id));
+    row.appendChild(el('strong', null, pct(client.macro_f1, 2)));
+    list.appendChild(row);
+  }
+}
+
+function renderClientSummary(locked) {
+  const container = $('client-summary');
+  container.textContent = '';
+  const summary = locked.local_only;
+  const entries = [
+    ['Best', summary.best_model.replace('local/', ''), summary.best_macro_f1],
+    ['Five-client mean', 'local-only baseline', summary.mean_macro_f1],
+    ['Worst', summary.worst_model.replace('local/', ''), summary.worst_macro_f1],
+  ];
+  for (const [label, client, value] of entries) {
+    const card = el('div', 'client-summary-card');
+    card.appendChild(el('div', 'metric-key', label));
+    card.appendChild(el('div', 'client-summary-value', pct(value, 2)));
+    card.appendChild(el('div', 'client-summary-name', client));
+    container.appendChild(card);
+  }
+}
+
+function renderSecurityEvidence(security) {
+  const badges = $('algorithm-badges');
+  badges.textContent = '';
+  const algorithms = security.algorithms;
+  const items = [
+    ['Key establishment', algorithms.kem],
+    ['Authentication', algorithms.signature],
+    ['Key derivation', algorithms.kdf],
+    ['Payload protection', algorithms.aead],
+  ];
+  for (const [role, name] of items) {
+    const badge = el('div', 'algorithm-badge');
+    badge.appendChild(el('span', null, role));
+    badge.appendChild(el('strong', null, name));
+    badges.appendChild(badge);
+  }
+
+  const summary = $('security-summary');
+  summary.textContent = '';
+  const statements = [
+    `${security.authenticated_clients} authenticated clients completed training`,
+    `${security.rejected_messages} controlled malicious messages were safely rejected`,
+    `Plain and secure aggregation matched exactly (max difference ${security.maximum_plain_secure_difference}; tolerance ${security.tolerance})`,
+  ];
+  for (const statement of statements) summary.appendChild(el('div', 'security-proof', statement));
+  $('security-result').textContent = security.rejected_messages + ' / ' +
+    security.rejected_messages + ' rejected safely';
+  renderRejectionChart($('reject-chart'), security.rejection_categories);
+}
+
+function renderAiData() {
+  const evidence = state.snapshot && state.snapshot.evidence;
+  const available = !!(evidence && evidence.available);
+  $('evidence-unavailable').hidden = available;
+  $('evidence-content').hidden = !available;
+  $('evidence-state').textContent = available ? 'verified saved evidence' : 'evidence unavailable';
+  if (!available) return;
+
+  renderLockedTestMetrics(evidence.locked_test);
+  renderComparison(evidence.locked_test);
+  renderConfusionMatrix(evidence.locked_test);
+  renderClientSummary(evidence.locked_test);
+  renderSecurityEvidence(evidence.security_test);
+  renderTechnicalDetails(evidence);
 }
 
 /* ── Rendering: console ─────────────────────────────────────────────── */
@@ -1515,9 +1144,7 @@ function render() {
   const banner = $('error-banner');
   if (state.error) {
     banner.hidden = false;
-    banner.textContent =
-      `Adapter unreachable — ${state.error}. Start it with: python -m gui_integration.backend ` +
-      `--allowed-origins ${location.origin}. Values below are the last known state and are not live.`;
+    banner.textContent = `Dashboard notice — ${state.error}.`;
   } else {
     banner.hidden = true;
   }
@@ -1551,6 +1178,11 @@ async function pollInferenceEvents() {
   try {
     const page = await api.events(state.inferenceCursor);
     if (page.events && page.events.length) {
+      for (const event of page.events) {
+        if (event.event_type === 'prediction_completed' && event.payload) {
+          recordPrediction(event.payload);
+        }
+      }
       state.inferenceLog.push(...page.events);
       if (state.inferenceLog.length > 500) {
         state.inferenceLog.splice(0, state.inferenceLog.length - 500);
@@ -1568,10 +1200,6 @@ async function pollFederatedEvents() {
     state.federatedPaced = page.data_mode === 'replay';
 
     if (events.length) {
-      // Mine derived state immediately — the tables and charts should be correct
-      // straight away even though the log itself is released at presentation pace.
-      for (const event of events) mineFederatedEvent(event);
-
       if (state.federatedPaced) state.pendingFederated.push(...events);
       else state.federatedLog.push(...events);
     }
@@ -1587,119 +1215,103 @@ function releasePendingFederated() {
 
 /* ── Injector ───────────────────────────────────────────────────────── */
 
-function setBusy(busy) {
+/* ── Locked-test traffic replay ─────────────────────────────────────────── */
+
+function setTrafficBusy(busy) {
   state.busy = busy;
-  $('btn-single').disabled = busy || !state.connected;
-  $('btn-replay').disabled = busy || !state.connected;
+  const start = $('btn-traffic');
+  const reset = $('btn-traffic-reset');
+  if (start) start.disabled = busy || !state.connected;
+  if (reset) reset.disabled = busy || !state.connected;
 }
 
-function renderReadout(vector, profileId) {
-  const readout = $('inject-readout');
-  const grid = $('readout-grid');
-  readout.hidden = false;
-  grid.textContent = '';
-
-  for (const feature of READOUT_FEATURES) {
-    const cell = el('div');
-    cell.appendChild(el('dt', null, feature));
-    const value = vector[feature];
-    cell.appendChild(el('dd', null,
-      typeof value === 'number' ? (Number.isInteger(value) ? num(value) : value.toPrecision(4)) : '—'));
-    grid.appendChild(cell);
-  }
-  $('inject-state').textContent =
-    (state.streaming ? 'sending · ' : 'sent one · ') + profileLabel(profileId);
-}
-
-async function injectOnce() {
-  if (state.busy || !state.connected) return;
-  setBusy(true);
-  const profileId = state.profile;
-  const vector = generateVector(profileId);
+async function sendNextNormal() {
+  if (state.busy || !state.connected || !state.trafficRunning) return;
+  setTrafficBusy(true);
   try {
-    const prediction = await api.predict({
-      record_id: 'inj-' + Date.now().toString(36),
-      source: 'sim:' + profileId,
-      features: vector,
-    });
-    recordPrediction(prediction, { fromThisTab: true, vector });
-    state.lastVector = vector;
-    state.lastProfile = profileId;
-    renderReadout(vector, profileId);
+    const prediction = await api.demoNextNormal();
+    recordPrediction(prediction, { fromThisTab: true });
+    $('traffic-state').textContent = 'running · locked-test Normal';
     render();
   } catch (error) {
-    state.error = error.message;
+    if (error.code === 'demo_pool_exhausted') {
+      pauseTraffic();
+      $('traffic-state').textContent = 'complete · pool exhausted';
+    } else {
+      state.error = error.message;
+      pauseTraffic();
+    }
     render();
   } finally {
-    setBusy(false);
+    setTrafficBusy(false);
   }
 }
 
-async function replayOnce() {
-  if (state.busy || !state.connected) return;
-  setBusy(true);
-  try {
-    const result = await api.replayNext();
-    recordPrediction(result.prediction, { fromThisTab: true });
-    $('inject-state').textContent =
-      `saved packet ${result.position} of ${result.total_records}`;
-    render();
-  } catch (error) {
-    state.error = error.message;
-    render();
-  } finally {
-    setBusy(false);
-  }
-}
-
-function scheduleStream() {
-  if (!state.streaming) return;
-  state.streamTimer = setTimeout(async () => {
-    await injectOnce();
-    scheduleStream();
+function scheduleTraffic() {
+  if (!state.trafficRunning) return;
+  state.trafficTimer = setTimeout(async () => {
+    await sendNextNormal();
+    scheduleTraffic();
   }, state.intervalMs);
 }
 
-function startStream() {
-  if (state.streaming) return;
-  state.streaming = true;
-  $('btn-stream').textContent = 'Stop sending';
-  $('btn-stream').classList.add('is-running');
-  $('inject-state').textContent = 'sending · ' + profileLabel(state.profile);
-  injectOnce().then(scheduleStream);
+function startTraffic() {
+  if (state.trafficRunning || !state.connected) return;
+  state.trafficRunning = true;
+  $('btn-traffic').textContent = 'Pause Traffic';
+  $('btn-traffic').classList.add('is-running');
+  $('traffic-state').textContent = 'starting · locked-test Normal';
+  sendNextNormal().then(scheduleTraffic);
 }
 
-function stopStream() {
-  state.streaming = false;
-  clearTimeout(state.streamTimer);
-  $('btn-stream').textContent = 'Start sending';
-  $('btn-stream').classList.remove('is-running');
-  $('inject-state').textContent = 'idle';
+function pauseTraffic() {
+  state.trafficRunning = false;
+  clearTimeout(state.trafficTimer);
+  if ($('btn-traffic')) {
+    $('btn-traffic').textContent = 'Start Traffic';
+    $('btn-traffic').classList.remove('is-running');
+  }
+  if ($('traffic-state') && !$('traffic-state').textContent.includes('complete')) {
+    $('traffic-state').textContent = 'paused';
+  }
+}
+
+async function resetTraffic() {
+  if (state.busy || !state.connected) return;
+  pauseTraffic();
+  setTrafficBusy(true);
+  try {
+    const session = await api.demoReset();
+    state.history = [];
+    state.volume = [];
+    state.seenPredictions = new Set();
+    state.inferenceLog = [];
+    state.inferenceCursor = session.last_event_seq || state.inferenceCursor;
+    if (state.snapshot) state.snapshot.dataset_demo = session;
+    $('traffic-state').textContent = 'ready · stream restarted';
+    render();
+  } catch (error) {
+    state.error = error.message;
+    render();
+  } finally {
+    setTrafficBusy(false);
+  }
+}
+
+function openAttackerView() {
+  const url = 'attacker.html?api=' + encodeURIComponent(API_BASE);
+  const popup = window.open(url, 'rasid-attacker', 'popup,width=1380,height=900,resizable=yes,scrollbars=yes');
+  if (!popup) {
+    state.error = 'The browser blocked Attacker View. Allow pop-ups for this local page and try again';
+    render();
+  }
 }
 
 /* ── Wiring ─────────────────────────────────────────────────────────── */
 
-function buildProfileButtons() {
-  const container = $('profile-buttons');
-  container.textContent = '';
-  for (const profile of PROFILES) {
-    const button = el('button', 'profile-btn' + (state.profile === profile.id ? ' is-active' : ''),
-      profile.name);
-    button.addEventListener('click', () => {
-      state.profile = profile.id;
-      buildProfileButtons();
-      $('profile-desc').textContent = profile.desc;
-      if (state.streaming) $('inject-state').textContent = 'sending · ' + profileLabel(profile.id);
-    });
-    container.appendChild(button);
-  }
-  const active = PROFILES.find((p) => p.id === state.profile);
-  $('profile-desc').textContent = active ? active.desc : '';
-}
-
 function switchView(view) {
   state.view = view;
-  for (const button of document.querySelectorAll('.nav-item')) {
+  for (const button of document.querySelectorAll('.nav-item[data-view]')) {
     const isActive = button.dataset.view === view;
     button.classList.toggle('is-active', isActive);
     button.setAttribute('aria-selected', String(isActive));
@@ -1734,7 +1346,7 @@ function applyTheme(theme) {
 }
 
 function wire() {
-  for (const button of document.querySelectorAll('.nav-item')) {
+  for (const button of document.querySelectorAll('.nav-item[data-view]')) {
     button.addEventListener('click', () => switchView(button.dataset.view));
   }
 
@@ -1753,14 +1365,20 @@ function wire() {
     });
   }
 
-  $('btn-stream').addEventListener('click', () => (state.streaming ? stopStream() : startStream()));
-  $('btn-single').addEventListener('click', injectOnce);
-  $('btn-replay').addEventListener('click', replayOnce);
+  $('btn-traffic').addEventListener('click', () =>
+    (state.trafficRunning ? pauseTraffic() : startTraffic()));
+  $('btn-traffic-reset').addEventListener('click', resetTraffic);
+  $('btn-attacker-view').addEventListener('click', openAttackerView);
+  $('btn-alert-history').addEventListener('click', () => {
+    state.alertsExpanded = !state.alertsExpanded;
+    renderAlerts();
+  });
+  $('btn-alert-export').addEventListener('click', exportAlerts);
 
-  const rate = $('inject-rate');
+  const rate = $('traffic-rate');
   rate.addEventListener('input', () => {
     state.intervalMs = Number(rate.value);
-    $('inject-rate-out').textContent = (state.intervalMs / 1000).toFixed(1) + ' s';
+    $('traffic-rate-out').textContent = (state.intervalMs / 1000).toFixed(2).replace(/0$/, '') + ' s';
   });
 
   $('btn-clear-console').addEventListener('click', () => {
@@ -1769,7 +1387,6 @@ function wire() {
     renderConsole();
   });
 
-  buildProfileButtons();
   buildSeverityFilters();
   // Sync the button's label with whatever the pre-paint script chose.
   applyTheme(currentTheme());
@@ -1787,6 +1404,7 @@ async function boot() {
 
   try {
     await api.health();
+    state.demoCatalog = await api.demoCatalog();
     state.connected = true;
   } catch (error) {
     state.connected = false;

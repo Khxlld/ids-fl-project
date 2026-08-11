@@ -4,12 +4,15 @@
   const DEFAULT_CONFIG = {
     apiBase: "http://127.0.0.1:8090/api/gui/v1",
     pollMs: 1200,
-    requestTimeoutMs: 1800,
+    requestTimeoutMs: 4500,
+    connectTimeoutMs: 20000,
+    liveRetryMs: 750,
   };
 
   const state = {
     config: { ...DEFAULT_CONFIG },
     replayData: null,
+    streamData: null,
     mode: "recorded",
     activeView: "monitor",
     liveStatus: "checking",
@@ -17,6 +20,7 @@
     snapshot: null,
     replayStageIndex: 0,
     replayPredictionCursor: 0,
+    liveDemoTotal: null,
     replayPlaying: false,
     replaySpeed: 1,
     replayTimer: null,
@@ -30,7 +34,25 @@
     federatedCursor: 0,
     sessionStarted: Date.now(),
     busy: false,
+    securityEvidenceVisible: false,
+    connectionAttempting: false,
+    connectionSteps: [],
+    connectionDiagnosis: "No connection check has run.",
+    connectionBannerUntil: 0,
   };
+
+  const FEDERATION_STAGE_COUNT = 7;
+  const SECTION_ORDER = ["monitor", "federation", "security", "evidence"];
+
+  class RequestFailure extends Error {
+    constructor(message, { kind = "unexpected", status = null, code = null } = {}) {
+      super(message);
+      this.name = "RequestFailure";
+      this.kind = kind;
+      this.status = status;
+      this.code = code;
+    }
+  }
 
   const $ = (id) => document.getElementById(id);
   const all = (selector) => Array.from(document.querySelectorAll(selector));
@@ -139,26 +161,40 @@
     if (state.federatedEvents.length > 160) state.federatedEvents = state.federatedEvents.slice(-160);
   }
 
-  async function fetchJson(url, options = {}) {
+  async function fetchJson(url, options = {}, timeoutMs = state.config.requestTimeoutMs) {
     const controller = new AbortController();
-    const timeout = window.setTimeout(() => controller.abort(), state.config.requestTimeoutMs);
+    const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
     try {
-      const response = await fetch(url, {
-        cache: "no-store",
-        ...options,
-        headers: {
-          Accept: "application/json",
-          ...(options.body ? { "Content-Type": "application/json" } : {}),
-          ...(options.headers || {}),
-        },
-        signal: controller.signal,
-      });
+      let response;
+      try {
+        response = await fetch(url, {
+          cache: "no-store",
+          ...options,
+          headers: {
+            Accept: "application/json",
+            ...(options.body ? { "Content-Type": "application/json" } : {}),
+            ...(options.headers || {}),
+          },
+          signal: controller.signal,
+        });
+      } catch (error) {
+        if (error?.name === "AbortError") {
+          throw new RequestFailure("The request timed out.", { kind: "timeout" });
+        }
+        throw new RequestFailure("The browser could not reach the adapter.", { kind: "network" });
+      }
       const payload = await response.json().catch(() => null);
       if (!response.ok) {
         const message = payload?.error?.message || `Request failed with HTTP ${response.status}`;
-        throw new Error(message);
+        throw new RequestFailure(message, {
+          kind: "http",
+          status: response.status,
+          code: payload?.error?.code || null,
+        });
       }
-      if (!payload || typeof payload !== "object") throw new Error("The server returned an invalid JSON response.");
+      if (!payload || typeof payload !== "object") {
+        throw new RequestFailure("The server returned an invalid JSON response.", { kind: "contract" });
+      }
       return payload;
     } finally {
       window.clearTimeout(timeout);
@@ -171,8 +207,9 @@
 
   function showBanner(message, kind = "warning", actionLabel = "", action = null) {
     const banner = $("statusBanner");
-    banner.classList.remove("hidden", "error");
+    banner.classList.remove("hidden", "error", "success");
     if (kind === "error") banner.classList.add("error");
+    if (kind === "success") banner.classList.add("success");
     setText("statusBannerText", message);
     const button = $("statusBannerAction");
     if (actionLabel && typeof action === "function") {
@@ -189,24 +226,49 @@
     $("statusBanner").classList.add("hidden");
   }
 
+  function renderConnectionDetails() {
+    if (!state.replayData) return;
+    setText("connectionApiUrl", state.config.apiBase);
+    setText("connectionDiagnosis", state.connectionDiagnosis);
+    const list = $("connectionSteps");
+    list.replaceChildren();
+    for (const step of state.connectionSteps) {
+      const item = document.createElement("li");
+      item.className = step.status;
+      const marker = document.createElement("i");
+      const copy = document.createElement("div");
+      const label = document.createElement("strong");
+      label.textContent = step.label;
+      const detail = document.createElement("span");
+      detail.textContent = step.detail || step.status;
+      copy.append(label, detail);
+      item.append(marker, copy);
+      list.append(item);
+    }
+  }
+
   function visibleReplayEvents(index) {
     const sequences = new Set();
-    for (let i = 0; i <= index; i += 1) {
+    for (let i = 0; i <= Math.min(index, FEDERATION_STAGE_COUNT - 1); i += 1) {
       for (const seq of state.replayData.replay_stages[i].event_sequences || []) sequences.add(seq);
+    }
+    if (state.securityEvidenceVisible) {
+      const securityStage = state.replayData.replay_stages.find((stage) => stage.id === "rejections");
+      for (const seq of securityStage?.event_sequences || []) sequences.add(seq);
     }
     return state.replayData.federated_events.filter((event) => sequences.has(event.seq));
   }
 
   function buildReplaySnapshot() {
     const data = state.replayData;
-    const stage = data.replay_stages[state.replayStageIndex];
+    const stage = data.replay_stages[Math.min(state.replayStageIndex, FEDERATION_STAGE_COUNT - 1)];
     const clients = data.clients.map((client) => ({ ...client, state: stage.client_state }));
     const predictions = state.predictionHistory;
     const latest = predictions.at(-1) || null;
     const alerts = predictions.filter((item) => item.label === "Attack").slice(-20).reverse();
     const security = data.evidence.security;
-    const rejectionCount = finiteNumber(stage.rejected_messages) ? stage.rejected_messages : 0;
-    const authenticated = state.replayStageIndex >= 1 ? security.authenticated_clients : 0;
+    const rejectionCount = state.securityEvidenceVisible ? security.rejected_messages : 0;
+    const authenticated = (state.securityEvidenceVisible || state.replayStageIndex >= 1) ? security.authenticated_clients : 0;
     const normalCount = predictions.filter((item) => item.label === "Normal").length;
     const attackCount = predictions.filter((item) => item.label === "Attack").length;
 
@@ -232,7 +294,7 @@
         data_mode: "replay",
         upstream_available: false,
         run_id: "23795a6c-4d27-4d27-96e1-1da6954d7c9c",
-        state: stage.id === "complete" || state.replayStageIndex > 6 ? "completed" : stage.id,
+        state: stage.id === "complete" ? "completed" : stage.id,
         current_round: stage.round,
         total_rounds: 3,
         updates_received: stage.updates,
@@ -256,18 +318,18 @@
     };
   }
 
-  function applyReplayStage(index, { announce = false } = {}) {
-    const max = state.replayData.replay_stages.length - 1;
+  function applyFederationStage(index, { announce = false } = {}) {
+    const max = FEDERATION_STAGE_COUNT - 1;
     state.replayStageIndex = Math.min(Math.max(index, 0), max);
     const stage = state.replayData.replay_stages[state.replayStageIndex];
-    if (Number.isInteger(stage.prediction_index)) appendPrediction(state.replayData.predictions[stage.prediction_index]);
     state.federatedEvents = visibleReplayEvents(state.replayStageIndex);
     state.snapshot = buildReplaySnapshot();
-    if (announce) showBanner(`Recorded stage: ${stage.title}`, "warning");
+    if (announce) showBanner(`Federation stage: ${stage.title}`, "warning");
     render();
   }
 
   function switchToRecorded({ preserveStage = true } = {}) {
+    stopReplay();
     stopLivePolling();
     state.mode = "recorded";
     state.liveStatus = state.liveStatus === "checking" ? "offline" : state.liveStatus;
@@ -278,23 +340,108 @@
     state.inferenceEvents = [];
     state.predictionHistory = [];
     state.replayPredictionCursor = 0;
+    state.liveDemoTotal = null;
+    state.securityEvidenceVisible = state.activeView === "security";
     if (!preserveStage) state.replayStageIndex = 0;
-    applyReplayStage(state.replayStageIndex);
+    applyFederationStage(state.replayStageIndex);
+  }
+
+  function setConnectionStep(label, status, detail = "") {
+    const existing = state.connectionSteps.find((step) => step.label === label);
+    if (existing) Object.assign(existing, { status, detail });
+    else state.connectionSteps.push({ label, status, detail });
+    renderConnectionDetails();
+  }
+
+  function sleep(milliseconds) {
+    return new Promise((resolve) => window.setTimeout(resolve, milliseconds));
+  }
+
+  async function waitForAdapterHealth() {
+    const deadline = Date.now() + state.config.connectTimeoutMs;
+    let lastError = null;
+    while (Date.now() < deadline) {
+      try {
+        return await fetchJson(api("/health"), {}, Math.min(state.config.requestTimeoutMs, 5000));
+      } catch (error) {
+        lastError = error;
+        if (error.kind === "http" || error.kind === "contract") throw error;
+        if (error.kind === "network") {
+          try {
+            const diagnostic = await fetchJson("/adapter-diagnostic.json", {}, 3500);
+            if (diagnostic.adapter_reached) throw error;
+          } catch (diagnosticError) {
+            if (diagnosticError === error) throw error;
+          }
+        }
+        await sleep(Math.min(state.config.liveRetryMs, Math.max(0, deadline - Date.now())));
+      }
+    }
+    throw new RequestFailure(lastError?.message || "Adapter readiness timed out.", { kind: "startup_timeout" });
+  }
+
+  async function diagnoseConnectionFailure(error) {
+    if (error?.kind === "http" && error.status === 404) {
+      return "The adapter responded, but this API path is wrong. Check GUI_API_BASE.";
+    }
+    if (error?.kind === "http" && error.code === "origin_not_allowed") {
+      return "The adapter rejected this browser origin. Restart it with the exact dashboard URL.";
+    }
+    if (error?.kind === "contract") {
+      return "The URL responded, but not with the required uavids-gui-api-v1 contract.";
+    }
+    if (error?.kind === "model") {
+      return "The adapter is reachable, but the frozen model is unavailable.";
+    }
+    try {
+      const diagnostic = await fetchJson("/adapter-diagnostic.json", {}, 3500);
+      if (diagnostic.adapter_reached && error?.kind === "network") {
+        return "The adapter is running, but the browser cannot use it. The likely cause is a CORS origin mismatch.";
+      }
+      if (diagnostic.adapter_reached && diagnostic.http_status === 404) {
+        return "The adapter is running, but GUI_API_BASE points to the wrong API path.";
+      }
+      if (!diagnostic.adapter_reached) {
+        return `No adapter is listening at ${state.config.apiBase}. Start the adapter, then retry.`;
+      }
+    } catch {
+      // Keep the primary diagnosis when the local helper is unavailable.
+    }
+    if (["timeout", "startup_timeout"].includes(error?.kind)) {
+      return "The adapter did not become ready before the startup window expired. Model loading may still be in progress.";
+    }
+    return "The adapter returned an unexpected response. Confirm its URL, health endpoint, and terminal output.";
   }
 
   async function tryLive({ userInitiated = false } = {}) {
-    stopReplay();
+    if (state.connectionAttempting) return;
+    state.connectionAttempting = true;
     state.liveStatus = "checking";
+    state.connectionSteps = [];
+    state.connectionDiagnosis = "Connection check in progress. Recorded state remains preserved until success.";
     renderMode();
-    if (userInitiated) showBanner("Checking the documented GUI adapter…", "warning");
+    showBanner("Checking the live adapter. Recorded Demo remains available during this check.", "warning");
+    $("connectionDetails").classList.remove("hidden");
+    setConnectionStep("Checking adapter", "active", state.config.apiBase);
     try {
-      const [health, snapshot] = await Promise.all([
-        fetchJson(api("/health")),
-        fetchJson(api("/snapshot")),
-      ]);
-      if (health.ok !== true || health.model_available !== true || snapshot.backend?.available !== true) {
-        throw new Error("The adapter is reachable, but its frozen model is unavailable.");
+      const health = await waitForAdapterHealth();
+      if (health.api_version !== "uavids-gui-api-v1") {
+        throw new RequestFailure("Adapter contract mismatch.", { kind: "contract" });
       }
+      setConnectionStep("Checking adapter", "complete", "Adapter reached");
+      setConnectionStep("Adapter reached", "complete", health.api_version);
+      setConnectionStep("Checking model", "active", "Reading frozen-model readiness");
+      if (health.ok !== true || health.model_available !== true) {
+        throw new RequestFailure("The frozen model is unavailable.", { kind: "model" });
+      }
+      setConnectionStep("Checking model", "complete", "Health check passed");
+      setConnectionStep("Model ready", "complete", "Frozen binary IDS available");
+
+      const snapshot = await fetchJson(api("/snapshot"), {}, state.config.connectTimeoutMs);
+      if (snapshot.api_version !== "uavids-gui-api-v1" || snapshot.backend?.available !== true || snapshot.model?.available !== true) {
+        throw new RequestFailure("Snapshot contract or model readiness is incompatible.", { kind: "contract" });
+      }
+      stopReplay();
       state.mode = "live";
       state.liveStatus = "connected";
       state.liveFailures = 0;
@@ -306,26 +453,39 @@
       state.seenFederatedEvents.clear();
       state.inferenceCursor = 0;
       state.federatedCursor = 0;
+      state.replayPredictionCursor = 0;
+      state.liveDemoTotal = Number.isInteger(snapshot.inference?.demo_total_records)
+        ? snapshot.inference.demo_total_records
+        : null;
       if (snapshot.inference?.latest_prediction) appendPrediction(snapshot.inference.latest_prediction);
-      hideBanner();
+      const upstream = snapshot.backend?.federated_upstream_available;
+      setConnectionStep("Live mode connected", "complete", upstream ? "Live model and federated upstream" : "Live model; recorded federation telemetry");
+      state.connectionDiagnosis = upstream
+        ? "Live frozen-model inference and live federated telemetry are connected."
+        : "Live frozen-model inference is connected. The Phase 4/5 upstream is not running, so federation remains clearly recorded.";
+      showBanner(upstream ? "Live mode connected." : "Live model connected; federation telemetry remains recorded.", "success");
+      state.connectionBannerUntil = Date.now() + 6000;
       render();
       scheduleLivePoll(150);
     } catch (error) {
       state.liveStatus = "offline";
-      if (state.mode !== "recorded") switchToRecorded();
+      state.connectionDiagnosis = await diagnoseConnectionFailure(error);
+      setConnectionStep("Connection failed", "failed", state.connectionDiagnosis);
       showBanner(
-        `Live adapter unavailable: ${safeErrorMessage(error)} Recorded mode remains ready.`,
+        `Live mode not connected. ${state.connectionDiagnosis} Recorded Demo is unchanged.`,
         "error",
         "Retry live",
         () => tryLive({ userInitiated: true }),
       );
       renderMode();
+    } finally {
+      state.connectionAttempting = false;
+      renderConnectionDetails();
     }
   }
 
   function safeErrorMessage(error) {
     const message = error instanceof Error ? error.message : "Connection failed.";
-    if (/abort/i.test(message)) return "request timed out.";
     return message.endsWith(".") ? message : `${message}.`;
   }
 
@@ -348,6 +508,9 @@
         fetchJson(api(`/federated/events?after_seq=${state.federatedCursor}`)),
       ]);
       state.snapshot = snapshot;
+      if (Number.isInteger(snapshot.inference?.demo_total_records)) {
+        state.liveDemoTotal = snapshot.inference.demo_total_records;
+      }
       state.liveStatus = "connected";
       state.liveFailures = 0;
       appendInferenceEvents(inferencePage.events);
@@ -355,7 +518,7 @@
       if (Number.isInteger(inferencePage.last_seq)) state.inferenceCursor = Math.max(state.inferenceCursor, inferencePage.last_seq);
       if (Number.isInteger(federatedPage.last_seq)) state.federatedCursor = Math.max(state.federatedCursor, federatedPage.last_seq);
       if (snapshot.inference?.latest_prediction) appendPrediction(snapshot.inference.latest_prediction);
-      hideBanner();
+      if (Date.now() >= state.connectionBannerUntil) hideBanner();
       render();
     } catch (error) {
       state.liveFailures += 1;
@@ -379,35 +542,118 @@
     renderReplayControls();
   }
 
+  function demoTotal() {
+    return state.mode === "live"
+      ? state.liveDemoTotal
+      : (state.streamData?.event_count || 0);
+  }
+
+  function demoComplete() {
+    const total = demoTotal();
+    return Number.isInteger(total) && total > 0 && state.replayPredictionCursor >= total;
+  }
+
+  async function processLiveFlow() {
+    if (demoComplete()) return false;
+    const response = await fetchJson(api("/replay/next"), {
+      method: "POST",
+      body: "{}",
+    });
+    if (!response?.prediction || !Number.isInteger(response.total_records) || response.total_records < 1) {
+      throw new RequestFailure("The live replay response is incompatible.", { kind: "contract" });
+    }
+    state.liveDemoTotal = response.total_records;
+    state.replayPredictionCursor += 1;
+    appendPrediction(response.prediction);
+    state.snapshot = await fetchJson(api("/snapshot"));
+    render();
+    return true;
+  }
+
   function scheduleReplay() {
-    if (!state.replayPlaying || state.mode !== "recorded") return;
-    const delay = 3000 / state.replaySpeed;
-    state.replayTimer = window.setTimeout(() => {
-      const max = state.replayData.replay_stages.length - 1;
-      if (state.replayStageIndex >= max) {
+    if (!state.replayPlaying) return;
+    const delay = 1250 / state.replaySpeed;
+    state.replayTimer = window.setTimeout(async () => {
+      if (demoComplete()) {
         stopReplay();
+        showBanner(`${state.mode === "live" ? "Live" : "Recorded"} IDS stream complete. Use Next section when you are ready to explain Federation.`, "success");
         return;
       }
-      applyReplayStage(state.replayStageIndex + 1);
-      scheduleReplay();
+      try {
+        state.busy = true;
+        const advanced = state.mode === "live"
+          ? await processLiveFlow()
+          : processRecordedFlow();
+        if (!advanced || demoComplete()) {
+          stopReplay();
+          showBanner(`${state.mode === "live" ? "Live" : "Recorded"} IDS stream complete. Use Next section when you are ready to explain Federation.`, "success");
+          return;
+        }
+        scheduleReplay();
+      } catch (error) {
+        stopReplay();
+        showBanner(`Automatic inference paused: ${safeErrorMessage(error)}`, "error");
+      } finally {
+        state.busy = false;
+        renderReplayControls();
+      }
     }, delay);
   }
 
   function toggleReplay() {
-    if (state.mode !== "recorded") return;
+    if (state.mode === "live" && state.liveStatus !== "connected") return;
+    if (demoComplete()) {
+      const restartHelp = state.mode === "live"
+        ? "Restart the Live adapter to run a fresh live session."
+        : "Restart it or continue to Federation.";
+      showBanner(`The IDS stream is complete. ${restartHelp}`, "success");
+      return;
+    }
     state.replayPlaying = !state.replayPlaying;
-    if (state.replayPlaying) scheduleReplay();
+    if (state.replayPlaying) {
+      hideBanner();
+      scheduleReplay();
+    }
     else if (state.replayTimer) window.clearTimeout(state.replayTimer);
     renderReplayControls();
+    renderOperationalStatus();
   }
 
   function restartReplay() {
+    if (state.mode === "live") {
+      showBanner("To reset live-model counters and the 24-input sequence, stop and run start_live.ps1 again.", "warning");
+      return;
+    }
     stopReplay();
     state.predictionHistory = [];
     state.replayPredictionCursor = 0;
     state.inferenceEvents = [];
     state.federatedEvents = [];
-    applyReplayStage(0, { announce: true });
+    state.securityEvidenceVisible = false;
+    state.replayStageIndex = 0;
+    selectView("monitor");
+    applyFederationStage(0);
+    showBanner("Presentation reset. The IDS Monitor is ready with 24 verified recorded flows.", "success");
+  }
+
+  function processRecordedFlow() {
+    const prediction = state.streamData.predictions[state.replayPredictionCursor];
+    if (!prediction) return false;
+    state.replayPredictionCursor += 1;
+    appendPrediction(prediction);
+    const event = {
+      seq: state.inferenceEvents.length + 1,
+      event_type: "prediction_completed",
+      severity: prediction.label === "Attack" ? "warning" : "info",
+      timestamp_utc: prediction.timestamp_utc,
+      source: prediction.source,
+      payload: prediction,
+      recorded: true,
+    };
+    state.inferenceEvents.push(event);
+    state.snapshot = buildReplaySnapshot();
+    render();
+    return true;
   }
 
   async function analyzeNext() {
@@ -416,35 +662,22 @@
     $("analyzeNextButton").disabled = true;
     try {
       if (state.mode === "live") {
-        const response = await fetchJson(api("/replay/next"), {
-          method: "POST",
-          body: "{}",
-        });
-        appendPrediction(response.prediction);
-        state.snapshot = await fetchJson(api("/snapshot"));
-        showBanner("Verified replay input was evaluated now by the live frozen model.", "warning");
+        if (await processLiveFlow()) {
+          showBanner("One approved replay input was evaluated now by the live frozen model.", "warning");
+        } else {
+          showBanner("The live IDS stream is complete. Restart the adapter for a fresh session.", "success");
+        }
       } else {
-        const prediction = state.replayData.predictions[state.replayPredictionCursor % state.replayData.predictions.length];
-        state.replayPredictionCursor += 1;
-        appendPrediction(prediction);
-        const event = {
-          seq: state.inferenceEvents.length + 1,
-          event_type: "prediction_completed",
-          severity: prediction.label === "Attack" ? "warning" : "info",
-          timestamp_utc: prediction.timestamp_utc,
-          source: prediction.source,
-          payload: prediction,
-          recorded: true,
-        };
-        state.inferenceEvents.push(event);
-        state.snapshot = buildReplaySnapshot();
+        if (!processRecordedFlow()) {
+          showBanner("All 24 verified recorded flows have been processed. Restart to run them again.", "success");
+        }
       }
       render();
     } catch (error) {
       showBanner(`Prediction request failed: ${safeErrorMessage(error)}`, "error");
     } finally {
       state.busy = false;
-      $("analyzeNextButton").disabled = false;
+      renderReplayControls();
     }
   }
 
@@ -453,14 +686,17 @@
     dot.className = "connection-dot";
     const isLive = state.mode === "live";
     $("liveModeButton").classList.toggle("active", isLive);
+    $("liveModeButton").classList.toggle("checking", state.connectionAttempting);
+    $("liveModeButton").disabled = state.connectionAttempting;
     $("replayModeButton").classList.toggle("active", !isLive);
-    $("replayControls").classList.toggle("inactive", isLive);
+    $("replayControls").classList.toggle("inactive", isLive && state.liveStatus !== "connected");
 
     if (isLive && state.liveStatus === "connected") {
       dot.classList.add("live");
       setText("modeTitle", "Live Adapter");
       const telemetry = state.snapshot?.presentation_mode === "live" ? "live federated telemetry" : "recorded federated telemetry";
-      setText("modeDetail", `Real model available • ${telemetry}`);
+      const liveFlows = state.liveDemoTotal ? ` • ${state.liveDemoTotal} verified inputs` : "";
+      setText("modeDetail", `Real model available • ${telemetry}${liveFlows}`);
     } else if (isLive) {
       dot.classList.add("offline");
       setText("modeTitle", "Live Adapter");
@@ -468,13 +704,44 @@
     } else {
       if (state.liveStatus === "offline") dot.classList.add("offline");
       setText("modeTitle", "Recorded Demo");
-      const stage = state.replayData?.replay_stages?.[state.replayStageIndex];
-      setText("modeDetail", stage ? `Clearly labelled replay • ${stage.title}` : "Loading verified evidence…");
+      const total = state.streamData?.event_count || 0;
+      const detail = state.connectionAttempting
+        ? "Checking Live Adapter · recorded state preserved"
+        : `Verified stream · ${state.replayPredictionCursor}/${total} flows processed`;
+      setText("modeDetail", detail);
     }
 
     const model = state.snapshot?.model || state.replayData?.model;
     setText("headerModel", model?.model_id || "Unavailable");
     setText("footerSource", isLive ? `Source: ${state.config.apiBase}` : "Source: verified recorded project evidence");
+    renderConnectionDetails();
+  }
+
+  function renderOperationalStatus() {
+    const isLive = state.mode === "live";
+    const backendReady = isLive ? state.snapshot?.backend?.available === true : true;
+    const modelReady = isLive ? state.snapshot?.model?.available === true : state.replayData?.model?.available === true;
+    const total = demoTotal();
+    const completed = demoComplete();
+    const stream = isLive
+      ? state.replayPlaying
+        ? `Running · ${state.replayPredictionCursor}/${total || "live"}`
+        : completed
+          ? `Complete · ${total}/${total}`
+          : state.replayPredictionCursor
+            ? `Paused · ${state.replayPredictionCursor}/${total || "live"}`
+            : `Connected · ${total ? `${total} verified inputs ready` : "ready for verified flows"}`
+      : state.replayPlaying
+        ? `Running · ${state.replayPredictionCursor}/${total}`
+        : completed
+          ? `Complete · ${total}/${total}`
+          : state.replayPredictionCursor
+            ? `Paused · ${state.replayPredictionCursor}/${total}`
+            : `Ready · ${total} verified flows`;
+    setText("systemState", backendReady ? "Operational" : "Recorded fallback ready");
+    setText("operationalMode", isLive ? "Live Adapter" : "Recorded Demo");
+    setText("modelState", modelReady ? (isLive ? "Frozen model / ready" : "Verified results / ready") : "Unavailable");
+    setText("streamState", stream);
   }
 
   function renderMonitor() {
@@ -491,7 +758,7 @@
       setText("confidenceValue", "—");
       setText("verdictKicker", "Awaiting inference");
       setText("verdictLabel", "No verdict");
-      setText("verdictExplanation", "Use the verified sample control to exercise the deployed binary model.");
+      setText("verdictExplanation", "Start the IDS stream or analyze one verified flow manually.");
       setText("latestRecord", "Unavailable");
       setText("latestSource", "Unavailable");
       setText("attackProbability", "Unavailable");
@@ -526,15 +793,19 @@
     setText("recordsProcessed", number(inference.records_processed ?? state.predictionHistory.length));
     setText("normalCount", number(inference.normal_count ?? state.predictionHistory.filter((item) => item.label === "Normal").length));
     setText("attackCount", number(inference.attack_count ?? state.predictionHistory.filter((item) => item.label === "Attack").length));
+    const recentAlerts = inference.recent_alerts || state.predictionHistory.filter((item) => item.label === "Attack").slice(-20).reverse();
+    setText("activeAlertCount", number(recentAlerts.length));
     setText("thresholdValue", finiteNumber(model?.decision_threshold) ? model.decision_threshold.toFixed(2) : "Unavailable");
     renderProbabilityChart(model?.decision_threshold ?? 0.42);
-    renderAlerts(inference.recent_alerts || []);
+    renderFlowActivity();
+    renderAlertRibbon(recentAlerts);
+    renderOperationalStatus();
   }
 
   function renderProbabilityChart(threshold) {
     const svgGroup = $("probabilitySeries");
     while (svgGroup.firstChild) svgGroup.removeChild(svgGroup.firstChild);
-    const history = state.predictionHistory.slice(-12);
+    const history = state.predictionHistory.slice(-20);
     $("emptyChart").classList.toggle("hidden", history.length > 0);
     if (!history.length) return;
 
@@ -573,48 +844,62 @@
     thresholdLabel.setAttribute("y", String(thresholdY - 8));
   }
 
-  function renderAlerts(alerts) {
-    const list = $("alertList");
+  function renderFlowActivity() {
+    const list = $("flowActivityList");
     list.replaceChildren();
-    const safeAlerts = (Array.isArray(alerts) ? alerts : []).filter((item) => item?.label === "Attack").slice(0, 20);
-    setText("alertCount", String(safeAlerts.length));
-    if (!safeAlerts.length) {
+    const history = state.predictionHistory.slice(-9).reverse();
+    const alertTotal = state.predictionHistory.filter((item) => item.label === "Attack").length;
+    setText("alertCount", `${alertTotal} alert${alertTotal === 1 ? "" : "s"}`);
+    if (!history.length) {
       const empty = document.createElement("div");
       empty.className = "empty-state";
       const symbol = document.createElement("span");
       symbol.className = "empty-symbol";
       symbol.textContent = "✓";
       const strong = document.createElement("strong");
-      strong.textContent = "No attack alerts yet";
+      strong.textContent = "Waiting for the first flow";
       const copy = document.createElement("p");
-      copy.textContent = "Alerts will appear when the model crosses its frozen threshold.";
+      copy.textContent = "Start IDS Demo to process verified flows automatically.";
       empty.append(symbol, strong, copy);
       list.append(empty);
       return;
     }
-    for (const alert of safeAlerts) {
+    for (const flow of history) {
       const item = document.createElement("article");
-      item.className = "alert-item";
-      const marker = document.createElement("span");
-      marker.className = "alert-marker";
+      item.className = `flow-row ${flow.label.toLowerCase()}`;
       const main = document.createElement("div");
-      main.className = "alert-main";
-      const title = document.createElement("strong");
-      title.textContent = alert.record_id || "Attack prediction";
-      const source = document.createElement("span");
-      source.textContent = alert.source || "Source unavailable";
-      main.append(title, source);
-      const side = document.createElement("div");
-      const confidence = document.createElement("div");
-      confidence.className = "alert-confidence";
-      confidence.textContent = pct(alert.confidence, 1);
+      main.className = "flow-main";
       const time = document.createElement("time");
-      time.className = "alert-time";
-      time.textContent = formatTime(alert.timestamp_utc);
-      side.append(confidence, time);
-      item.append(marker, main, side);
+      time.textContent = formatTime(flow.timestamp_utc);
+      const title = document.createElement("strong");
+      title.textContent = flow.record_id || "Recorded flow";
+      const source = document.createElement("span");
+      source.textContent = flow.source || "Source unavailable";
+      main.append(time, title, source);
+      const probability = document.createElement("strong");
+      probability.className = "flow-probability";
+      probability.textContent = pct(flow.attack_probability, 1);
+      const verdict = document.createElement("span");
+      verdict.className = "flow-verdict";
+      verdict.textContent = flow.label;
+      item.append(main, probability, verdict);
       list.append(item);
     }
+  }
+
+  function renderAlertRibbon(alerts) {
+    const ribbon = $("latestAlertRibbon");
+    const latest = (Array.isArray(alerts) ? alerts : [])[0] || null;
+    ribbon.classList.toggle("quiet", !latest);
+    ribbon.classList.toggle("active", Boolean(latest));
+    setText("latestAlertTitle", latest ? `Latest threat alert · ${latest.record_id}` : "No active replay alert");
+    setText(
+      "latestAlertDetail",
+      latest
+        ? `${pct(latest.attack_probability, 1)} attack probability · ${latest.source || "source unavailable"} · ${formatTime(latest.timestamp_utc)}`
+        : "Attack decisions will be highlighted here and in the flow stream.",
+    );
+    ribbon.querySelector(".alert-ribbon-icon").textContent = latest ? "!" : "✓";
   }
 
   function liveStageDescription(federated) {
@@ -682,9 +967,15 @@
     const stage = state.mode === "recorded"
       ? state.replayData.replay_stages[state.replayStageIndex]
       : liveStageDescription(federated);
-    setText("replayStageIndex", state.mode === "recorded" ? `STAGE ${String(state.replayStageIndex + 1).padStart(2, "0")}` : "LIVE STATE");
+    setText("replayStageIndex", state.mode === "recorded" ? `STAGE ${String(state.replayStageIndex + 1).padStart(2, "0")} / 07` : "LIVE STATE");
     setText("replayStageTitle", stage.title);
     setText("replayStageCaption", stage.caption);
+    const federationComplete = state.replayStageIndex >= FEDERATION_STAGE_COUNT - 1;
+    $("federationAdvanceButton").disabled = state.mode !== "recorded" || federationComplete;
+    $("federationRestartButton").disabled = state.mode !== "recorded" || state.replayStageIndex === 0;
+    $("federationAdvanceButton").innerHTML = federationComplete
+      ? "Federation walkthrough complete"
+      : "Advance FL stage <span aria-hidden=\"true\">→</span>";
 
     const metrics = federated.global_model_metrics || {};
     setText("demoMacroF1", pct(metrics.macro_f1, 2));
@@ -852,14 +1143,25 @@
   }
 
   function renderReplayControls() {
-    const stages = state.replayData?.replay_stages || [];
-    const count = stages.length;
+    const count = demoTotal();
+    const cursor = state.replayPredictionCursor;
+    const complete = demoComplete();
     setText("replayPlayIcon", state.replayPlaying ? "Ⅱ" : "▶");
-    setText("replayPlayLabel", state.replayPlaying ? "Pause" : "Play");
-    setText("stageCounter", `${state.replayStageIndex + 1} / ${count || 1}`);
-    $("stageFill").style.width = `${count ? ((state.replayStageIndex + 1) / count) * 100 : 0}%`;
-    $("replayPrevious").disabled = state.mode !== "recorded" || state.replayStageIndex === 0;
-    $("replayNext").disabled = state.mode !== "recorded" || state.replayStageIndex >= count - 1;
+    setText("replayPlayLabel", state.replayPlaying ? "Pause" : (complete ? "IDS Demo complete" : (cursor ? "Resume" : "Start IDS Demo")));
+    setText("stageCounter", `${cursor} / ${count || (state.mode === "live" ? "live" : 0)} flows`);
+    $("stageFill").style.width = `${count ? (cursor / count) * 100 : 0}%`;
+    $("replayPlay").disabled = complete || state.busy || (state.mode === "live" && state.liveStatus !== "connected");
+    $("replayRestart").disabled = state.mode === "live" || cursor === 0;
+    $("replaySpeed").disabled = state.mode === "live" && state.liveStatus !== "connected";
+    $("analyzeNextButton").disabled = state.busy || complete || (state.mode === "live" && state.liveStatus !== "connected");
+
+    const sectionIndex = SECTION_ORDER.indexOf(state.activeView);
+    const next = SECTION_ORDER[sectionIndex + 1];
+    const labels = { federation: "Federation", security: "Security", evidence: "Evidence" };
+    $("nextSectionButton").disabled = !next;
+    $("nextSectionButton").innerHTML = next
+      ? `Next section: ${labels[next]} <span aria-hidden="true">→</span>`
+      : "Presentation complete";
   }
 
   function render() {
@@ -876,28 +1178,53 @@
   function selectView(view) {
     if (!["monitor", "federation", "security", "evidence"].includes(view)) return;
     state.activeView = view;
+    if (state.mode === "recorded" && view === "security" && !state.securityEvidenceVisible) {
+      state.securityEvidenceVisible = true;
+      state.federatedEvents = visibleReplayEvents(state.replayStageIndex);
+      state.snapshot = buildReplaySnapshot();
+    }
     all(".view-button").forEach((button) => button.classList.toggle("active", button.dataset.view === view));
     all(".view").forEach((section) => section.classList.toggle("active", section.id === `view-${view}`));
+    renderReplayControls();
+    if (state.replayData) {
+      renderFederation();
+      renderSecurity();
+    }
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function goToNextSection() {
+    const index = SECTION_ORDER.indexOf(state.activeView);
+    const next = SECTION_ORDER[index + 1];
+    if (!next) return;
+    if (state.replayPlaying) {
+      stopReplay();
+      showBanner(`IDS stream paused at ${state.replayPredictionCursor}/${state.streamData.event_count} flows. Resume it at any time.`, "warning");
+    }
+    selectView(next);
+  }
+
+  function advanceFederationStage() {
+    const next = Math.min(state.replayStageIndex + 1, FEDERATION_STAGE_COUNT - 1);
+    applyFederationStage(next, { announce: true });
   }
 
   function bindControls() {
     all(".view-button").forEach((button) => button.addEventListener("click", () => selectView(button.dataset.view)));
     $("liveModeButton").addEventListener("click", () => tryLive({ userInitiated: true }));
     $("replayModeButton").addEventListener("click", () => {
+      if (state.mode === "recorded") {
+        hideBanner();
+        return;
+      }
       hideBanner();
       switchToRecorded();
     });
     $("replayPlay").addEventListener("click", toggleReplay);
-    $("replayPrevious").addEventListener("click", () => {
-      stopReplay();
-      applyReplayStage(state.replayStageIndex - 1);
-    });
-    $("replayNext").addEventListener("click", () => {
-      stopReplay();
-      applyReplayStage(state.replayStageIndex + 1);
-    });
     $("replayRestart").addEventListener("click", restartReplay);
+    $("nextSectionButton").addEventListener("click", goToNextSection);
+    $("federationAdvanceButton").addEventListener("click", advanceFederationStage);
+    $("federationRestartButton").addEventListener("click", () => applyFederationStage(0, { announce: true }));
     $("replaySpeed").addEventListener("change", (event) => {
       state.replaySpeed = Number(event.target.value) || 1;
       if (state.replayPlaying) {
@@ -932,18 +1259,28 @@
     updateClock();
     await loadConfig();
     state.replayData = await fetchJson("data/replay.json");
+    state.streamData = await fetchJson("data/inference_stream.json");
     if (state.replayData.schema_version !== "anas-attempt-recorded-demo-v1") {
       throw new Error("Recorded demonstration schema is incompatible.");
+    }
+    if (state.streamData.schema_version !== "uavids-recorded-inference-stream-v1" || state.streamData.event_count !== 24) {
+      throw new Error("Recorded inference stream is incompatible.");
     }
     const query = new URLSearchParams(window.location.search);
     const requestedStage = Number.parseInt(query.get("stage") || "0", 10);
     const initialStage = Number.isInteger(requestedStage)
-      ? Math.min(Math.max(requestedStage, 0), state.replayData.replay_stages.length - 1)
+      ? Math.min(Math.max(requestedStage, 0), FEDERATION_STAGE_COUNT - 1)
       : 0;
-    applyReplayStage(initialStage);
+    applyFederationStage(initialStage);
+    const requestedFlows = Number.parseInt(query.get("flows") || "0", 10);
+    if (Number.isInteger(requestedFlows) && requestedFlows > 0) {
+      for (let index = 0; index < Math.min(requestedFlows, state.streamData.event_count); index += 1) processRecordedFlow();
+    }
     const requestedView = query.get("view");
     if (["monitor", "federation", "security", "evidence"].includes(requestedView)) selectView(requestedView);
-    if (query.get("mode") !== "recorded") await tryLive();
+    else selectView("monitor");
+    if (query.get("mode") === "live") await tryLive({ userInitiated: true });
+    if (query.get("autoplay") === "1") toggleReplay();
   }
 
   window.addEventListener("error", () => {

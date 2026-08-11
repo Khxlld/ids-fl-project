@@ -12,16 +12,32 @@ from serve import create_server
 
 
 ROOT = Path(__file__).resolve().parent
+IGNORED_LOCAL_DIRS = {".venv", ".venv-gui", "__pycache__", "node_modules"}
 REQUIRED_FILES = {
     "index.html",
     "styles.css",
     "app.js",
     "serve.py",
     "start.ps1",
+    "start_live.ps1",
+    "start_live.cmd",
+    "live_adapter.py",
+    "generate_recorded_stream.py",
     "README.md",
     ".env.example",
     "data/replay.json",
+    "data/inference_stream.json",
 }
+
+
+def dashboard_files() -> list[Path]:
+    """Return dashboard source/evidence files, excluding local tool environments."""
+    return [
+        path
+        for path in ROOT.rglob("*")
+        if path.is_file()
+        and not (set(path.relative_to(ROOT).parts[:-1]) & IGNORED_LOCAL_DIRS)
+    ]
 
 
 class AssetParser(HTMLParser):
@@ -43,13 +59,14 @@ def require(condition: bool, message: str) -> None:
 
 
 def verify_files() -> None:
-    present = {str(path.relative_to(ROOT)).replace("\\", "/") for path in ROOT.rglob("*") if path.is_file()}
+    files = dashboard_files()
+    present = {str(path.relative_to(ROOT)).replace("\\", "/") for path in files}
     missing = REQUIRED_FILES - present
     require(not missing, f"missing required files: {sorted(missing)}")
     prohibited_suffixes = {".pt", ".pth", ".joblib", ".pem", ".key", ".csv"}
-    prohibited = [path.name for path in ROOT.rglob("*") if path.is_file() and path.suffix.lower() in prohibited_suffixes]
+    prohibited = [path.name for path in files if path.suffix.lower() in prohibited_suffixes]
     require(not prohibited, f"prohibited payload files present: {prohibited}")
-    large = [path.name for path in ROOT.rglob("*") if path.is_file() and path.stat().st_size > 2 * 1024 * 1024]
+    large = [path.name for path in files if path.stat().st_size > 2 * 1024 * 1024]
     require(not large, f"unexpected file larger than 2 MiB: {large}")
 
 
@@ -63,9 +80,28 @@ def verify_html() -> None:
         require((ROOT / asset).is_file(), f"referenced asset does not exist: {asset}")
     for required_text in (
         "IDS Monitor", "Federation", "Security", "Evidence", "Recorded demo",
+        "Start IDS Demo", "Next section: Federation", "RECENT NETWORK FLOWS",
         "Normal", "Attack", "ML-KEM-768", "ML-DSA-65", "AES-256-GCM",
     ):
         require(required_text in html, f"required UI text missing: {required_text}")
+
+    javascript = (ROOT / "app.js").read_text(encoding="utf-8")
+    for required_text in (
+        "async function processLiveFlow()",
+        "? await processLiveFlow()",
+        'state.liveDemoTotal = response.total_records',
+        'state.mode === "live" && state.liveStatus !== "connected"',
+    ):
+        require(required_text in javascript, f"live automatic-demo behavior missing: {required_text}")
+
+    adapter = (ROOT / "live_adapter.py").read_text(encoding="utf-8")
+    for required_text in (
+        "DEMO_CANDIDATE_INDICES = (",
+        'EXPECTED_LABELS = "NNANNANNANNANNANNANNANNA"',
+        'payload["inference"]["demo_total_records"]',
+        "backend.replay_records = build_live_demo_records(backend)",
+    ):
+        require(required_text in adapter, f"presentation adapter behavior missing: {required_text}")
 
 
 def verify_replay() -> None:
@@ -102,6 +138,20 @@ def verify_replay() -> None:
     for forbidden in ("begin private key", '"private_key"', '"shared_secret"', '"ciphertext":', '"features":', "artifacts_phase3"):
         require(forbidden not in serialized, f"sensitive or prohibited replay content found: {forbidden}")
 
+    stream = json.loads((ROOT / "data" / "inference_stream.json").read_text(encoding="utf-8"))
+    require(stream["schema_version"] == "uavids-recorded-inference-stream-v1", "unexpected inference stream schema")
+    require(stream["event_count"] == 24 and len(stream["predictions"]) == 24, "recorded stream must contain 24 events")
+    require(stream["distinct_record_count"] == 24, "recorded stream records must be distinct")
+    require(len({item["record_id"] for item in stream["predictions"]}) == 24, "record IDs are not distinct")
+    require(stream["normal_count"] == 16 and stream["attack_count"] == 8, "recorded stream class counts changed")
+    require(all(item["stream_sequence"] == index for index, item in enumerate(stream["predictions"], start=1)), "stream sequence is not ordered")
+    require(all(item["model_id"] == replay["model"]["model_id"] for item in stream["predictions"]), "stream model identity changed")
+    require(all(item["decision_threshold"] == 0.42 for item in stream["predictions"]), "stream threshold changed")
+    require(all(item["inference_mode"] == "live_model" and item["replayed"] for item in stream["predictions"]), "stream responses lost frozen-model provenance")
+    serialized_stream = json.dumps(stream).lower()
+    for forbidden in ("begin private key", '"private_key"', '"shared_secret"', '"ciphertext":', '"features":', "binary_label", "original_label"):
+        require(forbidden not in serialized_stream, f"sensitive or prohibited stream content found: {forbidden}")
+
 
 def verify_http() -> None:
     server = create_server(port=0)
@@ -117,6 +167,10 @@ def verify_http() -> None:
             require(config["apiBase"].endswith("/api/gui/v1"), "runtime API base is invalid")
         with urllib.request.urlopen(f"{base}/data/replay.json", timeout=3) as response:
             require(json.loads(response.read())["schema_version"] == "anas-attempt-recorded-demo-v1", "replay HTTP response failed")
+        with urllib.request.urlopen(f"{base}/data/inference_stream.json", timeout=3) as response:
+            require(json.loads(response.read())["event_count"] == 24, "stream HTTP response failed")
+        with urllib.request.urlopen(f"{base}/adapter-diagnostic.json", timeout=6) as response:
+            require(json.loads(response.read())["schema_version"] == "anas-adapter-diagnostic-v1", "diagnostic HTTP response failed")
     finally:
         server.shutdown()
         server.server_close()
@@ -128,7 +182,7 @@ def main() -> None:
     verify_html()
     verify_replay()
     verify_http()
-    print("Anas_Attempt verification passed: files, safe evidence, locked metrics, algorithms, and HTTP serving.")
+    print("Anas_Attempt verification passed: 24 safe frozen-model flows, controls, locked evidence, algorithms, diagnostics, and HTTP serving.")
 
 
 if __name__ == "__main__":

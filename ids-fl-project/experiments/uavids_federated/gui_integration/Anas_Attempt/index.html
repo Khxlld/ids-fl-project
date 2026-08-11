@@ -34,7 +34,7 @@
         <span class="connection-dot" id="connectionDot" aria-hidden="true"></span>
         <div>
           <p class="mode-title" id="modeTitle">Recorded Demo</p>
-          <p class="mode-detail" id="modeDetail">Loading verified evidence…</p>
+          <p class="mode-detail" id="modeDetail">Verified recorded stream ready</p>
         </div>
         <div class="mode-switch" role="group" aria-label="Choose live or recorded data">
           <button type="button" class="mode-button" id="liveModeButton">Live adapter</button>
@@ -70,13 +70,11 @@
         </button>
       </nav>
 
-      <div class="replay-controls" id="replayControls" aria-label="Recorded demonstration controls">
-        <button type="button" class="icon-button" id="replayPrevious" aria-label="Previous replay stage" title="Previous stage">‹</button>
-        <button type="button" class="primary-control" id="replayPlay" aria-label="Play recorded demonstration">
+      <div class="replay-controls" id="replayControls" aria-label="IDS demonstration controls">
+        <button type="button" class="primary-control" id="replayPlay" aria-label="Start or pause the IDS demonstration">
           <span id="replayPlayIcon">▶</span>
-          <span id="replayPlayLabel">Play</span>
+          <span id="replayPlayLabel">Start IDS Demo</span>
         </button>
-        <button type="button" class="icon-button" id="replayNext" aria-label="Next replay stage" title="Next stage">›</button>
         <button type="button" class="text-button" id="replayRestart">Restart</button>
         <label class="speed-control">Speed
           <select id="replaySpeed" aria-label="Replay speed">
@@ -85,16 +83,29 @@
             <option value="2">2×</option>
           </select>
         </label>
-        <div class="stage-meter" aria-label="Replay stage progress">
-          <span id="stageCounter">1 / 10</span>
+        <div class="stage-meter" aria-label="Recorded flow progress">
+          <span id="stageCounter">0 / 24 flows</span>
           <span class="stage-track"><span id="stageFill"></span></span>
         </div>
+        <button type="button" class="next-section-button" id="nextSectionButton">Next section: Federation <span aria-hidden="true">→</span></button>
       </div>
     </div>
 
     <div class="status-banner hidden" id="statusBanner" role="status" aria-live="polite">
-      <span id="statusBannerText"></span>
-      <button type="button" id="statusBannerAction">Use recorded demo</button>
+      <div class="status-banner-line">
+        <span id="statusBannerText"></span>
+        <button type="button" id="statusBannerAction">Use recorded demo</button>
+      </div>
+      <details class="connection-details hidden" id="connectionDetails">
+        <summary>Connection details and setup help</summary>
+        <div class="connection-details-grid">
+          <ol id="connectionSteps" class="connection-steps"></ol>
+          <div>
+            <p><strong>Adapter URL</strong><code id="connectionApiUrl">Unavailable</code></p>
+            <p id="connectionDiagnosis">No connection check has run.</p>
+          </div>
+        </div>
+      </details>
     </div>
 
     <main id="mainContent">
@@ -102,16 +113,24 @@
         <div class="view-heading">
           <div>
             <p class="eyebrow">DEPLOYED IDS / PRIMARY VIEW</p>
-            <h2 id="monitorTitle">See the global model decide</h2>
+            <h2 id="monitorTitle">UAV network-flow monitoring</h2>
           </div>
           <p class="view-summary">Binary inference only: <strong>Normal</strong> or <strong>Attack</strong>. Saved metrics never masquerade as live accuracy.</p>
         </div>
+
+        <article class="operations-strip" aria-label="Operational status">
+          <div><span>System</span><strong id="systemState">Operational</strong></div>
+          <div><span>Data source</span><strong id="operationalMode">Recorded Demo</strong></div>
+          <div><span>Model</span><strong id="modelState">Verified / ready</strong></div>
+          <div><span>IDS stream</span><strong id="streamState">Ready · 24 verified flows</strong></div>
+          <div><span>Training-data boundary</span><strong>Remains with each client</strong></div>
+        </article>
 
         <div class="monitor-grid">
           <article class="panel verdict-panel state-empty" id="verdictPanel">
             <div class="panel-topline">
               <span class="panel-label">LATEST VERDICT</span>
-              <span class="source-chip" id="predictionSourceChip">No sample yet</span>
+              <span class="source-chip" id="predictionSourceChip">Stream ready</span>
             </div>
             <div class="verdict-core">
               <div class="probability-orbit" id="probabilityOrbit" style="--probability:0">
@@ -123,7 +142,7 @@
               <div class="verdict-copy">
                 <p class="verdict-kicker" id="verdictKicker">Awaiting inference</p>
                 <h3 id="verdictLabel">No verdict</h3>
-                <p id="verdictExplanation">Use the verified sample control to exercise the deployed binary model.</p>
+              <p id="verdictExplanation">Start the recorded flow stream or analyze one verified flow manually.</p>
               </div>
             </div>
             <div class="verdict-details">
@@ -133,7 +152,7 @@
               <div><span>Inference latency</span><strong title="The GUI API does not currently expose per-record inference latency.">Not supplied</strong></div>
             </div>
             <button type="button" class="analyze-button" id="analyzeNextButton">
-              <span>Analyze next verified record</span>
+              <span>Analyze next verified flow</span>
               <span aria-hidden="true">→</span>
             </button>
           </article>
@@ -161,50 +180,50 @@
               <p class="empty-chart" id="emptyChart">No inference history in this session.</p>
             </div>
             <div class="counter-row">
-              <div class="counter-card"><span>Analyzed</span><strong id="recordsProcessed">0</strong></div>
+              <div class="counter-card"><span>Flows analyzed</span><strong id="recordsProcessed">0</strong></div>
               <div class="counter-card normal"><span>Normal</span><strong id="normalCount">0</strong></div>
               <div class="counter-card attack"><span>Attack</span><strong id="attackCount">0</strong></div>
+              <div class="counter-card attack"><span>Recent alerts</span><strong id="activeAlertCount">0</strong></div>
               <div class="counter-card"><span>Threshold</span><strong id="thresholdValue">0.42</strong></div>
             </div>
           </article>
 
-          <article class="panel alerts-panel">
+          <article class="panel alerts-panel flow-panel">
             <div class="panel-topline">
               <div>
-                <span class="panel-label">RECENT THREAT ALERTS</span>
-                <p class="panel-subtitle">Only binary Attack predictions appear here</p>
+                <span class="panel-label">RECENT NETWORK FLOWS</span>
+                <p class="panel-subtitle">Chronological model decisions · newest first</p>
               </div>
-              <span class="alert-count" id="alertCount">0</span>
+              <span class="alert-count" id="alertCount">0 alerts</span>
             </div>
-            <div class="alert-list" id="alertList" aria-live="polite">
+            <div class="flow-table-header" aria-hidden="true"><span>Time / flow</span><span>Probability</span><span>Verdict</span></div>
+            <div class="alert-list flow-list" id="flowActivityList" aria-live="polite">
               <div class="empty-state">
                 <span class="empty-symbol">✓</span>
-                <strong>No attack alerts yet</strong>
-                <p>Alerts will appear when the model crosses its frozen threshold.</p>
+                <strong>Waiting for the first flow</strong>
+                <p>Start IDS Demo to process the verified recorded stream automatically.</p>
               </div>
             </div>
           </article>
         </div>
 
-        <article class="story-rail" aria-label="Project explanation">
+        <article class="alert-ribbon quiet" id="latestAlertRibbon" aria-live="polite">
+          <span class="alert-ribbon-icon" aria-hidden="true">✓</span>
+          <div><strong id="latestAlertTitle">No active replay alert</strong><span id="latestAlertDetail">Attack decisions will be highlighted here and in the flow stream.</span></div>
+        </article>
+
+        <article class="story-rail value-rail" aria-label="Sponsor value">
           <div class="rail-step">
             <span class="rail-number">01</span>
-            <div><strong>Five local clients</strong><small>Separate source-based partitions</small></div>
+            <div><strong>Data remains local</strong><small>Five clients share model updates, not raw training rows</small></div>
           </div>
-          <span class="rail-arrow" aria-hidden="true">→</span>
           <div class="rail-step secure">
             <span class="rail-number">02</span>
-            <div><strong>Protected updates</strong><small>Identity, encryption, replay checks</small></div>
+            <div><strong>Federation improves isolation</strong><small>+5.33 Macro-F1 points over the local-only mean</small></div>
           </div>
-          <span class="rail-arrow" aria-hidden="true">→</span>
-          <div class="rail-step">
-            <span class="rail-number">03</span>
-            <div><strong>FedAvg control center</strong><small>Sample-weighted global model</small></div>
-          </div>
-          <span class="rail-arrow" aria-hidden="true">→</span>
           <div class="rail-step result">
-            <span class="rail-number">04</span>
-            <div><strong>Deployed binary IDS</strong><small>Normal / Attack at threshold 0.42</small></div>
+            <span class="rail-number">03</span>
+            <div><strong>Model exchanges are protected</strong><small>Authenticated, encrypted, tamper- and replay-checked</small></div>
           </div>
         </article>
       </section>
@@ -259,10 +278,14 @@
 
           <aside class="federation-sidebar">
             <article class="panel stage-card">
-              <span class="panel-label">CURRENT STORY STAGE</span>
+              <span class="panel-label">FEDERATION WALKTHROUGH</span>
               <p class="stage-index" id="replayStageIndex">STAGE 01</p>
               <h3 id="replayStageTitle">Control center online</h3>
               <p id="replayStageCaption">Loading the recorded secure demonstration.</p>
+              <div class="stage-actions">
+                <button type="button" class="stage-action primary" id="federationAdvanceButton">Advance FL stage <span aria-hidden="true">→</span></button>
+                <button type="button" class="stage-action" id="federationRestartButton">Restart FL</button>
+              </div>
             </article>
 
             <article class="panel metric-context">

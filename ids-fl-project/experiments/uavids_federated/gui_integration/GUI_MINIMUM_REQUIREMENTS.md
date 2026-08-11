@@ -31,5 +31,9 @@ The GUI team controls layout and visual design. A presentation-ready implementat
 
 - Keep `presentation_mode`, `inference_mode`, and prediction `replayed` indicators visible and distinct.
 - Never fabricate missing source, metric, client, or security values.
+- Dataset attack families may be shown only as ground truth for controlled
+  locked-test replay. They must never be presented as multiclass model output.
+- A selected logical client in Attacker View is controlled target context, not
+  evidence of network delivery or per-client inference.
 - Never claim multiclass attack identification, production readiness, malicious-update protection, private federated preprocessing, or live accuracy.
 - Never request or display private keys, shared secrets, signatures, ciphertext, raw tensors, checkpoint paths, or dataset paths.

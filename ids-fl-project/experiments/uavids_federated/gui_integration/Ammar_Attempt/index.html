@@ -55,6 +55,15 @@
           <span>AI Data</span>
         </button>
       </li>
+      <li>
+        <button class="nav-item nav-launch" id="btn-attacker-view" type="button" aria-haspopup="true">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3l8 4v5c0 4.8-3.1 7.8-8 9-4.9-1.2-8-4.2-8-9V7l8-4z"/>
+            <path d="M9 14l6-6M9.5 8.5h.01M14.5 13.5h.01"/>
+          </svg>
+          <span>Attacker View</span>
+        </button>
+      </li>
     </ul>
 
     <div class="sidebar-foot">
@@ -102,7 +111,7 @@
         <article class="tile">
           <span class="tile-key">Traffic analysed</span>
           <strong class="tile-val" id="k-records">—</strong>
-          <span class="tile-sub">adapter process lifetime</span>
+          <span class="tile-sub">current controlled session</span>
         </article>
         <article class="tile tile-attack">
           <span class="tile-key">Attack Traffic</span>
@@ -115,110 +124,53 @@
           <span class="tile-sub" id="k-normal-rate">—</span>
         </article>
         <article class="tile">
-          <span class="tile-key">Records you sent</span>
+          <span class="tile-key">Normal flows remaining</span>
           <strong class="tile-val" id="k-packets">0</strong>
-          <span class="tile-sub" id="k-packets-sub">this browser session only</span>
+          <span class="tile-sub" id="k-packets-sub">locked-test demonstration pool</span>
         </article>
       </div>
 
-      <div class="grid grid-two">
-
-        <!-- Hero verdict -->
-        <section class="panel panel-verdict" id="verdict-panel" aria-live="polite">
-          <div class="panel-head">
-            <h2>Latest verdict</h2>
-            <span class="tag" id="verdict-origin">awaiting input</span>
-          </div>
-          <div class="verdict-body">
-            <div class="verdict-figure">
-              <div class="verdict-label" id="verdict-label">IDLE</div>
-              <div class="verdict-prob">
-                <span class="hero" id="verdict-prob">—</span>
-                <span class="hero-unit">attack probability</span>
-              </div>
-            </div>
-            <div class="verdict-scale" id="verdict-scale"></div>
-          </div>
-          <dl class="verdict-meta">
-            <div><dt>Record</dt><dd class="mono" id="verdict-record">—</dd></div>
-            <div><dt>Source</dt><dd class="mono" id="verdict-source">—</dd></div>
-            <div><dt>Confidence</dt><dd class="mono" id="verdict-conf">—</dd></div>
-            <div><dt>Imputed</dt><dd class="mono" id="verdict-imputed">—</dd></div>
-          </dl>
-        </section>
-
-        <!-- Probability timeline -->
-        <section class="panel">
-          <div class="panel-head">
-            <h2>Detection timeline</h2>
-            <span class="tag">session · last 60</span>
-          </div>
-          <div class="chart" id="timeline-chart"></div>
-          <p class="legend-row" id="timeline-legend">
-            <span class="key"><i class="swatch swatch-attack"></i>at or above threshold — Attack</span>
-            <span class="key"><i class="swatch swatch-normal"></i>below threshold — Normal</span>
-          </p>
-        </section>
-
-      </div>
-
-      <!-- Verdicts over time. Full width with the legend beside it — the shape
-           of the Grafana reference's "Protocole vs Time" panel. Where the
-           detection timeline plots one bar per verdict, this plots arrival rate. -->
-      <section class="panel">
+      <!-- Probability timeline -->
+      <section class="panel panel-timeline">
         <div class="panel-head">
-          <h2>Verdicts over time</h2>
-          <span class="tag" id="volume-window">—</span>
+          <h2>Detection timeline</h2>
+          <span class="tag" id="timeline-range">locked test · last 5 minutes</span>
         </div>
-        <div class="volume-layout">
-          <div class="chart" id="volume-chart"></div>
-          <div class="series-stats" id="volume-stats"></div>
-        </div>
-        <p class="fineprint">
-          Counts verdicts this tab has seen since it was opened — its own injections
-          plus anything else the adapter scored while it was watching. Not the
-          adapter's lifetime totals shown above.
+        <div class="chart" id="timeline-chart"></div>
+        <p class="legend-row" id="timeline-legend">
+          <span class="key"><i class="swatch swatch-attack"></i>at or above threshold — Attack</span>
+          <span class="key"><i class="swatch swatch-normal"></i>below threshold — Normal</span>
+          <span class="key"><i class="timeline-injection-key"></i>controlled attack input (ground truth)</span>
         </p>
       </section>
 
-      <div class="grid grid-two">
-
-        <!-- Injector -->
-        <section class="panel">
-          <div class="panel-head">
-            <h2>Packet injector</h2>
-            <span class="tag" id="inject-state">idle</span>
+      <!-- Real locked-test traffic controls -->
+      <section class="panel traffic-control-panel">
+        <div class="panel-head">
+          <h2>Held-out traffic replay</h2>
+          <span class="tag" id="traffic-state">ready</span>
+        </div>
+        <div class="traffic-copy">
+          <strong>Ground-truth Normal flows from the locked test split</strong>
+          <span>Each original UAVIDS-2025 record is scored at runtime by the frozen binary model.</span>
+        </div>
+        <div class="inject-controls traffic-controls">
+          <label class="rate">
+            <span>Replay pace</span>
+            <input type="range" id="traffic-rate" min="500" max="3000" step="250" value="1500">
+            <output class="mono" id="traffic-rate-out">1.5 s</output>
+          </label>
+          <div class="btn-row">
+            <button class="btn btn-primary" id="btn-traffic">Start Traffic</button>
+            <button class="btn" id="btn-traffic-reset">Restart Test Stream</button>
           </div>
-          <div class="profiles" id="profile-buttons" role="group" aria-label="Kind of traffic"></div>
-          <p class="profile-desc" id="profile-desc"></p>
-          <div class="inject-controls">
-            <label class="rate">
-              <span>Send every</span>
-              <input type="range" id="inject-rate" min="400" max="4000" step="100" value="1500">
-              <output class="mono" id="inject-rate-out">1.5 s</output>
-            </label>
-            <div class="btn-row">
-              <button class="btn btn-primary" id="btn-stream">Start sending</button>
-              <button class="btn" id="btn-single">Send one</button>
-              <button class="btn" id="btn-replay">Send a real saved packet</button>
-            </div>
-          </div>
-          <div class="inject-readout" id="inject-readout" hidden>
-            <span class="readout-title">What we just sent</span>
-            <div class="readout-grid" id="readout-grid"></div>
-          </div>
-        </section>
-
-        <!-- Rejection categories -->
-        <section class="panel">
-          <div class="panel-head">
-            <h2>Rejected federated messages</h2>
-            <span class="tag" id="reject-total">—</span>
-          </div>
-          <div class="chart" id="reject-chart"></div>
-        </section>
-
-      </div>
+        </div>
+        <div class="traffic-meta">
+          <span><b id="traffic-remaining">250</b> unused Normal flows</span>
+          <span>Selection: test-partition order, independent of model outcome</span>
+          <span class="traffic-honesty">Controlled dataset replay—not live packet capture.</span>
+        </div>
+      </section>
 
       <!-- Collapsible row, as in the Grafana reference -->
       <button class="row-header" type="button" data-section="alerts" aria-expanded="true" aria-controls="section-alerts">
@@ -227,60 +179,21 @@
       </button>
       <div class="row-body" id="section-alerts">
       <section class="panel">
-        <div class="panel-head">
-          <h2>Attack alert log</h2>
-          <span class="tag">newest first · max 20</span>
-        </div>
+          <div class="panel-head panel-head-actions">
+            <h2>Attack alert log</h2>
+            <div class="panel-actions">
+              <span class="tag" id="alert-summary">latest 10</span>
+              <button class="btn btn-small" id="btn-alert-history" type="button" hidden>Show full history</button>
+              <button class="btn btn-small" id="btn-alert-export" type="button" disabled>Export CSV</button>
+            </div>
+          </div>
         <div class="table-scroll">
           <table class="data-table alert-table" id="alert-table"></table>
         </div>
         <p class="fineprint">
-          Attack confidence is how sure the model is that this record is an attack —
-          not how dangerous it is. The model is binary and never identifies an attack
-          type, technique, or actor.
-        </p>
-      </section>
-      </div>
-
-      <!-- Collapsible row, as in the Grafana reference -->
-      <button class="row-header" type="button" data-section="federation" aria-expanded="true" aria-controls="section-federation">
-        <svg class="row-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
-        <span>Federation</span>
-      </button>
-      <div class="row-body" id="section-federation">
-      <section class="panel">
-        <div class="panel-head">
-          <h2>Federated network</h2>
-          <span class="tag" id="fed-round">—</span>
-        </div>
-
-        <div class="fed-layout">
-          <div class="fed-web">
-            <div class="chart" id="fed-topology"></div>
-            <p class="legend-row" id="topology-legend">
-              <span class="key"><i class="node-key node-key-complete"></i>complete</span>
-              <span class="key"><i class="node-key node-key-active"></i>in progress</span>
-              <span class="key"><i class="node-key node-key-wait"></i>waiting</span>
-              <span class="key"><i class="node-key node-key-error"></i>error</span>
-            </p>
-            <div class="meter-block">
-              <div class="meter-label">
-                <span>Updates received</span>
-                <span class="mono" id="updates-text">—</span>
-              </div>
-              <div class="meter"><div class="meter-fill" id="updates-meter"></div></div>
-            </div>
-          </div>
-
-          <aside class="fed-detail" id="client-detail" aria-live="polite"></aside>
-        </div>
-
-        <p class="fineprint" id="local-data-statement"></p>
-        <p class="fineprint">
-          Edges carry model parameters between each client and the control center only.
-          Clients never exchange data with each other, and no raw training row leaves a
-          client. The five nodes are dataset partitions on device-inspired container
-          profiles — not verified physical UAV identities.
+          Only model-generated Attack alerts appear here. Dataset labels are ground truth,
+          not attack families predicted by the binary model. Missed controlled attacks stay
+          visible in the timeline and Attacker View but are not alerts.
         </p>
       </section>
       </div>
@@ -328,86 +241,112 @@
 
     <!-- ══ VIEW: AI DATA ════════════════════════════════════════════ -->
     <section class="view" id="view-ai" role="tabpanel">
-
-
-      <div class="grid grid-two">
-        <section class="panel">
-          <div class="panel-head"><h2>Model identity</h2></div>
-          <dl class="kv" id="model-identity"></dl>
-        </section>
-
-        <section class="panel">
-          <div class="panel-head">
-            <h2>Frozen validation metrics</h2>
-            <span class="tag" id="metrics-source">—</span>
-          </div>
-          <div class="metric-tiles" id="frozen-metrics"></div>
-        </section>
-      </div>
-
-      <div class="grid grid-two">
-        <section class="panel">
-          <div class="panel-head">
-            <h2>Confusion matrix</h2>
-            <span class="tag" id="cm-rows">—</span>
-          </div>
-          <div class="cm" id="confusion-matrix"></div>
-          <p class="fineprint" id="cm-note">
-            Reported by the <code>round_metrics</code> event of the recorded federated run,
-            evaluated at threshold 0.42.
-          </p>
-        </section>
-
-        <section class="panel">
-          <div class="panel-head">
-            <h2>Full round metrics</h2>
-            <span class="tag" id="round-metrics-tag">—</span>
-          </div>
-          <div class="table-scroll">
-            <table class="data-table" id="round-metrics-table"></table>
-          </div>
-        </section>
-      </div>
-
-      <section class="panel">
-        <div class="panel-head">
-          <h2>Per-client training telemetry</h2>
-          <span class="tag">mined from federated events</span>
+      <div class="evidence-intro">
+        <div>
+          <span class="eyebrow">VERIFIED RESEARCH EVIDENCE</span>
+          <h1>How the federated IDS performed</h1>
+          <p>Saved locked-test and controlled security results. These values are not live-stream accuracy.</p>
         </div>
-        <div class="table-scroll">
-          <table class="data-table" id="client-table"></table>
-        </div>
-        <p class="fineprint">
-          Clients are dataset partitions running on device-inspired container profiles —
-          not verified physical UAV identities. Each trains on its own mounted partition;
-          raw training rows are never uploaded.
-        </p>
-      </section>
-
-      <div class="grid grid-two">
-        <section class="panel">
-          <div class="panel-head">
-            <h2>Input features</h2>
-            <span class="tag" id="feature-count">—</span>
-          </div>
-          <ol class="feature-list" id="feature-list"></ol>
-        </section>
-
-        <section class="panel">
-          <div class="panel-head"><h2>Communication security</h2></div>
-          <dl class="kv" id="security-kv"></dl>
-          <p class="fineprint">
-            Security protects federated model exchange in transit. It does not detect
-            poisoning by an authenticated client, does not hide HTTP metadata, and does
-            not make this production infrastructure.
-          </p>
-        </section>
+        <span class="tag" id="evidence-state">checking evidence</span>
       </div>
 
+      <div class="banner banner-error" id="evidence-unavailable" hidden>
+        Evidence unavailable. The IDS monitor can continue, but saved research claims cannot be displayed.
+      </div>
+
+      <div id="evidence-content">
+        <section class="panel evidence-hero">
+          <div class="panel-head panel-head-actions">
+            <div>
+              <h2>Locked-test performance</h2>
+              <p class="panel-subtitle">Federated FedAvg global model</p>
+            </div>
+            <span class="tag" id="locked-test-rows">—</span>
+          </div>
+          <div class="metric-tiles metric-tiles-four" id="locked-test-metrics"></div>
+          <p class="fineprint">Final evaluation after model architecture, preprocessing, training policy, threshold, and checkpoint selection were frozen.</p>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head panel-head-actions">
+            <div>
+              <h2>Training-method comparison</h2>
+              <p class="panel-subtitle">Macro-F1 on the same locked test split</p>
+            </div>
+            <span class="tag">higher is better</span>
+          </div>
+          <div class="comparison-bars" id="comparison-bars"></div>
+          <div class="comparison-conclusion" id="comparison-conclusion"></div>
+        </section>
+
+        <div class="grid grid-two">
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Locked-test confusion matrix</h2>
+              <span class="tag" id="cm-rows">—</span>
+            </div>
+            <div class="cm" id="confusion-matrix"></div>
+            <p class="fineprint" id="cm-note">Binary FedAvg decisions at the frozen 0.42 attack threshold.</p>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Isolated-client variation</h2>
+              <span class="tag">locked test</span>
+            </div>
+            <div class="client-summary" id="client-summary"></div>
+            <p class="fineprint">Different local data distributions produced uneven generalization. FedAvg reduced this isolation gap but did not outperform centralized pooling.</p>
+          </section>
+        </div>
+
+        <section class="panel">
+          <div class="panel-head panel-head-actions">
+            <div>
+              <h2>Verified communication security</h2>
+              <p class="panel-subtitle">Controlled Phase 5 protocol tests</p>
+            </div>
+            <span class="tag" id="security-result">—</span>
+          </div>
+          <div class="algorithm-badges" id="algorithm-badges"></div>
+          <div class="security-summary" id="security-summary"></div>
+          <div class="chart rejection-chart" id="reject-chart"></div>
+          <p class="fineprint">Rejected updates did not reach FedAvg. Encryption and authentication protect transport; they do not detect malicious model poisoning or make this production infrastructure.</p>
+        </section>
+
+        <details class="panel technical-details">
+          <summary>
+            <span>Technical details</span>
+            <span class="summary-hint">model identity, preprocessing, features, and exact client scores</span>
+          </summary>
+          <div class="technical-grid">
+            <section>
+              <h3>Frozen model</h3>
+              <dl class="kv" id="model-identity"></dl>
+            </section>
+            <section>
+              <h3>Preprocessing boundary</h3>
+              <dl class="kv" id="preprocessing-details"></dl>
+            </section>
+          </div>
+          <div class="technical-grid technical-grid-lower">
+            <section>
+              <div class="technical-head">
+                <h3>Approved model inputs</h3>
+                <span class="tag" id="feature-count">—</span>
+              </div>
+              <ol class="feature-list" id="feature-list"></ol>
+            </section>
+            <section>
+              <h3>Local-only macro-F1</h3>
+              <div class="client-score-list" id="client-score-list"></div>
+            </section>
+          </div>
+        </details>
+      </div>
     </section>
 
     <footer class="footer">
-      <span><strong>KAUSTLESS TEAM : </strong>This is just a demo to demo our project demo</span>
+      <span><strong>RASID</strong> · Federated UAV intrusion-detection demonstration</span>
     </footer>
 
   </main>

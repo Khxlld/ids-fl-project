@@ -7,6 +7,8 @@ import json
 import os
 import sys
 import threading
+import urllib.error
+import urllib.request
 import webbrowser
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -16,6 +18,51 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parent
 DEFAULT_API_BASE = "http://127.0.0.1:8090/api/gui/v1"
+
+
+def adapter_diagnostic(api_base: str, timeout_seconds: float = 3.5) -> dict[str, Any]:
+    """Safely distinguish an absent adapter from a browser/CORS problem."""
+
+    health_url = f"{api_base.rstrip('/')}/health"
+    request = urllib.request.Request(health_url, headers={"Accept": "application/json"})
+    try:
+        with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
+            payload = json.loads(response.read())
+            return {
+                "schema_version": "anas-adapter-diagnostic-v1",
+                "adapter_reached": True,
+                "http_status": response.status,
+                "contract_ok": payload.get("api_version") == "uavids-gui-api-v1",
+                "model_available": payload.get("model_available") is True,
+                "category": "reachable",
+            }
+    except urllib.error.HTTPError as exc:
+        return {
+            "schema_version": "anas-adapter-diagnostic-v1",
+            "adapter_reached": True,
+            "http_status": exc.code,
+            "contract_ok": False,
+            "model_available": False,
+            "category": "http_error",
+        }
+    except (urllib.error.URLError, TimeoutError, OSError):
+        return {
+            "schema_version": "anas-adapter-diagnostic-v1",
+            "adapter_reached": False,
+            "http_status": None,
+            "contract_ok": False,
+            "model_available": False,
+            "category": "not_running_or_not_ready",
+        }
+    except (json.JSONDecodeError, ValueError):
+        return {
+            "schema_version": "anas-adapter-diagnostic-v1",
+            "adapter_reached": True,
+            "http_status": 200,
+            "contract_ok": False,
+            "model_available": False,
+            "category": "invalid_contract",
+        }
 
 
 def positive_int(value: str, *, name: str) -> int:
@@ -36,8 +83,19 @@ class PresentationHandler(SimpleHTTPRequestHandler):
         super().__init__(*args, directory=directory, **kwargs)
 
     def do_GET(self) -> None:  # noqa: N802 - stdlib handler API
-        if self.path.split("?", 1)[0] == "/runtime-config.json":
+        request_path = self.path.split("?", 1)[0]
+        if request_path == "/runtime-config.json":
             payload = json.dumps(self.runtime_config, separators=(",", ":")).encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Content-Length", str(len(payload)))
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            self.wfile.write(payload)
+            return
+        if request_path == "/adapter-diagnostic.json":
+            diagnostic = adapter_diagnostic(self.runtime_config["apiBase"])
+            payload = json.dumps(diagnostic, separators=(",", ":")).encode("utf-8")
             self.send_response(200)
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Content-Length", str(len(payload)))
@@ -67,12 +125,15 @@ class PresentationHandler(SimpleHTTPRequestHandler):
 
 def create_server(
     *, host: str = "127.0.0.1", port: int = 3000, api_base: str = DEFAULT_API_BASE,
-    poll_ms: int = 1200, request_timeout_ms: int = 1800,
+    poll_ms: int = 1200, request_timeout_ms: int = 4500,
+    connect_timeout_ms: int = 20000, live_retry_ms: int = 750,
 ) -> ThreadingHTTPServer:
     runtime_config = {
         "apiBase": api_base.rstrip("/"),
         "pollMs": poll_ms,
         "requestTimeoutMs": request_timeout_ms,
+        "connectTimeoutMs": connect_timeout_ms,
+        "liveRetryMs": live_retry_ms,
     }
     handler = partial(
         PresentationHandler,
@@ -99,7 +160,17 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--request-timeout-ms",
         type=lambda value: positive_int(value, name="request-timeout-ms"),
-        default=positive_int(os.environ.get("GUI_REQUEST_TIMEOUT_MS", "1800"), name="request-timeout-ms"),
+        default=positive_int(os.environ.get("GUI_REQUEST_TIMEOUT_MS", "4500"), name="request-timeout-ms"),
+    )
+    parser.add_argument(
+        "--connect-timeout-ms",
+        type=lambda value: positive_int(value, name="connect-timeout-ms"),
+        default=positive_int(os.environ.get("GUI_CONNECT_TIMEOUT_MS", "20000"), name="connect-timeout-ms"),
+    )
+    parser.add_argument(
+        "--live-retry-ms",
+        type=lambda value: positive_int(value, name="live-retry-ms"),
+        default=positive_int(os.environ.get("GUI_LIVE_RETRY_MS", "750"), name="live-retry-ms"),
     )
     parser.add_argument("--open", action="store_true", help="Open the local URL in the default browser.")
     return parser.parse_args()
@@ -114,6 +185,8 @@ def main() -> int:
             api_base=args.api_base,
             poll_ms=args.poll_ms,
             request_timeout_ms=args.request_timeout_ms,
+            connect_timeout_ms=args.connect_timeout_ms,
+            live_retry_ms=args.live_retry_ms,
         )
     except OSError as exc:
         print(f"Could not start the GUI server on {args.host}:{args.port}: {exc}", file=sys.stderr)

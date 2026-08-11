@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RASID · Controlled Attacker View</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="attacker.css">
+<script>
+  (function () {
+    var theme = 'light';
+    try { theme = localStorage.getItem('rasid-theme') || 'light'; } catch (e) {}
+    document.documentElement.setAttribute('data-theme', theme);
+  })();
+</script>
+</head>
+<body class="attacker-page">
+  <header class="attacker-header">
+    <div class="attacker-brand">
+      <span class="attacker-shield" aria-hidden="true">◇</span>
+      <div><strong>RASID</strong><span>Controlled Attacker View</span></div>
+    </div>
+    <div class="attacker-header-actions">
+      <span class="attacker-status" id="attacker-status"><i></i>Connecting…</span>
+      <button class="btn btn-small" id="attacker-theme" type="button">Switch theme</button>
+      <button class="btn btn-small" type="button" onclick="window.close()">Close</button>
+    </div>
+  </header>
+
+  <main class="attacker-main">
+    <section class="attacker-intro">
+      <div>
+        <span class="eyebrow">CONTROLLED DATASET REPLAY</span>
+        <h1>Choose a logical client and test an attack flow</h1>
+        <p>The target is presentation context. The selected held-out UAVIDS-2025 flow keeps its real recorded source and is scored by the shared frozen binary model.</p>
+      </div>
+      <div class="attacker-boundary">
+        <strong>What this demonstrates</strong>
+        <span>Ground-truth attack input → frozen model → Normal or Attack</span>
+        <small>Not live packet capture, container delivery, or per-client inference.</small>
+      </div>
+    </section>
+
+    <div class="attacker-grid">
+      <section class="panel attacker-network-panel">
+        <div class="panel-head">
+          <h2>Federated network</h2>
+          <span class="tag" id="attacker-round">—</span>
+        </div>
+        <div class="attacker-topology" id="attacker-topology" aria-label="Five logical federated clients"></div>
+        <p class="fineprint">The connections represent federated model exchange. Selecting a client below creates a controlled target label only; no attack is sent through the federated protocol.</p>
+      </section>
+
+      <aside class="panel attacker-client-panel" id="attacker-client-detail" aria-live="polite">
+        <div class="attacker-empty">
+          <strong>Select one of the five clients</strong>
+          <span>Its complete configured profile and attack controls will appear here.</span>
+        </div>
+      </aside>
+    </div>
+
+    <section class="panel attacker-controls-panel">
+      <div class="panel-head">
+        <h2>Controlled attack flow</h2>
+        <span class="tag" id="attack-pool-status">locked test split</span>
+      </div>
+      <div class="attack-controls">
+        <label>
+          <span>Target client</span>
+          <output id="selected-target">Select a client above</output>
+        </label>
+        <label>
+          <span>Dataset attack family</span>
+          <select id="attack-type" disabled></select>
+        </label>
+        <button class="btn btn-primary attack-send" id="send-attack" type="button" disabled>Send Next Held-out Attack Flow</button>
+      </div>
+      <p class="fineprint">The family is dataset ground truth and is never supplied to the model. Rows are consumed in locked test-partition order, independent of expected outcomes.</p>
+    </section>
+
+    <section class="panel attack-result-panel" id="attack-result" hidden aria-live="polite"></section>
+    <div class="banner banner-error" id="attacker-error" hidden></div>
+  </main>
+
+<script src="attacker.js"></script>
+</body>
+</html>

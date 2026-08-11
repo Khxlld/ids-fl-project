@@ -1,0 +1,58 @@
+.attacker-page { min-height: 100vh; background: var(--page); color: var(--ink); }
+.attacker-header { height: 68px; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 0 28px; background: var(--surface); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20; }
+.attacker-brand, .attacker-header-actions, .attacker-status { display: flex; align-items: center; gap: 12px; }
+.attacker-brand > div { display: grid; }
+.attacker-brand span { color: var(--ink-muted); font-size: 12px; }
+.attacker-shield { width: 34px; height: 34px; border: 1px solid var(--mark-normal); border-radius: 8px; display: grid; place-items: center; color: var(--mark-normal) !important; font-size: 20px !important; }
+.attacker-status { font-size: 12px; color: var(--ink-muted); }
+.attacker-status i { width: 9px; height: 9px; border-radius: 50%; background: var(--mark-rule); }
+.attacker-status.is-up i { background: var(--mark-normal); }
+.attacker-status.is-down i { background: var(--mark-attack); }
+.attacker-main { max-width: 1500px; margin: 0 auto; padding: 28px; display: grid; gap: 18px; }
+.attacker-intro { display: flex; justify-content: space-between; align-items: flex-start; gap: 30px; }
+.attacker-intro h1 { margin: 5px 0 8px; font-size: clamp(26px, 3vw, 40px); letter-spacing: -.025em; }
+.attacker-intro p { margin: 0; max-width: 780px; color: var(--ink-muted); line-height: 1.55; }
+.eyebrow { color: var(--mark-normal); font-size: 11px; font-weight: 800; letter-spacing: .12em; }
+.attacker-boundary { min-width: 340px; display: grid; gap: 4px; padding: 14px 16px; border: 1px solid var(--line); background: var(--surface); border-radius: 4px; }
+.attacker-boundary span { font-size: 13px; }
+.attacker-boundary small { color: var(--ink-muted); }
+.attacker-grid { display: grid; grid-template-columns: minmax(620px, 1.55fr) minmax(340px, .75fr); gap: 18px; align-items: stretch; }
+.attacker-network-panel, .attacker-client-panel { min-height: 520px; }
+.attacker-topology { min-height: 410px; }
+.attacker-topology svg { width: 100%; height: auto; display: block; }
+.topology-client { cursor: pointer; }
+.topology-client circle { transition: stroke-width .15s ease, filter .15s ease; }
+.topology-client:hover circle, .topology-client.is-selected circle { stroke-width: 5; filter: drop-shadow(0 0 5px color-mix(in srgb, var(--accent) 40%, transparent)); }
+.attacker-client-panel { padding: 20px; }
+.attacker-empty { min-height: 430px; display: grid; place-content: center; text-align: center; gap: 7px; color: var(--ink-muted); }
+.attacker-empty strong { color: var(--ink); font-size: 17px; }
+.client-title { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; padding-bottom: 15px; border-bottom: 1px solid var(--line); }
+.client-title h2 { margin: 0 0 4px; font-size: 22px; }
+.client-title p { margin: 0; color: var(--ink-muted); }
+.client-state { padding: 5px 8px; background: var(--surface-sunk); border: 1px solid var(--line); border-radius: 2px; font-size: 11px; text-transform: uppercase; }
+.client-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); margin: 16px 0; }
+.client-fact { background: var(--surface); padding: 11px; display: grid; gap: 3px; }
+.client-fact span { color: var(--ink-muted); font-size: 10px; text-transform: uppercase; }
+.client-fact strong { font-size: 13px; }
+.distribution { display: grid; gap: 8px; }
+.distribution h3 { margin: 2px 0; font-size: 13px; }
+.dist-row { display: grid; grid-template-columns: 120px 1fr 42px; gap: 8px; align-items: center; font-size: 11px; }
+.dist-bar { height: 7px; background: var(--surface-sunk); overflow: hidden; }
+.dist-bar i { display: block; height: 100%; background: var(--accent); }
+.attacker-controls-panel { padding-bottom: 18px; }
+.attack-controls { display: grid; grid-template-columns: minmax(210px,.7fr) minmax(250px,1fr) auto; gap: 16px; align-items: end; }
+.attack-controls label { display: grid; gap: 7px; color: var(--ink-muted); font-size: 11px; text-transform: uppercase; }
+.attack-controls output, .attack-controls select { min-height: 40px; padding: 9px 10px; background: var(--surface-sunk); color: var(--ink); border: 1px solid var(--line); font: inherit; text-transform: none; }
+.attack-send { min-height: 40px; }
+.attack-result-panel { border-left: 5px solid var(--accent); }
+.attack-result-panel.is-detected { border-left-color: var(--mark-attack); }
+.attack-result-panel.is-missed { border-left-color: var(--mark-rule); }
+.result-head { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
+.result-head h2 { margin: 0; }
+.result-verdict { font-size: 22px; font-weight: 800; }
+.result-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: 14px; }
+.result-grid div { background: var(--surface); padding: 11px; display: grid; gap: 4px; }
+.result-grid span { color: var(--ink-muted); font-size: 10px; text-transform: uppercase; }
+.result-grid strong { font-size: 12px; overflow-wrap: anywhere; }
+@media (max-width: 1050px) { .attacker-grid { grid-template-columns: 1fr; } .attacker-intro { display: grid; } .attacker-boundary { min-width: 0; } .result-grid { grid-template-columns: repeat(3,1fr); } }
+@media (max-width: 700px) { .attacker-header { height: auto; padding: 12px 16px; align-items: flex-start; } .attacker-header-actions { flex-wrap: wrap; justify-content: flex-end; } .attacker-main { padding: 16px; } .attack-controls { grid-template-columns: 1fr; } .result-grid, .client-facts { grid-template-columns: 1fr 1fr; } }
