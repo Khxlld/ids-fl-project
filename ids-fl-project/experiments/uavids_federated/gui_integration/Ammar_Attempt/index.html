@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RASID Demo</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  /* Applied before first paint so the page never flashes the wrong theme.
+     Stored choice wins; otherwise follow the operating system. */
+  (function () {
+    var theme = 'light';
+    try {
+      theme = localStorage.getItem('rasid-theme') ||
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    } catch (e) { /* private mode — fall through to light */ }
+    document.documentElement.setAttribute('data-theme', theme);
+  })();
+</script>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ── Sidebar ─────────────────────────────────────────────────── -->
+  <nav class="sidebar" aria-label="Sections">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/>
+          <circle cx="12" cy="12" r="3.1"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <strong>RASID</strong>
+      </div>
+    </div>
+
+    <ul class="nav" role="tablist">
+      <li>
+        <button class="nav-item is-active" role="tab" aria-selected="true" data-view="dashboard">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/>
+            <rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>
+          </svg>
+          <span>Dashboard</span>
+        </button>
+      </li>
+      <li>
+        <button class="nav-item" role="tab" aria-selected="false" data-view="ai">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M12 2v4M12 18v4M2 12h4M18 12h4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M19.1 4.9l-2.8 2.8M7.7 16.3l-2.8 2.8"/>
+          </svg>
+          <span>AI Data</span>
+        </button>
+      </li>
+    </ul>
+
+    <div class="sidebar-foot">
+      <div class="link-state" id="link-state">
+        <span class="dot" aria-hidden="true"></span>
+        <span class="link-label">Connecting…</span>
+      </div>
+
+      <!-- Honesty indicators. GUI_MINIMUM_REQUIREMENTS.md requires that
+           inference_mode and presentation_mode stay visible and distinct. -->
+      <div class="mode-block">
+        <div class="mode-row">
+          <span class="mode-key">Inference</span>
+          <span class="mode-val" id="s-inference">—</span>
+        </div>
+        <div class="mode-row">
+          <span class="mode-key">FL telemetry</span>
+          <span class="mode-val" id="s-mode">—</span>
+        </div>
+      </div>
+
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-pressed="false">
+        <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4.2"/>
+          <path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/>
+        </svg>
+        <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20.5 14.4A8.6 8.6 0 1 1 9.6 3.5a6.9 6.9 0 0 0 10.9 10.9z"/>
+        </svg>
+        <span class="theme-label" id="theme-label">Dark theme</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── Main ────────────────────────────────────────────────────── -->
+  <main class="main">
+
+    <div class="banner banner-error" id="error-banner" hidden></div>
+
+    <!-- ══ VIEW: DASHBOARD ══════════════════════════════════════════ -->
+    <section class="view is-active" id="view-dashboard" role="tabpanel">
+
+      <!-- Stat strip across the top, then rows of panels — the Grafana rhythm. -->
+      <div class="kpi-row">
+        <article class="tile">
+          <span class="tile-key">Traffic analysed</span>
+          <strong class="tile-val" id="k-records">—</strong>
+          <span class="tile-sub">adapter process lifetime</span>
+        </article>
+        <article class="tile tile-attack">
+          <span class="tile-key">Attack Traffic</span>
+          <strong class="tile-val" id="k-attacks">—</strong>
+          <span class="tile-sub" id="k-attack-rate">—</span>
+        </article>
+        <article class="tile tile-normal">
+          <span class="tile-key">Normal Traffic</span>
+          <strong class="tile-val" id="k-normal">—</strong>
+          <span class="tile-sub" id="k-normal-rate">—</span>
+        </article>
+        <article class="tile">
+          <span class="tile-key">Records you sent</span>
+          <strong class="tile-val" id="k-packets">0</strong>
+          <span class="tile-sub" id="k-packets-sub">this browser session only</span>
+        </article>
+      </div>
+
+      <div class="grid grid-two">
+
+        <!-- Hero verdict -->
+        <section class="panel panel-verdict" id="verdict-panel" aria-live="polite">
+          <div class="panel-head">
+            <h2>Latest verdict</h2>
+            <span class="tag" id="verdict-origin">awaiting input</span>
+          </div>
+          <div class="verdict-body">
+            <div class="verdict-figure">
+              <div class="verdict-label" id="verdict-label">IDLE</div>
+              <div class="verdict-prob">
+                <span class="hero" id="verdict-prob">—</span>
+                <span class="hero-unit">attack probability</span>
+              </div>
+            </div>
+            <div class="verdict-scale" id="verdict-scale"></div>
+          </div>
+          <dl class="verdict-meta">
+            <div><dt>Record</dt><dd class="mono" id="verdict-record">—</dd></div>
+            <div><dt>Source</dt><dd class="mono" id="verdict-source">—</dd></div>
+            <div><dt>Confidence</dt><dd class="mono" id="verdict-conf">—</dd></div>
+            <div><dt>Imputed</dt><dd class="mono" id="verdict-imputed">—</dd></div>
+          </dl>
+        </section>
+
+        <!-- Probability timeline -->
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Detection timeline</h2>
+            <span class="tag">session · last 60</span>
+          </div>
+          <div class="chart" id="timeline-chart"></div>
+          <p class="legend-row" id="timeline-legend">
+            <span class="key"><i class="swatch swatch-attack"></i>at or above threshold — Attack</span>
+            <span class="key"><i class="swatch swatch-normal"></i>below threshold — Normal</span>
+          </p>
+        </section>
+
+      </div>
+
+      <!-- Verdicts over time. Full width with the legend beside it — the shape
+           of the Grafana reference's "Protocole vs Time" panel. Where the
+           detection timeline plots one bar per verdict, this plots arrival rate. -->
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Verdicts over time</h2>
+          <span class="tag" id="volume-window">—</span>
+        </div>
+        <div class="volume-layout">
+          <div class="chart" id="volume-chart"></div>
+          <div class="series-stats" id="volume-stats"></div>
+        </div>
+        <p class="fineprint">
+          Counts verdicts this tab has seen since it was opened — its own injections
+          plus anything else the adapter scored while it was watching. Not the
+          adapter's lifetime totals shown above.
+        </p>
+      </section>
+
+      <div class="grid grid-two">
+
+        <!-- Injector -->
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Packet injector</h2>
+            <span class="tag" id="inject-state">idle</span>
+          </div>
+          <div class="profiles" id="profile-buttons" role="group" aria-label="Kind of traffic"></div>
+          <p class="profile-desc" id="profile-desc"></p>
+          <div class="inject-controls">
+            <label class="rate">
+              <span>Send every</span>
+              <input type="range" id="inject-rate" min="400" max="4000" step="100" value="1500">
+              <output class="mono" id="inject-rate-out">1.5 s</output>
+            </label>
+            <div class="btn-row">
+              <button class="btn btn-primary" id="btn-stream">Start sending</button>
+              <button class="btn" id="btn-single">Send one</button>
+              <button class="btn" id="btn-replay">Send a real saved packet</button>
+            </div>
+          </div>
+          <div class="inject-readout" id="inject-readout" hidden>
+            <span class="readout-title">What we just sent</span>
+            <div class="readout-grid" id="readout-grid"></div>
+          </div>
+        </section>
+
+        <!-- Rejection categories -->
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Rejected federated messages</h2>
+            <span class="tag" id="reject-total">—</span>
+          </div>
+          <div class="chart" id="reject-chart"></div>
+        </section>
+
+      </div>
+
+      <!-- Collapsible row, as in the Grafana reference -->
+      <button class="row-header" type="button" data-section="alerts" aria-expanded="true" aria-controls="section-alerts">
+        <svg class="row-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        <span>Alerts</span>
+      </button>
+      <div class="row-body" id="section-alerts">
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Attack alert log</h2>
+          <span class="tag">newest first · max 20</span>
+        </div>
+        <div class="table-scroll">
+          <table class="data-table alert-table" id="alert-table"></table>
+        </div>
+        <p class="fineprint">
+          Attack confidence is how sure the model is that this record is an attack —
+          not how dangerous it is. The model is binary and never identifies an attack
+          type, technique, or actor.
+        </p>
+      </section>
+      </div>
+
+      <!-- Collapsible row, as in the Grafana reference -->
+      <button class="row-header" type="button" data-section="federation" aria-expanded="true" aria-controls="section-federation">
+        <svg class="row-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        <span>Federation</span>
+      </button>
+      <div class="row-body" id="section-federation">
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Federated network</h2>
+          <span class="tag" id="fed-round">—</span>
+        </div>
+
+        <div class="fed-layout">
+          <div class="fed-web">
+            <div class="chart" id="fed-topology"></div>
+            <p class="legend-row" id="topology-legend">
+              <span class="key"><i class="node-key node-key-complete"></i>complete</span>
+              <span class="key"><i class="node-key node-key-active"></i>in progress</span>
+              <span class="key"><i class="node-key node-key-wait"></i>waiting</span>
+              <span class="key"><i class="node-key node-key-error"></i>error</span>
+            </p>
+            <div class="meter-block">
+              <div class="meter-label">
+                <span>Updates received</span>
+                <span class="mono" id="updates-text">—</span>
+              </div>
+              <div class="meter"><div class="meter-fill" id="updates-meter"></div></div>
+            </div>
+          </div>
+
+          <aside class="fed-detail" id="client-detail" aria-live="polite"></aside>
+        </div>
+
+        <p class="fineprint" id="local-data-statement"></p>
+        <p class="fineprint">
+          Edges carry model parameters between each client and the control center only.
+          Clients never exchange data with each other, and no raw training row leaves a
+          client. The five nodes are dataset partitions on device-inspired container
+          profiles — not verified physical UAV identities.
+        </p>
+      </section>
+      </div>
+
+      <!-- Raw event evidence, kept on the dashboard so the operating picture
+           and the record behind it are on one screen. -->
+      <!-- Collapsible row, as in the Grafana reference -->
+      <button class="row-header" type="button" data-section="log" aria-expanded="true" aria-controls="section-log">
+        <svg class="row-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        <span>Log</span>
+      </button>
+      <div class="row-body" id="section-log">
+      <div class="console-bar">
+        <div class="filters" id="severity-filters" role="group" aria-label="Severity filter"></div>
+        <div class="console-actions">
+          <label class="check">
+            <input type="checkbox" id="autoscroll" checked>
+            <span>Follow tail</span>
+          </label>
+          <button class="btn btn-small" id="btn-clear-console">Clear view</button>
+        </div>
+      </div>
+
+      <div class="grid grid-two grid-console">
+        <section class="panel panel-log">
+          <div class="panel-head">
+            <h2>Inference activity</h2>
+            <span class="tag" id="inf-log-count">0</span>
+          </div>
+          <div class="log" id="inference-log"></div>
+        </section>
+
+        <section class="panel panel-log">
+          <div class="panel-head">
+            <h2>Federated &amp; security events</h2>
+            <span class="tag" id="fed-log-count">0</span>
+          </div>
+          <div class="banner banner-inline" id="paced-note" hidden></div>
+          <div class="log" id="federated-log"></div>
+        </section>
+      </div>
+      </div>
+
+    </section>
+
+    <!-- ══ VIEW: AI DATA ════════════════════════════════════════════ -->
+    <section class="view" id="view-ai" role="tabpanel">
+
+
+      <div class="grid grid-two">
+        <section class="panel">
+          <div class="panel-head"><h2>Model identity</h2></div>
+          <dl class="kv" id="model-identity"></dl>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Frozen validation metrics</h2>
+            <span class="tag" id="metrics-source">—</span>
+          </div>
+          <div class="metric-tiles" id="frozen-metrics"></div>
+        </section>
+      </div>
+
+      <div class="grid grid-two">
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Confusion matrix</h2>
+            <span class="tag" id="cm-rows">—</span>
+          </div>
+          <div class="cm" id="confusion-matrix"></div>
+          <p class="fineprint" id="cm-note">
+            Reported by the <code>round_metrics</code> event of the recorded federated run,
+            evaluated at threshold 0.42.
+          </p>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Full round metrics</h2>
+            <span class="tag" id="round-metrics-tag">—</span>
+          </div>
+          <div class="table-scroll">
+            <table class="data-table" id="round-metrics-table"></table>
+          </div>
+        </section>
+      </div>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Per-client training telemetry</h2>
+          <span class="tag">mined from federated events</span>
+        </div>
+        <div class="table-scroll">
+          <table class="data-table" id="client-table"></table>
+        </div>
+        <p class="fineprint">
+          Clients are dataset partitions running on device-inspired container profiles —
+          not verified physical UAV identities. Each trains on its own mounted partition;
+          raw training rows are never uploaded.
+        </p>
+      </section>
+
+      <div class="grid grid-two">
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Input features</h2>
+            <span class="tag" id="feature-count">—</span>
+          </div>
+          <ol class="feature-list" id="feature-list"></ol>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head"><h2>Communication security</h2></div>
+          <dl class="kv" id="security-kv"></dl>
+          <p class="fineprint">
+            Security protects federated model exchange in transit. It does not detect
+            poisoning by an authenticated client, does not hide HTTP metadata, and does
+            not make this production infrastructure.
+          </p>
+        </section>
+      </div>
+
+    </section>
+
+    <footer class="footer">
+      <span><strong>KAUSTLESS TEAM : </strong>This is just a demo to demo our project demo</span>
+    </footer>
+
+  </main>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
