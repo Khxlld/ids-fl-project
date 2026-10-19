@@ -1,0 +1,94 @@
+{
+  "status": "planned_not_run",
+  "scope": "Contribution 1 known-only baseline optimization and budget tuning",
+  "development_seeds": [240517, 240519, 240520, 240521, 240522, 240523],
+  "stage_1_centralized_screen": {
+    "description": "Screen a small learning-rate and training-window grid using centralized CLOSR first.",
+    "candidates": [
+      {
+        "id": "C0_frozen_baseline",
+        "learning_rate": 0.001,
+        "weight_decay": 0.0001,
+        "centralized_epochs": 40,
+        "centralized_patience": 8
+      },
+      {
+        "id": "C1_longer_window",
+        "learning_rate": 0.001,
+        "weight_decay": 0.0001,
+        "centralized_epochs": 80,
+        "centralized_patience": 16
+      },
+      {
+        "id": "C2_half_learning_rate",
+        "learning_rate": 0.0005,
+        "weight_decay": 0.0001,
+        "centralized_epochs": 80,
+        "centralized_patience": 16
+      },
+      {
+        "id": "C3_quarter_learning_rate",
+        "learning_rate": 0.00025,
+        "weight_decay": 0.0001,
+        "centralized_epochs": 80,
+        "centralized_patience": 16
+      }
+    ],
+    "selection_data_only_metrics": [
+      "closed-set Macro-F1",
+      "per-class recall and precision",
+      "closed-set confusion matrix",
+      "Normal-to-Sybil error rate",
+      "selected epoch and optimizer steps"
+    ],
+    "ranking_rule": [
+      "maximize six-seed mean known-selection closed-set Macro-F1",
+      "for candidates within 0.005 Macro-F1, maximize the lower of mean Normal recall and mean Sybil recall",
+      "if still tied, minimize mean Normal-to-Sybil error rate",
+      "if still tied, choose fewer optimizer steps through the selected checkpoint"
+    ],
+    "calibration_metrics_may_select_a_candidate": false
+  },
+  "stage_2_three_way_confirmation": {
+    "description": "Freeze the centralized winner, then apply its learning rate unchanged to centralized, IID FedAvg, and natural Non-IID FedAvg CLOSR.",
+    "federated_local_epochs": 1,
+    "federated_optimizer_state": "fresh AdamW per client per round, unchanged from the baseline",
+    "round_budget_rule": "Use 30 rounds to isolate the selected learning rate. If and only if the centralized winner is a longer-window candidate, also run one predeclared 60-round confirmation for both FedAvg modes.",
+    "within_seed_controls": [
+      "identical initial model tensors across all three configurations",
+      "fixed source partitions, known-selection group, known-calibration group, and IID repartition",
+      "reproducibly controlled but composition-dependent sampler streams",
+      "same CLOSR architecture, original CLOSR loss, class centers, scoring, and strict rejection rule"
+    ],
+    "interpretation": {
+      "shared_baseline_weakness": "Centralized and IID improve consistently under the frozen winner; improvement in natural is assessed separately.",
+      "additional_federated_weakness": "Centralized improves but IID does not, indicating that centralized tuning alone does not transfer to FedAvg optimization.",
+      "additional_natural_partition_associated_gap": "Centralized and IID improve while paired natural-minus-IID development gaps persist across seeds. This is association under the controls, not a causal Non-IID claim.",
+      "screen_does_not_help": "If centralized CLOSR does not improve, stop this tuning branch and reassess the known-class baseline without automatically changing the CLOSR method."
+    }
+  },
+  "fixed_invariants": [
+    "CLOSR is the only detector",
+    "original class-specific CLOSR loss and normalization",
+    "CLOSR center-similarity inference",
+    "known-only training, checkpoint selection, center computation, and calibration",
+    "Wormhole exclusion during development",
+    "balanced replacement sampling policy",
+    "pooled preprocessing baseline",
+    "checkpoint/calibration source groups",
+    "IID partition seed 240518"
+  ],
+  "forbidden_during_tuning": [
+    "configuration selection using calibration performance",
+    "unknown-validation evaluation",
+    "final-test performance evaluation",
+    "rejection-threshold tuning as a known-confusion remedy",
+    "missing-class compensation",
+    "update-conflict correction",
+    "distillation, adaptation, another detector, or method changes"
+  ],
+  "after_development": {
+    "protocol_freeze": "Freeze the chosen configuration, code revision, dependency lock, seeds, partition and manifest hashes, selection rule, calibration rule, output schema, and one-shot evaluation command before opening performance data from the final test.",
+    "unknown_evaluation": "After the freeze, run the declared source-disjoint final-test evaluation once. Calibrate thresholds only from the frozen known-calibration group; report known metrics and Wormhole unknown metrics without retuning."
+  }
+}

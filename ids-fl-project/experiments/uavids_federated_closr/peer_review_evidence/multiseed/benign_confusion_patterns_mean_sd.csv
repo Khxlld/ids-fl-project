@@ -1,0 +1,31 @@
+mode,measurement_group,predicted_label,row_rate__mean,row_rate__sample_sd,n_seeds
+centralized,checkpoint_selection,Normal Traffic,0.9455782312925171,0.019401048045050592,6
+centralized,checkpoint_selection,Blackhole Attack,0.008030990173847317,0.003890557808792175,6
+centralized,checkpoint_selection,Flooding Attack,0.004472159234063996,0.001962563843775499,6
+centralized,checkpoint_selection,Sybil Attack,0.02236079617031998,0.016275389280702397,6
+centralized,checkpoint_selection,UNKNOWN,0.0195578231292517,0.006826562320709305,6
+centralized,threshold_calibration,Normal Traffic,0.9407477820025348,0.021207434315604217,6
+centralized,threshold_calibration,Blackhole Attack,0.00921322023983621,0.004754088978830971,6
+centralized,threshold_calibration,Flooding Attack,0.0038022813688212928,0.001988025208302595,6
+centralized,threshold_calibration,Sybil Attack,0.02625036560397777,0.018027679681873538,6
+centralized,threshold_calibration,UNKNOWN,0.01998635078482987,0.005089263401528709,6
+iid_federated,checkpoint_selection,Normal Traffic,0.9302721088435374,0.023429766100337285,6
+iid_federated,checkpoint_selection,Blackhole Attack,0.012345679012345678,0.004338233662771373,6
+iid_federated,checkpoint_selection,Flooding Attack,0.005731922398589066,0.0009153893738767928,6
+iid_federated,checkpoint_selection,Sybil Attack,0.023211136306374402,0.006505887058275589,6
+iid_federated,checkpoint_selection,UNKNOWN,0.028439153439153434,0.014769601630520232,6
+iid_federated,threshold_calibration,Normal Traffic,0.9289022131227455,0.024395695355565676,6
+iid_federated,threshold_calibration,Blackhole Attack,0.014014819147898996,0.005395832502637837,6
+iid_federated,threshold_calibration,Flooding Attack,0.005532806863605342,0.0015377403557527826,6
+iid_federated,threshold_calibration,Sybil Attack,0.02325241298625329,0.007358146782901446,6
+iid_federated,threshold_calibration,UNKNOWN,0.028297747879496928,0.014711860454639136,6
+natural_non_iid_federated,checkpoint_selection,Normal Traffic,0.8507810531620056,0.06931897609514868,6
+natural_non_iid_federated,checkpoint_selection,Blackhole Attack,0.007495590828924162,0.0035707119675769615,6
+natural_non_iid_federated,checkpoint_selection,Flooding Attack,0.041194255479969764,0.049171156138218895,6
+natural_non_iid_federated,checkpoint_selection,Sybil Attack,0.06327160493827161,0.06057063588822118,6
+natural_non_iid_federated,checkpoint_selection,UNKNOWN,0.03725749559082892,0.010564054971214432,6
+natural_non_iid_federated,threshold_calibration,Normal Traffic,0.8419372136102176,0.07214662069527814,6
+natural_non_iid_federated,threshold_calibration,Blackhole Attack,0.008335770693185142,0.004955842496557919,6
+natural_non_iid_federated,threshold_calibration,Flooding Attack,0.04058204153261188,0.04909831382303497,6
+natural_non_iid_federated,threshold_calibration,Sybil Attack,0.06741737350102368,0.06195288156303691,6
+natural_non_iid_federated,threshold_calibration,UNKNOWN,0.04172760066296188,0.010258059743746594,6

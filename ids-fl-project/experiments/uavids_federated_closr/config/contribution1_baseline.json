@@ -1,0 +1,98 @@
+{
+  "experiment_id": "uavids_contribution1_closr_v2_pre_full_audit",
+  "data_root": "C:\\Users\\feras\\Downloads\\KAUST 4th stage\\glasgow\\Project\\useCases\\military theme datasets\\experiments\\uavids_federated",
+  "manifest_relative_path": "results_phase2/partition_manifest.json",
+  "row_assignments_relative_path": "results_phase2/row_assignments.csv",
+  "known_classes": [
+    "Normal Traffic",
+    "Blackhole Attack",
+    "Flooding Attack",
+    "Sybil Attack"
+  ],
+  "globally_withheld_unknown_classes": [
+    "Wormhole Attack"
+  ],
+  "benign_class": "Normal Traffic",
+  "validation_group_split": {
+    "selection_fraction": 0.5,
+    "seed": 240517
+  },
+  "preprocessing": {
+    "imputer": "median",
+    "scaler": "StandardScaler",
+    "fit_scope": "pooled known-only rows from the five training clients"
+  },
+  "model": {
+    "hidden_dims": [128, 128, 128],
+    "projection_dim": 32,
+    "dropout": 0.1
+  },
+  "loss": {
+    "margin": 1.0,
+    "squared": true,
+    "alpha": 0.5,
+    "normalization": "official_active_pairs",
+    "head_reduction": "mean_all",
+    "unavailable_term_policy": "independent_differentiable_zero_matching_pinned_upstream",
+    "epsilon": 1e-6
+  },
+  "training": {
+    "seed": 240517,
+    "device": "cpu",
+    "torch_num_threads": 4,
+    "batch_size": 128,
+    "balanced_sampling": true,
+    "drop_last": false,
+    "optimizer": "AdamW",
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "centralized_epochs": 40,
+    "centralized_patience": 8,
+    "federated_rounds": 30,
+    "local_epochs": 1,
+    "all_clients_per_round": true,
+    "aggregation": "sample_weighted_fedavg_after_unknown_exclusion",
+    "optimizer_state_handling": "centralized AdamW persists across epochs; each FL client starts fresh AdamW state every round and retains it only across that round's local epochs"
+  },
+  "iid_control": {
+    "enabled": true,
+    "partition_seed": 240518,
+    "method": "deterministic sequential stratified repartition of the identical pooled known-only rows",
+    "preserve_natural_client_sizes": true,
+    "same_initial_model_state": true,
+    "same_evaluation_partitions": true
+  },
+  "centers": {
+    "centralized": "normalized class sums from known-only centralized training rows using the selected inference model",
+    "federated": "aggregate per-class embedding sums and counts computed locally with the fixed selected global model, then normalize at the server"
+  },
+  "threshold_calibration": {
+    "known_rejection_rate_target": 0.05,
+    "rule": "reject when unknown_score > threshold",
+    "data": "known-only source-group-disjoint calibration subset"
+  },
+  "final_evaluation": {
+    "test_partition": "partitions/phase2/test.csv",
+    "metrics": [
+      "known_class_macro_f1",
+      "unknown_recall",
+      "overall_known_rejection_rate",
+      "per_class_known_rejection_rate",
+      "benign_rejection_rate",
+      "benign_total_alert_fpr",
+      "known_vs_unknown_auroc"
+    ],
+    "run_during_setup": false
+  },
+  "smoke": {
+    "max_rows_per_client": 128,
+    "max_selection_rows": 256,
+    "max_calibration_rows": 256,
+    "hidden_dims": [32, 32],
+    "projection_dim": 8,
+    "batch_size": 32,
+    "centralized_epochs": 1,
+    "federated_rounds": 1,
+    "local_epochs": 1
+  }
+}

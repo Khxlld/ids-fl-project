@@ -1,0 +1,24 @@
+{
+  "baseline_method_modified": false,
+  "calibration_use": "known-only threshold calculation; never used to search or choose a configuration",
+  "cosine_near_zero_norm": 1e-05,
+  "final_test_performance_evaluated": false,
+  "gradient_zero_norm": 1e-12,
+  "known_selection_subset_only": true,
+  "modes": [
+    "iid_federated",
+    "natural_non_iid_federated"
+  ],
+  "post_hoc_exploratory_examples": true,
+  "rounds": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "seeds": [
+    240520,
+    240523
+  ],
+  "unknown_examples_evaluated": false
+}

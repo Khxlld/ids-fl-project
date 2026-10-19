@@ -1,0 +1,78 @@
+{
+  "checks": {
+    "240517": {
+      "data_audit_identical_to_pilot": true,
+      "final_test_not_loaded": true,
+      "only_training_seed_changed_in_resolved_config": true,
+      "resolved_training_seed_matches": true,
+      "sampling_plan_identical_except_training_seed": true,
+      "three_modes_share_initial_selection_metric": true,
+      "unknown_validation_not_evaluated": true
+    },
+    "240519": {
+      "data_audit_identical_to_pilot": true,
+      "final_test_not_loaded": true,
+      "identical_initial_state_declared_and_hashed": true,
+      "only_training_seed_changed_in_resolved_config": true,
+      "resolved_training_seed_matches": true,
+      "rng_audit_seed_matches": true,
+      "sampling_plan_identical_except_training_seed": true,
+      "three_modes_share_initial_selection_metric": true,
+      "unknown_validation_not_evaluated": true
+    },
+    "240520": {
+      "data_audit_identical_to_pilot": true,
+      "final_test_not_loaded": true,
+      "identical_initial_state_declared_and_hashed": true,
+      "only_training_seed_changed_in_resolved_config": true,
+      "resolved_training_seed_matches": true,
+      "rng_audit_seed_matches": true,
+      "sampling_plan_identical_except_training_seed": true,
+      "three_modes_share_initial_selection_metric": true,
+      "unknown_validation_not_evaluated": true
+    },
+    "240521": {
+      "data_audit_identical_to_pilot": true,
+      "final_test_not_loaded": true,
+      "identical_initial_state_declared_and_hashed": true,
+      "only_training_seed_changed_in_resolved_config": true,
+      "resolved_training_seed_matches": true,
+      "rng_audit_seed_matches": true,
+      "sampling_plan_identical_except_training_seed": true,
+      "three_modes_share_initial_selection_metric": true,
+      "unknown_validation_not_evaluated": true
+    },
+    "240522": {
+      "data_audit_identical_to_pilot": true,
+      "final_test_not_loaded": true,
+      "identical_initial_state_declared_and_hashed": true,
+      "only_training_seed_changed_in_resolved_config": true,
+      "resolved_training_seed_matches": true,
+      "rng_audit_seed_matches": true,
+      "sampling_plan_identical_except_training_seed": true,
+      "three_modes_share_initial_selection_metric": true,
+      "unknown_validation_not_evaluated": true
+    },
+    "240523": {
+      "data_audit_identical_to_pilot": true,
+      "final_test_not_loaded": true,
+      "identical_initial_state_declared_and_hashed": true,
+      "only_training_seed_changed_in_resolved_config": true,
+      "resolved_training_seed_matches": true,
+      "rng_audit_seed_matches": true,
+      "sampling_plan_identical_except_training_seed": true,
+      "three_modes_share_initial_selection_metric": true,
+      "unknown_validation_not_evaluated": true
+    }
+  },
+  "expected_seeds": [
+    240517,
+    240519,
+    240520,
+    240521,
+    240522,
+    240523
+  ],
+  "final_test_performance_evaluated": false,
+  "unknown_validation_performance_evaluated": false
+}

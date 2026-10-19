@@ -1,0 +1,6 @@
+true_label,Normal Traffic,Blackhole Attack,Flooding Attack,Sybil Attack,UNKNOWN
+Normal Traffic,4884,57,24,126,201
+Blackhole Attack,5,5829,50,19,80
+Flooding Attack,1,100,1253,71,94
+Sybil Attack,12,93,3090,1625,532
+UNKNOWN,0,0,0,0,0

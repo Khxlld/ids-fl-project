@@ -1,0 +1,721 @@
+seed,seed_role,mode,measurement_group,true_label,predicted_label,count,row_rate,true_row_total
+240517,pilot,centralized,checkpoint_selection,Normal Traffic,Normal Traffic,5051,0.9544595616024187,5292
+240517,pilot,centralized,checkpoint_selection,Normal Traffic,Blackhole Attack,56,0.010582010582010581,5292
+240517,pilot,centralized,checkpoint_selection,Normal Traffic,Flooding Attack,35,0.006613756613756613,5292
+240517,pilot,centralized,checkpoint_selection,Normal Traffic,Sybil Attack,41,0.007747543461829176,5292
+240517,pilot,centralized,checkpoint_selection,Normal Traffic,UNKNOWN,109,0.020597127739984882,5292
+240517,pilot,centralized,checkpoint_selection,Blackhole Attack,Normal Traffic,2,0.00033428046130703663,5983
+240517,pilot,centralized,checkpoint_selection,Blackhole Attack,Blackhole Attack,5828,0.9740932642487047,5983
+240517,pilot,centralized,checkpoint_selection,Blackhole Attack,Flooding Attack,54,0.009025572455289989,5983
+240517,pilot,centralized,checkpoint_selection,Blackhole Attack,Sybil Attack,12,0.0020056827678422194,5983
+240517,pilot,centralized,checkpoint_selection,Blackhole Attack,UNKNOWN,87,0.014541200066856092,5983
+240517,pilot,centralized,checkpoint_selection,Flooding Attack,Normal Traffic,2,0.0013166556945358788,1519
+240517,pilot,centralized,checkpoint_selection,Flooding Attack,Blackhole Attack,64,0.04213298222514812,1519
+240517,pilot,centralized,checkpoint_selection,Flooding Attack,Flooding Attack,1317,0.8670177748518763,1519
+240517,pilot,centralized,checkpoint_selection,Flooding Attack,Sybil Attack,59,0.038841342988808425,1519
+240517,pilot,centralized,checkpoint_selection,Flooding Attack,UNKNOWN,77,0.05069124423963134,1519
+240517,pilot,centralized,checkpoint_selection,Sybil Attack,Normal Traffic,15,0.002802690582959641,5352
+240517,pilot,centralized,checkpoint_selection,Sybil Attack,Blackhole Attack,20,0.0037369207772795215,5352
+240517,pilot,centralized,checkpoint_selection,Sybil Attack,Flooding Attack,3002,0.5609118086696562,5352
+240517,pilot,centralized,checkpoint_selection,Sybil Attack,Sybil Attack,1753,0.3275411061285501,5352
+240517,pilot,centralized,checkpoint_selection,Sybil Attack,UNKNOWN,562,0.10500747384155455,5352
+240517,pilot,centralized,threshold_calibration,Normal Traffic,Normal Traffic,6483,0.9480842351564785,6838
+240517,pilot,centralized,threshold_calibration,Normal Traffic,Blackhole Attack,79,0.01155308569757239,6838
+240517,pilot,centralized,threshold_calibration,Normal Traffic,Flooding Attack,41,0.005995905235448962,6838
+240517,pilot,centralized,threshold_calibration,Normal Traffic,Sybil Attack,78,0.011406844106463879,6838
+240517,pilot,centralized,threshold_calibration,Normal Traffic,UNKNOWN,157,0.02295992980403627,6838
+240517,pilot,centralized,threshold_calibration,Blackhole Attack,Normal Traffic,3,0.0004697040864255519,6387
+240517,pilot,centralized,threshold_calibration,Blackhole Attack,Blackhole Attack,6207,0.9718177548144669,6387
+240517,pilot,centralized,threshold_calibration,Blackhole Attack,Flooding Attack,51,0.007984969469234382,6387
+240517,pilot,centralized,threshold_calibration,Blackhole Attack,Sybil Attack,12,0.0018788163457022077,6387
+240517,pilot,centralized,threshold_calibration,Blackhole Attack,UNKNOWN,114,0.017848755284170972,6387
+240517,pilot,centralized,threshold_calibration,Flooding Attack,Normal Traffic,28,0.008059873344847437,3474
+240517,pilot,centralized,threshold_calibration,Flooding Attack,Blackhole Attack,70,0.020149683362118594,3474
+240517,pilot,centralized,threshold_calibration,Flooding Attack,Flooding Attack,3098,0.8917674150834772,3474
+240517,pilot,centralized,threshold_calibration,Flooding Attack,Sybil Attack,84,0.024179620034542316,3474
+240517,pilot,centralized,threshold_calibration,Flooding Attack,UNKNOWN,194,0.055843408175014396,3474
+240517,pilot,centralized,threshold_calibration,Sybil Attack,Normal Traffic,8,0.0012298232129131438,6505
+240517,pilot,centralized,threshold_calibration,Sybil Attack,Blackhole Attack,16,0.0024596464258262877,6505
+240517,pilot,centralized,threshold_calibration,Sybil Attack,Flooding Attack,3380,0.5196003074558032,6505
+240517,pilot,centralized,threshold_calibration,Sybil Attack,Sybil Attack,2406,0.369869331283628,6505
+240517,pilot,centralized,threshold_calibration,Sybil Attack,UNKNOWN,695,0.10684089162182936,6505
+240517,pilot,iid_federated,checkpoint_selection,Normal Traffic,Normal Traffic,4960,0.9372637944066515,5292
+240517,pilot,iid_federated,checkpoint_selection,Normal Traffic,Blackhole Attack,86,0.016250944822373395,5292
+240517,pilot,iid_federated,checkpoint_selection,Normal Traffic,Flooding Attack,32,0.006046863189720333,5292
+240517,pilot,iid_federated,checkpoint_selection,Normal Traffic,Sybil Attack,111,0.020975056689342405,5292
+240517,pilot,iid_federated,checkpoint_selection,Normal Traffic,UNKNOWN,103,0.01946334089191232,5292
+240517,pilot,iid_federated,checkpoint_selection,Blackhole Attack,Normal Traffic,6,0.0010028413839211097,5983
+240517,pilot,iid_federated,checkpoint_selection,Blackhole Attack,Blackhole Attack,5789,0.9675747952532174,5983
+240517,pilot,iid_federated,checkpoint_selection,Blackhole Attack,Flooding Attack,30,0.005014206919605549,5983
+240517,pilot,iid_federated,checkpoint_selection,Blackhole Attack,Sybil Attack,27,0.004512786227644994,5983
+240517,pilot,iid_federated,checkpoint_selection,Blackhole Attack,UNKNOWN,131,0.021895370215610898,5983
+240517,pilot,iid_federated,checkpoint_selection,Flooding Attack,Normal Traffic,0,0.0,1519
+240517,pilot,iid_federated,checkpoint_selection,Flooding Attack,Blackhole Attack,88,0.05793285055957867,1519
+240517,pilot,iid_federated,checkpoint_selection,Flooding Attack,Flooding Attack,1245,0.8196181698485846,1519
+240517,pilot,iid_federated,checkpoint_selection,Flooding Attack,Sybil Attack,64,0.04213298222514812,1519
+240517,pilot,iid_federated,checkpoint_selection,Flooding Attack,UNKNOWN,122,0.08031599736668861,1519
+240517,pilot,iid_federated,checkpoint_selection,Sybil Attack,Normal Traffic,15,0.002802690582959641,5352
+240517,pilot,iid_federated,checkpoint_selection,Sybil Attack,Blackhole Attack,123,0.02298206278026906,5352
+240517,pilot,iid_federated,checkpoint_selection,Sybil Attack,Flooding Attack,3176,0.593423019431988,5352
+240517,pilot,iid_federated,checkpoint_selection,Sybil Attack,Sybil Attack,1547,0.289050822122571,5352
+240517,pilot,iid_federated,checkpoint_selection,Sybil Attack,UNKNOWN,491,0.09174140508221226,5352
+240517,pilot,iid_federated,threshold_calibration,Normal Traffic,Normal Traffic,6393,0.9349224919567125,6838
+240517,pilot,iid_federated,threshold_calibration,Normal Traffic,Blackhole Attack,134,0.019596373208540508,6838
+240517,pilot,iid_federated,threshold_calibration,Normal Traffic,Flooding Attack,41,0.005995905235448962,6838
+240517,pilot,iid_federated,threshold_calibration,Normal Traffic,Sybil Attack,130,0.019011406844106463,6838
+240517,pilot,iid_federated,threshold_calibration,Normal Traffic,UNKNOWN,140,0.020473822755191575,6838
+240517,pilot,iid_federated,threshold_calibration,Blackhole Attack,Normal Traffic,16,0.002505088460936277,6387
+240517,pilot,iid_federated,threshold_calibration,Blackhole Attack,Blackhole Attack,6178,0.9672772819790199,6387
+240517,pilot,iid_federated,threshold_calibration,Blackhole Attack,Flooding Attack,23,0.003601064662595898,6387
+240517,pilot,iid_federated,threshold_calibration,Blackhole Attack,Sybil Attack,17,0.0026616564897447943,6387
+240517,pilot,iid_federated,threshold_calibration,Blackhole Attack,UNKNOWN,153,0.023954908407703146,6387
+240517,pilot,iid_federated,threshold_calibration,Flooding Attack,Normal Traffic,11,0.0031663788140472078,3474
+240517,pilot,iid_federated,threshold_calibration,Flooding Attack,Blackhole Attack,123,0.03540587219343696,3474
+240517,pilot,iid_federated,threshold_calibration,Flooding Attack,Flooding Attack,2998,0.8629821531375935,3474
+240517,pilot,iid_federated,threshold_calibration,Flooding Attack,Sybil Attack,98,0.028209556706966035,3474
+240517,pilot,iid_federated,threshold_calibration,Flooding Attack,UNKNOWN,244,0.07023603914795624,3474
+240517,pilot,iid_federated,threshold_calibration,Sybil Attack,Normal Traffic,10,0.0015372790161414297,6505
+240517,pilot,iid_federated,threshold_calibration,Sybil Attack,Blackhole Attack,56,0.008608762490392005,6505
+240517,pilot,iid_federated,threshold_calibration,Sybil Attack,Flooding Attack,3784,0.5817063797079169,6505
+240517,pilot,iid_federated,threshold_calibration,Sybil Attack,Sybil Attack,2032,0.3123750960799385,6505
+240517,pilot,iid_federated,threshold_calibration,Sybil Attack,UNKNOWN,623,0.09577248270561106,6505
+240517,pilot,natural_non_iid_federated,checkpoint_selection,Normal Traffic,Normal Traffic,4245,0.8021541950113379,5292
+240517,pilot,natural_non_iid_federated,checkpoint_selection,Normal Traffic,Blackhole Attack,18,0.003401360544217687,5292
+240517,pilot,natural_non_iid_federated,checkpoint_selection,Normal Traffic,Flooding Attack,497,0.09391534391534391,5292
+240517,pilot,natural_non_iid_federated,checkpoint_selection,Normal Traffic,Sybil Attack,334,0.06311413454270597,5292
+240517,pilot,natural_non_iid_federated,checkpoint_selection,Normal Traffic,UNKNOWN,198,0.03741496598639456,5292
+240517,pilot,natural_non_iid_federated,checkpoint_selection,Blackhole Attack,Normal Traffic,89,0.01487548052816313,5983
+240517,pilot,natural_non_iid_federated,checkpoint_selection,Blackhole Attack,Blackhole Attack,4999,0.835534013036938,5983
+240517,pilot,natural_non_iid_federated,checkpoint_selection,Blackhole Attack,Flooding Attack,0,0.0,5983
+240517,pilot,natural_non_iid_federated,checkpoint_selection,Blackhole Attack,Sybil Attack,210,0.03509944843723884,5983
+240517,pilot,natural_non_iid_federated,checkpoint_selection,Blackhole Attack,UNKNOWN,685,0.11449105799766003,5983
+240517,pilot,natural_non_iid_federated,checkpoint_selection,Flooding Attack,Normal Traffic,0,0.0,1519
+240517,pilot,natural_non_iid_federated,checkpoint_selection,Flooding Attack,Blackhole Attack,272,0.17906517445687953,1519
+240517,pilot,natural_non_iid_federated,checkpoint_selection,Flooding Attack,Flooding Attack,940,0.618828176431863,1519
+240517,pilot,natural_non_iid_federated,checkpoint_selection,Flooding Attack,Sybil Attack,182,0.11981566820276497,1519
+240517,pilot,natural_non_iid_federated,checkpoint_selection,Flooding Attack,UNKNOWN,125,0.08229098090849243,1519
+240517,pilot,natural_non_iid_federated,checkpoint_selection,Sybil Attack,Normal Traffic,73,0.013639760837070254,5352
+240517,pilot,natural_non_iid_federated,checkpoint_selection,Sybil Attack,Blackhole Attack,492,0.09192825112107623,5352
+240517,pilot,natural_non_iid_federated,checkpoint_selection,Sybil Attack,Flooding Attack,3185,0.5951046337817638,5352
+240517,pilot,natural_non_iid_federated,checkpoint_selection,Sybil Attack,Sybil Attack,1547,0.289050822122571,5352
+240517,pilot,natural_non_iid_federated,checkpoint_selection,Sybil Attack,UNKNOWN,55,0.010276532137518685,5352
+240517,pilot,natural_non_iid_federated,threshold_calibration,Normal Traffic,Normal Traffic,5415,0.7918982158525885,6838
+240517,pilot,natural_non_iid_federated,threshold_calibration,Normal Traffic,Blackhole Attack,21,0.0030710734132787364,6838
+240517,pilot,natural_non_iid_federated,threshold_calibration,Normal Traffic,Flooding Attack,669,0.09783562445159404,6838
+240517,pilot,natural_non_iid_federated,threshold_calibration,Normal Traffic,Sybil Attack,450,0.06580871599883006,6838
+240517,pilot,natural_non_iid_federated,threshold_calibration,Normal Traffic,UNKNOWN,283,0.04138637028370869,6838
+240517,pilot,natural_non_iid_federated,threshold_calibration,Blackhole Attack,Normal Traffic,114,0.017848755284170972,6387
+240517,pilot,natural_non_iid_federated,threshold_calibration,Blackhole Attack,Blackhole Attack,5313,0.8318459370596524,6387
+240517,pilot,natural_non_iid_federated,threshold_calibration,Blackhole Attack,Flooding Attack,0,0.0,6387
+240517,pilot,natural_non_iid_federated,threshold_calibration,Blackhole Attack,Sybil Attack,214,0.0335055581650227,6387
+240517,pilot,natural_non_iid_federated,threshold_calibration,Blackhole Attack,UNKNOWN,746,0.1167997494911539,6387
+240517,pilot,natural_non_iid_federated,threshold_calibration,Flooding Attack,Normal Traffic,6,0.0017271157167530224,3474
+240517,pilot,natural_non_iid_federated,threshold_calibration,Flooding Attack,Blackhole Attack,360,0.10362694300518134,3474
+240517,pilot,natural_non_iid_federated,threshold_calibration,Flooding Attack,Flooding Attack,2130,0.613126079447323,3474
+240517,pilot,natural_non_iid_federated,threshold_calibration,Flooding Attack,Sybil Attack,877,0.2524467472654001,3474
+240517,pilot,natural_non_iid_federated,threshold_calibration,Flooding Attack,UNKNOWN,101,0.029073114565342544,3474
+240517,pilot,natural_non_iid_federated,threshold_calibration,Sybil Attack,Normal Traffic,47,0.007225211375864719,6505
+240517,pilot,natural_non_iid_federated,threshold_calibration,Sybil Attack,Blackhole Attack,229,0.03520368946963874,6505
+240517,pilot,natural_non_iid_federated,threshold_calibration,Sybil Attack,Flooding Attack,4267,0.655956956187548,6505
+240517,pilot,natural_non_iid_federated,threshold_calibration,Sybil Attack,Sybil Attack,1932,0.2970023059185242,6505
+240517,pilot,natural_non_iid_federated,threshold_calibration,Sybil Attack,UNKNOWN,30,0.004611837048424289,6505
+240519,replication,centralized,checkpoint_selection,Normal Traffic,Normal Traffic,4994,0.9436885865457294,5292
+240519,replication,centralized,checkpoint_selection,Normal Traffic,Blackhole Attack,57,0.010770975056689343,5292
+240519,replication,centralized,checkpoint_selection,Normal Traffic,Flooding Attack,25,0.00472411186696901,5292
+240519,replication,centralized,checkpoint_selection,Normal Traffic,Sybil Attack,159,0.030045351473922902,5292
+240519,replication,centralized,checkpoint_selection,Normal Traffic,UNKNOWN,57,0.010770975056689343,5292
+240519,replication,centralized,checkpoint_selection,Blackhole Attack,Normal Traffic,6,0.0010028413839211097,5983
+240519,replication,centralized,checkpoint_selection,Blackhole Attack,Blackhole Attack,5810,0.9710847400969413,5983
+240519,replication,centralized,checkpoint_selection,Blackhole Attack,Flooding Attack,42,0.0070198896874477685,5983
+240519,replication,centralized,checkpoint_selection,Blackhole Attack,Sybil Attack,22,0.0036770850743774027,5983
+240519,replication,centralized,checkpoint_selection,Blackhole Attack,UNKNOWN,103,0.017215443757312387,5983
+240519,replication,centralized,checkpoint_selection,Flooding Attack,Normal Traffic,18,0.01184990125082291,1519
+240519,replication,centralized,checkpoint_selection,Flooding Attack,Blackhole Attack,61,0.040157998683344305,1519
+240519,replication,centralized,checkpoint_selection,Flooding Attack,Flooding Attack,1252,0.8242264647794602,1519
+240519,replication,centralized,checkpoint_selection,Flooding Attack,Sybil Attack,65,0.042791310072416065,1519
+240519,replication,centralized,checkpoint_selection,Flooding Attack,UNKNOWN,123,0.08097432521395655,1519
+240519,replication,centralized,checkpoint_selection,Sybil Attack,Normal Traffic,169,0.03157698056801196,5352
+240519,replication,centralized,checkpoint_selection,Sybil Attack,Blackhole Attack,87,0.016255605381165918,5352
+240519,replication,centralized,checkpoint_selection,Sybil Attack,Flooding Attack,2407,0.4497384155455904,5352
+240519,replication,centralized,checkpoint_selection,Sybil Attack,Sybil Attack,2114,0.39499252615844543,5352
+240519,replication,centralized,checkpoint_selection,Sybil Attack,UNKNOWN,575,0.10743647234678624,5352
+240519,replication,centralized,threshold_calibration,Normal Traffic,Normal Traffic,6425,0.9396022228721849,6838
+240519,replication,centralized,threshold_calibration,Normal Traffic,Blackhole Attack,66,0.009651945013161743,6838
+240519,replication,centralized,threshold_calibration,Normal Traffic,Flooding Attack,23,0.003363556595495759,6838
+240519,replication,centralized,threshold_calibration,Normal Traffic,Sybil Attack,234,0.034220532319391636,6838
+240519,replication,centralized,threshold_calibration,Normal Traffic,UNKNOWN,90,0.013161743199766013,6838
+240519,replication,centralized,threshold_calibration,Blackhole Attack,Normal Traffic,11,0.0017222483168936903,6387
+240519,replication,centralized,threshold_calibration,Blackhole Attack,Blackhole Attack,6205,0.9715046187568499,6387
+240519,replication,centralized,threshold_calibration,Blackhole Attack,Flooding Attack,31,0.0048536088930640365,6387
+240519,replication,centralized,threshold_calibration,Blackhole Attack,Sybil Attack,23,0.003601064662595898,6387
+240519,replication,centralized,threshold_calibration,Blackhole Attack,UNKNOWN,117,0.018318459370596524,6387
+240519,replication,centralized,threshold_calibration,Flooding Attack,Normal Traffic,71,0.020437535981577434,3474
+240519,replication,centralized,threshold_calibration,Flooding Attack,Blackhole Attack,76,0.021876799078871616,3474
+240519,replication,centralized,threshold_calibration,Flooding Attack,Flooding Attack,3010,0.8664363845710996,3474
+240519,replication,centralized,threshold_calibration,Flooding Attack,Sybil Attack,118,0.033966609096142776,3474
+240519,replication,centralized,threshold_calibration,Flooding Attack,UNKNOWN,199,0.05728267127230858,3474
+240519,replication,centralized,threshold_calibration,Sybil Attack,Normal Traffic,249,0.038278247501921596,6505
+240519,replication,centralized,threshold_calibration,Sybil Attack,Blackhole Attack,39,0.005995388162951576,6505
+240519,replication,centralized,threshold_calibration,Sybil Attack,Flooding Attack,2646,0.40676402767102227,6505
+240519,replication,centralized,threshold_calibration,Sybil Attack,Sybil Attack,2817,0.43305149884704075,6505
+240519,replication,centralized,threshold_calibration,Sybil Attack,UNKNOWN,754,0.1159108378170638,6505
+240519,replication,iid_federated,checkpoint_selection,Normal Traffic,Normal Traffic,4717,0.8913454270597128,5292
+240519,replication,iid_federated,checkpoint_selection,Normal Traffic,Blackhole Attack,100,0.01889644746787604,5292
+240519,replication,iid_federated,checkpoint_selection,Normal Traffic,Flooding Attack,27,0.00510204081632653,5292
+240519,replication,iid_federated,checkpoint_selection,Normal Traffic,Sybil Attack,180,0.034013605442176874,5292
+240519,replication,iid_federated,checkpoint_selection,Normal Traffic,UNKNOWN,268,0.050642479213907785,5292
+240519,replication,iid_federated,checkpoint_selection,Blackhole Attack,Normal Traffic,5,0.0008357011532675915,5983
+240519,replication,iid_federated,checkpoint_selection,Blackhole Attack,Blackhole Attack,5837,0.9755975263245863,5983
+240519,replication,iid_federated,checkpoint_selection,Blackhole Attack,Flooding Attack,40,0.006685609226140732,5983
+240519,replication,iid_federated,checkpoint_selection,Blackhole Attack,Sybil Attack,8,0.0013371218452281465,5983
+240519,replication,iid_federated,checkpoint_selection,Blackhole Attack,UNKNOWN,93,0.015544041450777202,5983
+240519,replication,iid_federated,checkpoint_selection,Flooding Attack,Normal Traffic,0,0.0,1519
+240519,replication,iid_federated,checkpoint_selection,Flooding Attack,Blackhole Attack,92,0.06056616194865043,1519
+240519,replication,iid_federated,checkpoint_selection,Flooding Attack,Flooding Attack,1259,0.8288347597103357,1519
+240519,replication,iid_federated,checkpoint_selection,Flooding Attack,Sybil Attack,58,0.03818301514154049,1519
+240519,replication,iid_federated,checkpoint_selection,Flooding Attack,UNKNOWN,110,0.07241606319947334,1519
+240519,replication,iid_federated,checkpoint_selection,Sybil Attack,Normal Traffic,2,0.0003736920777279522,5352
+240519,replication,iid_federated,checkpoint_selection,Sybil Attack,Blackhole Attack,112,0.02092675635276532,5352
+240519,replication,iid_federated,checkpoint_selection,Sybil Attack,Flooding Attack,2928,0.547085201793722,5352
+240519,replication,iid_federated,checkpoint_selection,Sybil Attack,Sybil Attack,1836,0.3430493273542601,5352
+240519,replication,iid_federated,checkpoint_selection,Sybil Attack,UNKNOWN,474,0.08856502242152467,5352
+240519,replication,iid_federated,threshold_calibration,Normal Traffic,Normal Traffic,6067,0.8872477332553378,6838
+240519,replication,iid_federated,threshold_calibration,Normal Traffic,Blackhole Attack,150,0.02193623866627669,6838
+240519,replication,iid_federated,threshold_calibration,Normal Traffic,Flooding Attack,33,0.004825972506580871,6838
+240519,replication,iid_federated,threshold_calibration,Normal Traffic,Sybil Attack,249,0.03641415618601931,6838
+240519,replication,iid_federated,threshold_calibration,Normal Traffic,UNKNOWN,339,0.04957589938578532,6838
+240519,replication,iid_federated,threshold_calibration,Blackhole Attack,Normal Traffic,8,0.0012525442304681385,6387
+240519,replication,iid_federated,threshold_calibration,Blackhole Attack,Blackhole Attack,6210,0.9722874589008924,6387
+240519,replication,iid_federated,threshold_calibration,Blackhole Attack,Flooding Attack,32,0.005010176921872554,6387
+240519,replication,iid_federated,threshold_calibration,Blackhole Attack,Sybil Attack,6,0.0009394081728511038,6387
+240519,replication,iid_federated,threshold_calibration,Blackhole Attack,UNKNOWN,131,0.020510411773915768,6387
+240519,replication,iid_federated,threshold_calibration,Flooding Attack,Normal Traffic,14,0.004029936672423719,3474
+240519,replication,iid_federated,threshold_calibration,Flooding Attack,Blackhole Attack,126,0.03626943005181347,3474
+240519,replication,iid_federated,threshold_calibration,Flooding Attack,Flooding Attack,3031,0.8724812895797351,3474
+240519,replication,iid_federated,threshold_calibration,Flooding Attack,Sybil Attack,94,0.027058146229130685,3474
+240519,replication,iid_federated,threshold_calibration,Flooding Attack,UNKNOWN,209,0.06016119746689695,3474
+240519,replication,iid_federated,threshold_calibration,Sybil Attack,Normal Traffic,1,0.00015372790161414298,6505
+240519,replication,iid_federated,threshold_calibration,Sybil Attack,Blackhole Attack,56,0.008608762490392005,6505
+240519,replication,iid_federated,threshold_calibration,Sybil Attack,Flooding Attack,3443,0.5292851652574943,6505
+240519,replication,iid_federated,threshold_calibration,Sybil Attack,Sybil Attack,2524,0.38800922367409685,6505
+240519,replication,iid_federated,threshold_calibration,Sybil Attack,UNKNOWN,481,0.07394312067640277,6505
+240519,replication,natural_non_iid_federated,checkpoint_selection,Normal Traffic,Normal Traffic,4381,0.8278533635676493,5292
+240519,replication,natural_non_iid_federated,checkpoint_selection,Normal Traffic,Blackhole Attack,59,0.011148904006046864,5292
+240519,replication,natural_non_iid_federated,checkpoint_selection,Normal Traffic,Flooding Attack,603,0.11394557823129252,5292
+240519,replication,natural_non_iid_federated,checkpoint_selection,Normal Traffic,Sybil Attack,118,0.022297808012093728,5292
+240519,replication,natural_non_iid_federated,checkpoint_selection,Normal Traffic,UNKNOWN,131,0.02475434618291761,5292
+240519,replication,natural_non_iid_federated,checkpoint_selection,Blackhole Attack,Normal Traffic,329,0.05498913588500752,5983
+240519,replication,natural_non_iid_federated,checkpoint_selection,Blackhole Attack,Blackhole Attack,4430,0.740431221795086,5983
+240519,replication,natural_non_iid_federated,checkpoint_selection,Blackhole Attack,Flooding Attack,0,0.0,5983
+240519,replication,natural_non_iid_federated,checkpoint_selection,Blackhole Attack,Sybil Attack,503,0.08407153601871971,5983
+240519,replication,natural_non_iid_federated,checkpoint_selection,Blackhole Attack,UNKNOWN,721,0.12050810630118669,5983
+240519,replication,natural_non_iid_federated,checkpoint_selection,Flooding Attack,Normal Traffic,3,0.0019749835418038184,1519
+240519,replication,natural_non_iid_federated,checkpoint_selection,Flooding Attack,Blackhole Attack,266,0.17511520737327188,1519
+240519,replication,natural_non_iid_federated,checkpoint_selection,Flooding Attack,Flooding Attack,965,0.6352863726135616,1519
+240519,replication,natural_non_iid_federated,checkpoint_selection,Flooding Attack,Sybil Attack,228,0.15009874917709018,1519
+240519,replication,natural_non_iid_federated,checkpoint_selection,Flooding Attack,UNKNOWN,57,0.037524687294272545,1519
+240519,replication,natural_non_iid_federated,checkpoint_selection,Sybil Attack,Normal Traffic,69,0.01289237668161435,5352
+240519,replication,natural_non_iid_federated,checkpoint_selection,Sybil Attack,Blackhole Attack,493,0.0921150971599402,5352
+240519,replication,natural_non_iid_federated,checkpoint_selection,Sybil Attack,Flooding Attack,3548,0.6629297458893871,5352
+240519,replication,natural_non_iid_federated,checkpoint_selection,Sybil Attack,Sybil Attack,1168,0.21823617339312407,5352
+240519,replication,natural_non_iid_federated,checkpoint_selection,Sybil Attack,UNKNOWN,74,0.01382660687593423,5352
+240519,replication,natural_non_iid_federated,threshold_calibration,Normal Traffic,Normal Traffic,5613,0.8208540508920737,6838
+240519,replication,natural_non_iid_federated,threshold_calibration,Normal Traffic,Blackhole Attack,81,0.011845568879789412,6838
+240519,replication,natural_non_iid_federated,threshold_calibration,Normal Traffic,Flooding Attack,749,0.10953495174027493,6838
+240519,replication,natural_non_iid_federated,threshold_calibration,Normal Traffic,Sybil Attack,178,0.026031003217315003,6838
+240519,replication,natural_non_iid_federated,threshold_calibration,Normal Traffic,UNKNOWN,217,0.03173442527054694,6838
+240519,replication,natural_non_iid_federated,threshold_calibration,Blackhole Attack,Normal Traffic,412,0.06450602786910913,6387
+240519,replication,natural_non_iid_federated,threshold_calibration,Blackhole Attack,Blackhole Attack,4685,0.7335212149679036,6387
+240519,replication,natural_non_iid_federated,threshold_calibration,Blackhole Attack,Flooding Attack,1,0.0001565680288085173,6387
+240519,replication,natural_non_iid_federated,threshold_calibration,Blackhole Attack,Sybil Attack,502,0.07859715046187568,6387
+240519,replication,natural_non_iid_federated,threshold_calibration,Blackhole Attack,UNKNOWN,787,0.12321903867230312,6387
+240519,replication,natural_non_iid_federated,threshold_calibration,Flooding Attack,Normal Traffic,1,0.0002878526194588371,3474
+240519,replication,natural_non_iid_federated,threshold_calibration,Flooding Attack,Blackhole Attack,367,0.10564191134139321,3474
+240519,replication,natural_non_iid_federated,threshold_calibration,Flooding Attack,Flooding Attack,2329,0.6704087507196316,3474
+240519,replication,natural_non_iid_federated,threshold_calibration,Flooding Attack,Sybil Attack,656,0.1888313183649971,3474
+240519,replication,natural_non_iid_federated,threshold_calibration,Flooding Attack,UNKNOWN,121,0.034830166954519286,3474
+240519,replication,natural_non_iid_federated,threshold_calibration,Sybil Attack,Normal Traffic,46,0.007071483474250576,6505
+240519,replication,natural_non_iid_federated,threshold_calibration,Sybil Attack,Blackhole Attack,226,0.03474250576479631,6505
+240519,replication,natural_non_iid_federated,threshold_calibration,Sybil Attack,Flooding Attack,4808,0.7391237509607994,6505
+240519,replication,natural_non_iid_federated,threshold_calibration,Sybil Attack,Sybil Attack,1390,0.21368178324365872,6505
+240519,replication,natural_non_iid_federated,threshold_calibration,Sybil Attack,UNKNOWN,35,0.005380476556495004,6505
+240520,replication,centralized,checkpoint_selection,Normal Traffic,Normal Traffic,5057,0.9555933484504913,5292
+240520,replication,centralized,checkpoint_selection,Normal Traffic,Blackhole Attack,38,0.007180650037792895,5292
+240520,replication,centralized,checkpoint_selection,Normal Traffic,Flooding Attack,9,0.0017006802721088435,5292
+240520,replication,centralized,checkpoint_selection,Normal Traffic,Sybil Attack,42,0.007936507936507936,5292
+240520,replication,centralized,checkpoint_selection,Normal Traffic,UNKNOWN,146,0.02758881330309902,5292
+240520,replication,centralized,checkpoint_selection,Blackhole Attack,Normal Traffic,0,0.0,5983
+240520,replication,centralized,checkpoint_selection,Blackhole Attack,Blackhole Attack,5784,0.9667390940999498,5983
+240520,replication,centralized,checkpoint_selection,Blackhole Attack,Flooding Attack,61,0.010195554069864617,5983
+240520,replication,centralized,checkpoint_selection,Blackhole Attack,Sybil Attack,11,0.0018385425371887014,5983
+240520,replication,centralized,checkpoint_selection,Blackhole Attack,UNKNOWN,127,0.021226809292996824,5983
+240520,replication,centralized,checkpoint_selection,Flooding Attack,Normal Traffic,4,0.0026333113890717576,1519
+240520,replication,centralized,checkpoint_selection,Flooding Attack,Blackhole Attack,80,0.052666227781435156,1519
+240520,replication,centralized,checkpoint_selection,Flooding Attack,Flooding Attack,1319,0.8683344305464121,1519
+240520,replication,centralized,checkpoint_selection,Flooding Attack,Sybil Attack,52,0.03423304805793285,1519
+240520,replication,centralized,checkpoint_selection,Flooding Attack,UNKNOWN,64,0.04213298222514812,1519
+240520,replication,centralized,checkpoint_selection,Sybil Attack,Normal Traffic,14,0.002615844544095665,5352
+240520,replication,centralized,checkpoint_selection,Sybil Attack,Blackhole Attack,42,0.007847533632286996,5352
+240520,replication,centralized,checkpoint_selection,Sybil Attack,Flooding Attack,2267,0.4235799701046338,5352
+240520,replication,centralized,checkpoint_selection,Sybil Attack,Sybil Attack,2494,0.46599402092675635,5352
+240520,replication,centralized,checkpoint_selection,Sybil Attack,UNKNOWN,535,0.09996263079222721,5352
+240520,replication,centralized,threshold_calibration,Normal Traffic,Normal Traffic,6498,0.9502778590231061,6838
+240520,replication,centralized,threshold_calibration,Normal Traffic,Blackhole Attack,68,0.009944428195378765,6838
+240520,replication,centralized,threshold_calibration,Normal Traffic,Flooding Attack,9,0.0013161743199766012,6838
+240520,replication,centralized,threshold_calibration,Normal Traffic,Sybil Attack,81,0.011845568879789412,6838
+240520,replication,centralized,threshold_calibration,Normal Traffic,UNKNOWN,182,0.026615969581749048,6838
+240520,replication,centralized,threshold_calibration,Blackhole Attack,Normal Traffic,0,0.0,6387
+240520,replication,centralized,threshold_calibration,Blackhole Attack,Blackhole Attack,6201,0.9708783466416158,6387
+240520,replication,centralized,threshold_calibration,Blackhole Attack,Flooding Attack,51,0.007984969469234382,6387
+240520,replication,centralized,threshold_calibration,Blackhole Attack,Sybil Attack,6,0.0009394081728511038,6387
+240520,replication,centralized,threshold_calibration,Blackhole Attack,UNKNOWN,129,0.020197275716298733,6387
+240520,replication,centralized,threshold_calibration,Flooding Attack,Normal Traffic,29,0.008347725964306276,3474
+240520,replication,centralized,threshold_calibration,Flooding Attack,Blackhole Attack,96,0.027633851468048358,3474
+240520,replication,centralized,threshold_calibration,Flooding Attack,Flooding Attack,3139,0.9035693724812895,3474
+240520,replication,centralized,threshold_calibration,Flooding Attack,Sybil Attack,82,0.02360391479562464,3474
+240520,replication,centralized,threshold_calibration,Flooding Attack,UNKNOWN,128,0.03684513529073115,3474
+240520,replication,centralized,threshold_calibration,Sybil Attack,Normal Traffic,9,0.0013835511145272868,6505
+240520,replication,centralized,threshold_calibration,Sybil Attack,Blackhole Attack,24,0.003689469638739431,6505
+240520,replication,centralized,threshold_calibration,Sybil Attack,Flooding Attack,2291,0.35219062259800155,6505
+240520,replication,centralized,threshold_calibration,Sybil Attack,Sybil Attack,3460,0.5318985395849347,6505
+240520,replication,centralized,threshold_calibration,Sybil Attack,UNKNOWN,721,0.11083781706379708,6505
+240520,replication,iid_federated,checkpoint_selection,Normal Traffic,Normal Traffic,5086,0.9610733182161754,5292
+240520,replication,iid_federated,checkpoint_selection,Normal Traffic,Blackhole Attack,49,0.009259259259259259,5292
+240520,replication,iid_federated,checkpoint_selection,Normal Traffic,Flooding Attack,28,0.005291005291005291,5292
+240520,replication,iid_federated,checkpoint_selection,Normal Traffic,Sybil Attack,73,0.01379440665154951,5292
+240520,replication,iid_federated,checkpoint_selection,Normal Traffic,UNKNOWN,56,0.010582010582010581,5292
+240520,replication,iid_federated,checkpoint_selection,Blackhole Attack,Normal Traffic,43,0.007187029918101287,5983
+240520,replication,iid_federated,checkpoint_selection,Blackhole Attack,Blackhole Attack,5865,0.9802774527828848,5983
+240520,replication,iid_federated,checkpoint_selection,Blackhole Attack,Flooding Attack,48,0.008022731071368878,5983
+240520,replication,iid_federated,checkpoint_selection,Blackhole Attack,Sybil Attack,10,0.001671402306535183,5983
+240520,replication,iid_federated,checkpoint_selection,Blackhole Attack,UNKNOWN,17,0.002841383921109811,5983
+240520,replication,iid_federated,checkpoint_selection,Flooding Attack,Normal Traffic,1,0.0006583278472679394,1519
+240520,replication,iid_federated,checkpoint_selection,Flooding Attack,Blackhole Attack,121,0.07965766951942067,1519
+240520,replication,iid_federated,checkpoint_selection,Flooding Attack,Flooding Attack,1273,0.8380513495720869,1519
+240520,replication,iid_federated,checkpoint_selection,Flooding Attack,Sybil Attack,60,0.03949967083607637,1519
+240520,replication,iid_federated,checkpoint_selection,Flooding Attack,UNKNOWN,64,0.04213298222514812,1519
+240520,replication,iid_federated,checkpoint_selection,Sybil Attack,Normal Traffic,24,0.004484304932735426,5352
+240520,replication,iid_federated,checkpoint_selection,Sybil Attack,Blackhole Attack,85,0.015881913303437967,5352
+240520,replication,iid_federated,checkpoint_selection,Sybil Attack,Flooding Attack,2923,0.5461509715994021,5352
+240520,replication,iid_federated,checkpoint_selection,Sybil Attack,Sybil Attack,1708,0.31913303437967117,5352
+240520,replication,iid_federated,checkpoint_selection,Sybil Attack,UNKNOWN,612,0.11434977578475336,5352
+240520,replication,iid_federated,threshold_calibration,Normal Traffic,Normal Traffic,6569,0.9606610119918104,6838
+240520,replication,iid_federated,threshold_calibration,Normal Traffic,Blackhole Attack,66,0.009651945013161743,6838
+240520,replication,iid_federated,threshold_calibration,Normal Traffic,Flooding Attack,39,0.005703422053231939,6838
+240520,replication,iid_federated,threshold_calibration,Normal Traffic,Sybil Attack,99,0.014477917519742615,6838
+240520,replication,iid_federated,threshold_calibration,Normal Traffic,UNKNOWN,65,0.009505703422053232,6838
+240520,replication,iid_federated,threshold_calibration,Blackhole Attack,Normal Traffic,83,0.012995146391106936,6387
+240520,replication,iid_federated,threshold_calibration,Blackhole Attack,Blackhole Attack,6227,0.9749491153906372,6387
+240520,replication,iid_federated,threshold_calibration,Blackhole Attack,Flooding Attack,51,0.007984969469234382,6387
+240520,replication,iid_federated,threshold_calibration,Blackhole Attack,Sybil Attack,9,0.0014091122592766556,6387
+240520,replication,iid_federated,threshold_calibration,Blackhole Attack,UNKNOWN,17,0.0026616564897447943,6387
+240520,replication,iid_federated,threshold_calibration,Flooding Attack,Normal Traffic,29,0.008347725964306276,3474
+240520,replication,iid_federated,threshold_calibration,Flooding Attack,Blackhole Attack,144,0.04145077720207254,3474
+240520,replication,iid_federated,threshold_calibration,Flooding Attack,Flooding Attack,3050,0.8779504893494531,3474
+240520,replication,iid_federated,threshold_calibration,Flooding Attack,Sybil Attack,95,0.02734599884858952,3474
+240520,replication,iid_federated,threshold_calibration,Flooding Attack,UNKNOWN,156,0.044905008635578586,3474
+240520,replication,iid_federated,threshold_calibration,Sybil Attack,Normal Traffic,16,0.0024596464258262877,6505
+240520,replication,iid_federated,threshold_calibration,Sybil Attack,Blackhole Attack,40,0.006149116064565719,6505
+240520,replication,iid_federated,threshold_calibration,Sybil Attack,Flooding Attack,3316,0.5097617217524981,6505
+240520,replication,iid_federated,threshold_calibration,Sybil Attack,Sybil Attack,2211,0.3398923904688701,6505
+240520,replication,iid_federated,threshold_calibration,Sybil Attack,UNKNOWN,922,0.1417371252882398,6505
+240520,replication,natural_non_iid_federated,checkpoint_selection,Normal Traffic,Normal Traffic,4832,0.9130763416477702,5292
+240520,replication,natural_non_iid_federated,checkpoint_selection,Normal Traffic,Blackhole Attack,48,0.009070294784580499,5292
+240520,replication,natural_non_iid_federated,checkpoint_selection,Normal Traffic,Flooding Attack,38,0.007180650037792895,5292
+240520,replication,natural_non_iid_federated,checkpoint_selection,Normal Traffic,Sybil Attack,246,0.046485260770975055,5292
+240520,replication,natural_non_iid_federated,checkpoint_selection,Normal Traffic,UNKNOWN,128,0.02418745275888133,5292
+240520,replication,natural_non_iid_federated,checkpoint_selection,Blackhole Attack,Normal Traffic,341,0.05699481865284974,5983
+240520,replication,natural_non_iid_federated,checkpoint_selection,Blackhole Attack,Blackhole Attack,4877,0.8151429048972088,5983
+240520,replication,natural_non_iid_federated,checkpoint_selection,Blackhole Attack,Flooding Attack,54,0.009025572455289989,5983
+240520,replication,natural_non_iid_federated,checkpoint_selection,Blackhole Attack,Sybil Attack,188,0.031422363362861444,5983
+240520,replication,natural_non_iid_federated,checkpoint_selection,Blackhole Attack,UNKNOWN,523,0.08741434063179007,5983
+240520,replication,natural_non_iid_federated,checkpoint_selection,Flooding Attack,Normal Traffic,0,0.0,1519
+240520,replication,natural_non_iid_federated,checkpoint_selection,Flooding Attack,Blackhole Attack,235,0.15470704410796576,1519
+240520,replication,natural_non_iid_federated,checkpoint_selection,Flooding Attack,Flooding Attack,1083,0.7129690585911784,1519
+240520,replication,natural_non_iid_federated,checkpoint_selection,Flooding Attack,Sybil Attack,156,0.10269914417379855,1519
+240520,replication,natural_non_iid_federated,checkpoint_selection,Flooding Attack,UNKNOWN,45,0.029624753127057275,1519
+240520,replication,natural_non_iid_federated,checkpoint_selection,Sybil Attack,Normal Traffic,109,0.020366218236173392,5352
+240520,replication,natural_non_iid_federated,checkpoint_selection,Sybil Attack,Blackhole Attack,440,0.08221225710014948,5352
+240520,replication,natural_non_iid_federated,checkpoint_selection,Sybil Attack,Flooding Attack,1696,0.31689088191330345,5352
+240520,replication,natural_non_iid_federated,checkpoint_selection,Sybil Attack,Sybil Attack,2843,0.531203288490284,5352
+240520,replication,natural_non_iid_federated,checkpoint_selection,Sybil Attack,UNKNOWN,264,0.04932735426008968,5352
+240520,replication,natural_non_iid_federated,threshold_calibration,Normal Traffic,Normal Traffic,6190,0.9052354489616847,6838
+240520,replication,natural_non_iid_federated,threshold_calibration,Normal Traffic,Blackhole Attack,71,0.010383152968704299,6838
+240520,replication,natural_non_iid_federated,threshold_calibration,Normal Traffic,Flooding Attack,47,0.00687335478210003,6838
+240520,replication,natural_non_iid_federated,threshold_calibration,Normal Traffic,Sybil Attack,345,0.05045334893243639,6838
+240520,replication,natural_non_iid_federated,threshold_calibration,Normal Traffic,UNKNOWN,185,0.02705469435507458,6838
+240520,replication,natural_non_iid_federated,threshold_calibration,Blackhole Attack,Normal Traffic,423,0.06622827618600281,6387
+240520,replication,natural_non_iid_federated,threshold_calibration,Blackhole Attack,Blackhole Attack,5207,0.8152497260059496,6387
+240520,replication,natural_non_iid_federated,threshold_calibration,Blackhole Attack,Flooding Attack,49,0.007671833411617348,6387
+240520,replication,natural_non_iid_federated,threshold_calibration,Blackhole Attack,Sybil Attack,195,0.030530765617660875,6387
+240520,replication,natural_non_iid_federated,threshold_calibration,Blackhole Attack,UNKNOWN,513,0.08031939877876937,6387
+240520,replication,natural_non_iid_federated,threshold_calibration,Flooding Attack,Normal Traffic,3,0.0008635578583765112,3474
+240520,replication,natural_non_iid_federated,threshold_calibration,Flooding Attack,Blackhole Attack,331,0.09527921704087507,3474
+240520,replication,natural_non_iid_federated,threshold_calibration,Flooding Attack,Flooding Attack,2746,0.7904432930339667,3474
+240520,replication,natural_non_iid_federated,threshold_calibration,Flooding Attack,Sybil Attack,262,0.07541738629821532,3474
+240520,replication,natural_non_iid_federated,threshold_calibration,Flooding Attack,UNKNOWN,132,0.037996545768566495,3474
+240520,replication,natural_non_iid_federated,threshold_calibration,Sybil Attack,Normal Traffic,75,0.011529592621060722,6505
+240520,replication,natural_non_iid_federated,threshold_calibration,Sybil Attack,Blackhole Attack,202,0.03105303612605688,6505
+240520,replication,natural_non_iid_federated,threshold_calibration,Sybil Attack,Flooding Attack,1946,0.2991544965411222,6505
+240520,replication,natural_non_iid_federated,threshold_calibration,Sybil Attack,Sybil Attack,3952,0.607532667179093,6505
+240520,replication,natural_non_iid_federated,threshold_calibration,Sybil Attack,UNKNOWN,330,0.05073020753266718,6505
+240521,replication,centralized,checkpoint_selection,Normal Traffic,Normal Traffic,5044,0.9531368102796675,5292
+240521,replication,centralized,checkpoint_selection,Normal Traffic,Blackhole Attack,24,0.0045351473922902496,5292
+240521,replication,centralized,checkpoint_selection,Normal Traffic,Flooding Attack,13,0.0024565381708238853,5292
+240521,replication,centralized,checkpoint_selection,Normal Traffic,Sybil Attack,89,0.016817838246409676,5292
+240521,replication,centralized,checkpoint_selection,Normal Traffic,UNKNOWN,122,0.02305366591080877,5292
+240521,replication,centralized,checkpoint_selection,Blackhole Attack,Normal Traffic,11,0.0018385425371887014,5983
+240521,replication,centralized,checkpoint_selection,Blackhole Attack,Blackhole Attack,5767,0.9638977101788401,5983
+240521,replication,centralized,checkpoint_selection,Blackhole Attack,Flooding Attack,65,0.010864114992478689,5983
+240521,replication,centralized,checkpoint_selection,Blackhole Attack,Sybil Attack,42,0.0070198896874477685,5983
+240521,replication,centralized,checkpoint_selection,Blackhole Attack,UNKNOWN,98,0.016379742604044793,5983
+240521,replication,centralized,checkpoint_selection,Flooding Attack,Normal Traffic,2,0.0013166556945358788,1519
+240521,replication,centralized,checkpoint_selection,Flooding Attack,Blackhole Attack,60,0.03949967083607637,1519
+240521,replication,centralized,checkpoint_selection,Flooding Attack,Flooding Attack,1345,0.8854509545753786,1519
+240521,replication,centralized,checkpoint_selection,Flooding Attack,Sybil Attack,68,0.04476629361421988,1519
+240521,replication,centralized,checkpoint_selection,Flooding Attack,UNKNOWN,44,0.028966425279789335,1519
+240521,replication,centralized,checkpoint_selection,Sybil Attack,Normal Traffic,10,0.0018684603886397607,5352
+240521,replication,centralized,checkpoint_selection,Sybil Attack,Blackhole Attack,16,0.0029895366218236174,5352
+240521,replication,centralized,checkpoint_selection,Sybil Attack,Flooding Attack,2108,0.3938714499252616,5352
+240521,replication,centralized,checkpoint_selection,Sybil Attack,Sybil Attack,2637,0.49271300448430494,5352
+240521,replication,centralized,checkpoint_selection,Sybil Attack,UNKNOWN,581,0.1085575485799701,5352
+240521,replication,centralized,threshold_calibration,Normal Traffic,Normal Traffic,6503,0.9510090669786487,6838
+240521,replication,centralized,threshold_calibration,Normal Traffic,Blackhole Attack,34,0.004972214097689383,6838
+240521,replication,centralized,threshold_calibration,Normal Traffic,Flooding Attack,12,0.0017548990933021352,6838
+240521,replication,centralized,threshold_calibration,Normal Traffic,Sybil Attack,138,0.020181339572974553,6838
+240521,replication,centralized,threshold_calibration,Normal Traffic,UNKNOWN,151,0.0220824802573852,6838
+240521,replication,centralized,threshold_calibration,Blackhole Attack,Normal Traffic,22,0.0034444966337873807,6387
+240521,replication,centralized,threshold_calibration,Blackhole Attack,Blackhole Attack,6150,0.9628933771723814,6387
+240521,replication,centralized,threshold_calibration,Blackhole Attack,Flooding Attack,66,0.010333489901362142,6387
+240521,replication,centralized,threshold_calibration,Blackhole Attack,Sybil Attack,34,0.005323312979489589,6387
+240521,replication,centralized,threshold_calibration,Blackhole Attack,UNKNOWN,115,0.01800532331297949,6387
+240521,replication,centralized,threshold_calibration,Flooding Attack,Normal Traffic,31,0.008923431203223949,3474
+240521,replication,centralized,threshold_calibration,Flooding Attack,Blackhole Attack,73,0.021013241220495107,3474
+240521,replication,centralized,threshold_calibration,Flooding Attack,Flooding Attack,3133,0.9018422567645366,3474
+240521,replication,centralized,threshold_calibration,Flooding Attack,Sybil Attack,100,0.028785261945883708,3474
+240521,replication,centralized,threshold_calibration,Flooding Attack,UNKNOWN,137,0.03943580886586068,3474
+240521,replication,centralized,threshold_calibration,Sybil Attack,Normal Traffic,5,0.0007686395080707148,6505
+240521,replication,centralized,threshold_calibration,Sybil Attack,Blackhole Attack,5,0.0007686395080707148,6505
+240521,replication,centralized,threshold_calibration,Sybil Attack,Flooding Attack,2175,0.33435818601076095,6505
+240521,replication,centralized,threshold_calibration,Sybil Attack,Sybil Attack,3563,0.5477325134511913,6505
+240521,replication,centralized,threshold_calibration,Sybil Attack,UNKNOWN,757,0.11637202152190623,6505
+240521,replication,iid_federated,checkpoint_selection,Normal Traffic,Normal Traffic,4990,0.9429327286470144,5292
+240521,replication,iid_federated,checkpoint_selection,Normal Traffic,Blackhole Attack,40,0.007558578987150416,5292
+240521,replication,iid_federated,checkpoint_selection,Normal Traffic,Flooding Attack,34,0.006424792139077854,5292
+240521,replication,iid_federated,checkpoint_selection,Normal Traffic,Sybil Attack,127,0.02399848828420257,5292
+240521,replication,iid_federated,checkpoint_selection,Normal Traffic,UNKNOWN,101,0.019085411942554798,5292
+240521,replication,iid_federated,checkpoint_selection,Blackhole Attack,Normal Traffic,42,0.0070198896874477685,5983
+240521,replication,iid_federated,checkpoint_selection,Blackhole Attack,Blackhole Attack,5787,0.9672405147919104,5983
+240521,replication,iid_federated,checkpoint_selection,Blackhole Attack,Flooding Attack,47,0.007855590840715361,5983
+240521,replication,iid_federated,checkpoint_selection,Blackhole Attack,Sybil Attack,32,0.005348487380912586,5983
+240521,replication,iid_federated,checkpoint_selection,Blackhole Attack,UNKNOWN,75,0.012535517299013872,5983
+240521,replication,iid_federated,checkpoint_selection,Flooding Attack,Normal Traffic,1,0.0006583278472679394,1519
+240521,replication,iid_federated,checkpoint_selection,Flooding Attack,Blackhole Attack,77,0.05069124423963134,1519
+240521,replication,iid_federated,checkpoint_selection,Flooding Attack,Flooding Attack,1306,0.859776168531929,1519
+240521,replication,iid_federated,checkpoint_selection,Flooding Attack,Sybil Attack,62,0.04081632653061224,1519
+240521,replication,iid_federated,checkpoint_selection,Flooding Attack,UNKNOWN,73,0.04805793285055958,1519
+240521,replication,iid_federated,checkpoint_selection,Sybil Attack,Normal Traffic,5,0.0009342301943198804,5352
+240521,replication,iid_federated,checkpoint_selection,Sybil Attack,Blackhole Attack,71,0.013266068759342301,5352
+240521,replication,iid_federated,checkpoint_selection,Sybil Attack,Flooding Attack,2800,0.523168908819133,5352
+240521,replication,iid_federated,checkpoint_selection,Sybil Attack,Sybil Attack,1877,0.3507100149476831,5352
+240521,replication,iid_federated,checkpoint_selection,Sybil Attack,UNKNOWN,599,0.11192077727952167,5352
+240521,replication,iid_federated,threshold_calibration,Normal Traffic,Normal Traffic,6437,0.9413571219654869,6838
+240521,replication,iid_federated,threshold_calibration,Normal Traffic,Blackhole Attack,63,0.00921322023983621,6838
+240521,replication,iid_federated,threshold_calibration,Normal Traffic,Flooding Attack,40,0.0058496636443404505,6838
+240521,replication,iid_federated,threshold_calibration,Normal Traffic,Sybil Attack,167,0.02442234571512138,6838
+240521,replication,iid_federated,threshold_calibration,Normal Traffic,UNKNOWN,131,0.019157648435214975,6838
+240521,replication,iid_federated,threshold_calibration,Blackhole Attack,Normal Traffic,61,0.009550649757319556,6387
+240521,replication,iid_federated,threshold_calibration,Blackhole Attack,Blackhole Attack,6170,0.9660247377485518,6387
+240521,replication,iid_federated,threshold_calibration,Blackhole Attack,Flooding Attack,45,0.007045561296383279,6387
+240521,replication,iid_federated,threshold_calibration,Blackhole Attack,Sybil Attack,17,0.0026616564897447943,6387
+240521,replication,iid_federated,threshold_calibration,Blackhole Attack,UNKNOWN,94,0.014717394708000627,6387
+240521,replication,iid_federated,threshold_calibration,Flooding Attack,Normal Traffic,24,0.0069084628670120895,3474
+240521,replication,iid_federated,threshold_calibration,Flooding Attack,Blackhole Attack,89,0.0256188831318365,3474
+240521,replication,iid_federated,threshold_calibration,Flooding Attack,Flooding Attack,3102,0.8929188255613126,3474
+240521,replication,iid_federated,threshold_calibration,Flooding Attack,Sybil Attack,100,0.028785261945883708,3474
+240521,replication,iid_federated,threshold_calibration,Flooding Attack,UNKNOWN,159,0.045768566493955096,3474
+240521,replication,iid_federated,threshold_calibration,Sybil Attack,Normal Traffic,2,0.00030745580322828596,6505
+240521,replication,iid_federated,threshold_calibration,Sybil Attack,Blackhole Attack,39,0.005995388162951576,6505
+240521,replication,iid_federated,threshold_calibration,Sybil Attack,Flooding Attack,3121,0.4797847809377402,6505
+240521,replication,iid_federated,threshold_calibration,Sybil Attack,Sybil Attack,2567,0.394619523443505,6505
+240521,replication,iid_federated,threshold_calibration,Sybil Attack,UNKNOWN,776,0.11929285165257494,6505
+240521,replication,natural_non_iid_federated,checkpoint_selection,Normal Traffic,Normal Traffic,4608,0.8707482993197279,5292
+240521,replication,natural_non_iid_federated,checkpoint_selection,Normal Traffic,Blackhole Attack,34,0.006424792139077854,5292
+240521,replication,natural_non_iid_federated,checkpoint_selection,Normal Traffic,Flooding Attack,27,0.00510204081632653,5292
+240521,replication,natural_non_iid_federated,checkpoint_selection,Normal Traffic,Sybil Attack,373,0.07048374905517762,5292
+240521,replication,natural_non_iid_federated,checkpoint_selection,Normal Traffic,UNKNOWN,250,0.0472411186696901,5292
+240521,replication,natural_non_iid_federated,checkpoint_selection,Blackhole Attack,Normal Traffic,378,0.06317900718702991,5983
+240521,replication,natural_non_iid_federated,checkpoint_selection,Blackhole Attack,Blackhole Attack,4218,0.7049974928965402,5983
+240521,replication,natural_non_iid_federated,checkpoint_selection,Blackhole Attack,Flooding Attack,0,0.0,5983
+240521,replication,natural_non_iid_federated,checkpoint_selection,Blackhole Attack,Sybil Attack,1044,0.1744944008022731,5983
+240521,replication,natural_non_iid_federated,checkpoint_selection,Blackhole Attack,UNKNOWN,343,0.057329099114156776,5983
+240521,replication,natural_non_iid_federated,checkpoint_selection,Flooding Attack,Normal Traffic,0,0.0,1519
+240521,replication,natural_non_iid_federated,checkpoint_selection,Flooding Attack,Blackhole Attack,132,0.086899275839368,1519
+240521,replication,natural_non_iid_federated,checkpoint_selection,Flooding Attack,Flooding Attack,919,0.6050032916392364,1519
+240521,replication,natural_non_iid_federated,checkpoint_selection,Flooding Attack,Sybil Attack,357,0.2350230414746544,1519
+240521,replication,natural_non_iid_federated,checkpoint_selection,Flooding Attack,UNKNOWN,111,0.07307439104674128,1519
+240521,replication,natural_non_iid_federated,checkpoint_selection,Sybil Attack,Normal Traffic,58,0.010837070254110613,5352
+240521,replication,natural_non_iid_federated,checkpoint_selection,Sybil Attack,Blackhole Attack,409,0.07642002989536621,5352
+240521,replication,natural_non_iid_federated,checkpoint_selection,Sybil Attack,Flooding Attack,1670,0.31203288490284004,5352
+240521,replication,natural_non_iid_federated,checkpoint_selection,Sybil Attack,Sybil Attack,2980,0.5568011958146487,5352
+240521,replication,natural_non_iid_federated,checkpoint_selection,Sybil Attack,UNKNOWN,235,0.04390881913303438,5352
+240521,replication,natural_non_iid_federated,threshold_calibration,Normal Traffic,Normal Traffic,5863,0.8574144486692015,6838
+240521,replication,natural_non_iid_federated,threshold_calibration,Normal Traffic,Blackhole Attack,44,0.006434630008774495,6838
+240521,replication,natural_non_iid_federated,threshold_calibration,Normal Traffic,Flooding Attack,38,0.005557180462123428,6838
+240521,replication,natural_non_iid_federated,threshold_calibration,Normal Traffic,Sybil Attack,542,0.0792629423808131,6838
+240521,replication,natural_non_iid_federated,threshold_calibration,Normal Traffic,UNKNOWN,351,0.051330798479087454,6838
+240521,replication,natural_non_iid_federated,threshold_calibration,Blackhole Attack,Normal Traffic,456,0.07139502113668389,6387
+240521,replication,natural_non_iid_federated,threshold_calibration,Blackhole Attack,Blackhole Attack,4497,0.7040864255519023,6387
+240521,replication,natural_non_iid_federated,threshold_calibration,Blackhole Attack,Flooding Attack,0,0.0,6387
+240521,replication,natural_non_iid_federated,threshold_calibration,Blackhole Attack,Sybil Attack,1073,0.16799749491153906,6387
+240521,replication,natural_non_iid_federated,threshold_calibration,Blackhole Attack,UNKNOWN,361,0.05652105839987474,6387
+240521,replication,natural_non_iid_federated,threshold_calibration,Flooding Attack,Normal Traffic,9,0.0025906735751295338,3474
+240521,replication,natural_non_iid_federated,threshold_calibration,Flooding Attack,Blackhole Attack,168,0.04835924006908463,3474
+240521,replication,natural_non_iid_federated,threshold_calibration,Flooding Attack,Flooding Attack,2372,0.6827864133563616,3474
+240521,replication,natural_non_iid_federated,threshold_calibration,Flooding Attack,Sybil Attack,641,0.18451352907311455,3474
+240521,replication,natural_non_iid_federated,threshold_calibration,Flooding Attack,UNKNOWN,284,0.08175014392630973,3474
+240521,replication,natural_non_iid_federated,threshold_calibration,Sybil Attack,Normal Traffic,36,0.005534204458109147,6505
+240521,replication,natural_non_iid_federated,threshold_calibration,Sybil Attack,Blackhole Attack,180,0.027671022290545733,6505
+240521,replication,natural_non_iid_federated,threshold_calibration,Sybil Attack,Flooding Attack,2020,0.31053036126056877,6505
+240521,replication,natural_non_iid_federated,threshold_calibration,Sybil Attack,Sybil Attack,4105,0.6310530361260569,6505
+240521,replication,natural_non_iid_federated,threshold_calibration,Sybil Attack,UNKNOWN,164,0.025211375864719446,6505
+240522,replication,centralized,checkpoint_selection,Normal Traffic,Normal Traffic,5076,0.9591836734693877,5292
+240522,replication,centralized,checkpoint_selection,Normal Traffic,Blackhole Attack,14,0.0026455026455026454,5292
+240522,replication,centralized,checkpoint_selection,Normal Traffic,Flooding Attack,30,0.005668934240362812,5292
+240522,replication,centralized,checkpoint_selection,Normal Traffic,Sybil Attack,110,0.020786092214663644,5292
+240522,replication,centralized,checkpoint_selection,Normal Traffic,UNKNOWN,62,0.011715797430083144,5292
+240522,replication,centralized,checkpoint_selection,Blackhole Attack,Normal Traffic,58,0.009694133377904061,5983
+240522,replication,centralized,checkpoint_selection,Blackhole Attack,Blackhole Attack,5711,0.954537857262243,5983
+240522,replication,centralized,checkpoint_selection,Blackhole Attack,Flooding Attack,60,0.010028413839211098,5983
+240522,replication,centralized,checkpoint_selection,Blackhole Attack,Sybil Attack,21,0.0035099448437238842,5983
+240522,replication,centralized,checkpoint_selection,Blackhole Attack,UNKNOWN,133,0.022229650676917935,5983
+240522,replication,centralized,checkpoint_selection,Flooding Attack,Normal Traffic,5,0.0032916392363396972,1519
+240522,replication,centralized,checkpoint_selection,Flooding Attack,Blackhole Attack,55,0.03620803159973667,1519
+240522,replication,centralized,checkpoint_selection,Flooding Attack,Flooding Attack,1308,0.8610928242264648,1519
+240522,replication,centralized,checkpoint_selection,Flooding Attack,Sybil Attack,67,0.044107965766951945,1519
+240522,replication,centralized,checkpoint_selection,Flooding Attack,UNKNOWN,84,0.055299539170506916,1519
+240522,replication,centralized,checkpoint_selection,Sybil Attack,Normal Traffic,22,0.004110612855007474,5352
+240522,replication,centralized,checkpoint_selection,Sybil Attack,Blackhole Attack,47,0.008781763826606876,5352
+240522,replication,centralized,checkpoint_selection,Sybil Attack,Flooding Attack,2622,0.4899103139013453,5352
+240522,replication,centralized,checkpoint_selection,Sybil Attack,Sybil Attack,2133,0.398542600896861,5352
+240522,replication,centralized,checkpoint_selection,Sybil Attack,UNKNOWN,528,0.09865470852017937,5352
+240522,replication,centralized,threshold_calibration,Normal Traffic,Normal Traffic,6541,0.9565662474407721,6838
+240522,replication,centralized,threshold_calibration,Normal Traffic,Blackhole Attack,20,0.0029248318221702253,6838
+240522,replication,centralized,threshold_calibration,Normal Traffic,Flooding Attack,32,0.00467973091547236,6838
+240522,replication,centralized,threshold_calibration,Normal Traffic,Sybil Attack,143,0.02091254752851711,6838
+240522,replication,centralized,threshold_calibration,Normal Traffic,UNKNOWN,102,0.014916642293068149,6838
+240522,replication,centralized,threshold_calibration,Blackhole Attack,Normal Traffic,87,0.013621418506341005,6387
+240522,replication,centralized,threshold_calibration,Blackhole Attack,Blackhole Attack,6083,0.9524033192422108,6387
+240522,replication,centralized,threshold_calibration,Blackhole Attack,Flooding Attack,66,0.010333489901362142,6387
+240522,replication,centralized,threshold_calibration,Blackhole Attack,Sybil Attack,16,0.002505088460936277,6387
+240522,replication,centralized,threshold_calibration,Blackhole Attack,UNKNOWN,135,0.021136683889149837,6387
+240522,replication,centralized,threshold_calibration,Flooding Attack,Normal Traffic,31,0.008923431203223949,3474
+240522,replication,centralized,threshold_calibration,Flooding Attack,Blackhole Attack,64,0.018422567645365574,3474
+240522,replication,centralized,threshold_calibration,Flooding Attack,Flooding Attack,3069,0.883419689119171,3474
+240522,replication,centralized,threshold_calibration,Flooding Attack,Sybil Attack,113,0.032527345998848586,3474
+240522,replication,centralized,threshold_calibration,Flooding Attack,UNKNOWN,197,0.056706966033390906,3474
+240522,replication,centralized,threshold_calibration,Sybil Attack,Normal Traffic,11,0.0016910069177555726,6505
+240522,replication,centralized,threshold_calibration,Sybil Attack,Blackhole Attack,24,0.003689469638739431,6505
+240522,replication,centralized,threshold_calibration,Sybil Attack,Flooding Attack,2823,0.43397386625672557,6505
+240522,replication,centralized,threshold_calibration,Sybil Attack,Sybil Attack,2921,0.4490392006149116,6505
+240522,replication,centralized,threshold_calibration,Sybil Attack,UNKNOWN,726,0.1116064565718678,6505
+240522,replication,iid_federated,checkpoint_selection,Normal Traffic,Normal Traffic,4901,0.9261148904006047,5292
+240522,replication,iid_federated,checkpoint_selection,Normal Traffic,Blackhole Attack,60,0.011337868480725623,5292
+240522,replication,iid_federated,checkpoint_selection,Normal Traffic,Flooding Attack,37,0.006991685563114134,5292
+240522,replication,iid_federated,checkpoint_selection,Normal Traffic,Sybil Attack,120,0.022675736961451247,5292
+240522,replication,iid_federated,checkpoint_selection,Normal Traffic,UNKNOWN,174,0.032879818594104306,5292
+240522,replication,iid_federated,checkpoint_selection,Blackhole Attack,Normal Traffic,35,0.005849908072873141,5983
+240522,replication,iid_federated,checkpoint_selection,Blackhole Attack,Blackhole Attack,5836,0.9754303860939328,5983
+240522,replication,iid_federated,checkpoint_selection,Blackhole Attack,Flooding Attack,29,0.0048470666889520305,5983
+240522,replication,iid_federated,checkpoint_selection,Blackhole Attack,Sybil Attack,8,0.0013371218452281465,5983
+240522,replication,iid_federated,checkpoint_selection,Blackhole Attack,UNKNOWN,75,0.012535517299013872,5983
+240522,replication,iid_federated,checkpoint_selection,Flooding Attack,Normal Traffic,1,0.0006583278472679394,1519
+240522,replication,iid_federated,checkpoint_selection,Flooding Attack,Blackhole Attack,125,0.08229098090849243,1519
+240522,replication,iid_federated,checkpoint_selection,Flooding Attack,Flooding Attack,1178,0.7755102040816326,1519
+240522,replication,iid_federated,checkpoint_selection,Flooding Attack,Sybil Attack,56,0.03686635944700461,1519
+240522,replication,iid_federated,checkpoint_selection,Flooding Attack,UNKNOWN,159,0.10467412771560237,1519
+240522,replication,iid_federated,checkpoint_selection,Sybil Attack,Normal Traffic,11,0.002055306427503737,5352
+240522,replication,iid_federated,checkpoint_selection,Sybil Attack,Blackhole Attack,144,0.026905829596412557,5352
+240522,replication,iid_federated,checkpoint_selection,Sybil Attack,Flooding Attack,3189,0.5958520179372198,5352
+240522,replication,iid_federated,checkpoint_selection,Sybil Attack,Sybil Attack,1520,0.28400597907324365,5352
+240522,replication,iid_federated,checkpoint_selection,Sybil Attack,UNKNOWN,488,0.09118086696562033,5352
+240522,replication,iid_federated,threshold_calibration,Normal Traffic,Normal Traffic,6332,0.9260017548990933,6838
+240522,replication,iid_federated,threshold_calibration,Normal Traffic,Blackhole Attack,83,0.012138052062006435,6838
+240522,replication,iid_federated,threshold_calibration,Normal Traffic,Flooding Attack,53,0.007750804328751097,6838
+240522,replication,iid_federated,threshold_calibration,Normal Traffic,Sybil Attack,152,0.022228721848493713,6838
+240522,replication,iid_federated,threshold_calibration,Normal Traffic,UNKNOWN,218,0.03188066686165546,6838
+240522,replication,iid_federated,threshold_calibration,Blackhole Attack,Normal Traffic,66,0.010333489901362142,6387
+240522,replication,iid_federated,threshold_calibration,Blackhole Attack,Blackhole Attack,6200,0.9707217786128073,6387
+240522,replication,iid_federated,threshold_calibration,Blackhole Attack,Flooding Attack,23,0.003601064662595898,6387
+240522,replication,iid_federated,threshold_calibration,Blackhole Attack,Sybil Attack,6,0.0009394081728511038,6387
+240522,replication,iid_federated,threshold_calibration,Blackhole Attack,UNKNOWN,92,0.014404258650383592,6387
+240522,replication,iid_federated,threshold_calibration,Flooding Attack,Normal Traffic,19,0.005469199769717904,3474
+240522,replication,iid_federated,threshold_calibration,Flooding Attack,Blackhole Attack,180,0.05181347150259067,3474
+240522,replication,iid_federated,threshold_calibration,Flooding Attack,Flooding Attack,2961,0.8523316062176166,3474
+240522,replication,iid_federated,threshold_calibration,Flooding Attack,Sybil Attack,79,0.02274035693724813,3474
+240522,replication,iid_federated,threshold_calibration,Flooding Attack,UNKNOWN,235,0.06764536557282672,3474
+240522,replication,iid_federated,threshold_calibration,Sybil Attack,Normal Traffic,7,0.0010760953112990007,6505
+240522,replication,iid_federated,threshold_calibration,Sybil Attack,Blackhole Attack,66,0.010146041506533436,6505
+240522,replication,iid_federated,threshold_calibration,Sybil Attack,Flooding Attack,3833,0.58923904688701,6505
+240522,replication,iid_federated,threshold_calibration,Sybil Attack,Sybil Attack,1984,0.3049961568024597,6505
+240522,replication,iid_federated,threshold_calibration,Sybil Attack,UNKNOWN,615,0.09454265949269793,6505
+240522,replication,natural_non_iid_federated,checkpoint_selection,Normal Traffic,Normal Traffic,4959,0.9370748299319728,5292
+240522,replication,natural_non_iid_federated,checkpoint_selection,Normal Traffic,Blackhole Attack,19,0.0035903250188964475,5292
+240522,replication,natural_non_iid_federated,checkpoint_selection,Normal Traffic,Flooding Attack,53,0.0100151171579743,5292
+240522,replication,natural_non_iid_federated,checkpoint_selection,Normal Traffic,Sybil Attack,10,0.001889644746787604,5292
+240522,replication,natural_non_iid_federated,checkpoint_selection,Normal Traffic,UNKNOWN,251,0.04743008314436886,5292
+240522,replication,natural_non_iid_federated,checkpoint_selection,Blackhole Attack,Normal Traffic,6,0.0010028413839211097,5983
+240522,replication,natural_non_iid_federated,checkpoint_selection,Blackhole Attack,Blackhole Attack,5481,0.9160956042119338,5983
+240522,replication,natural_non_iid_federated,checkpoint_selection,Blackhole Attack,Flooding Attack,21,0.0035099448437238842,5983
+240522,replication,natural_non_iid_federated,checkpoint_selection,Blackhole Attack,Sybil Attack,0,0.0,5983
+240522,replication,natural_non_iid_federated,checkpoint_selection,Blackhole Attack,UNKNOWN,475,0.0793916095604212,5983
+240522,replication,natural_non_iid_federated,checkpoint_selection,Flooding Attack,Normal Traffic,6,0.003949967083607637,1519
+240522,replication,natural_non_iid_federated,checkpoint_selection,Flooding Attack,Blackhole Attack,77,0.05069124423963134,1519
+240522,replication,natural_non_iid_federated,checkpoint_selection,Flooding Attack,Flooding Attack,1200,0.7899934167215273,1519
+240522,replication,natural_non_iid_federated,checkpoint_selection,Flooding Attack,Sybil Attack,79,0.05200789993416721,1519
+240522,replication,natural_non_iid_federated,checkpoint_selection,Flooding Attack,UNKNOWN,157,0.10335747202106649,1519
+240522,replication,natural_non_iid_federated,checkpoint_selection,Sybil Attack,Normal Traffic,114,0.021300448430493273,5352
+240522,replication,natural_non_iid_federated,checkpoint_selection,Sybil Attack,Blackhole Attack,140,0.026158445440956652,5352
+240522,replication,natural_non_iid_federated,checkpoint_selection,Sybil Attack,Flooding Attack,4803,0.8974215246636771,5352
+240522,replication,natural_non_iid_federated,checkpoint_selection,Sybil Attack,Sybil Attack,166,0.03101644245142003,5352
+240522,replication,natural_non_iid_federated,checkpoint_selection,Sybil Attack,UNKNOWN,129,0.024103139013452915,5352
+240522,replication,natural_non_iid_federated,threshold_calibration,Normal Traffic,Normal Traffic,6394,0.935068733547821,6838
+240522,replication,natural_non_iid_federated,threshold_calibration,Normal Traffic,Blackhole Attack,21,0.0030710734132787364,6838
+240522,replication,natural_non_iid_federated,threshold_calibration,Normal Traffic,Flooding Attack,69,0.010090669786487276,6838
+240522,replication,natural_non_iid_federated,threshold_calibration,Normal Traffic,Sybil Attack,16,0.00233986545773618,6838
+240522,replication,natural_non_iid_federated,threshold_calibration,Normal Traffic,UNKNOWN,338,0.049429657794676805,6838
+240522,replication,natural_non_iid_federated,threshold_calibration,Blackhole Attack,Normal Traffic,2,0.0003131360576170346,6387
+240522,replication,natural_non_iid_federated,threshold_calibration,Blackhole Attack,Blackhole Attack,5875,0.9198371692500391,6387
+240522,replication,natural_non_iid_federated,threshold_calibration,Blackhole Attack,Flooding Attack,12,0.0018788163457022077,6387
+240522,replication,natural_non_iid_federated,threshold_calibration,Blackhole Attack,Sybil Attack,0,0.0,6387
+240522,replication,natural_non_iid_federated,threshold_calibration,Blackhole Attack,UNKNOWN,498,0.07797087834664161,6387
+240522,replication,natural_non_iid_federated,threshold_calibration,Flooding Attack,Normal Traffic,9,0.0025906735751295338,3474
+240522,replication,natural_non_iid_federated,threshold_calibration,Flooding Attack,Blackhole Attack,112,0.03223949337938975,3474
+240522,replication,natural_non_iid_federated,threshold_calibration,Flooding Attack,Flooding Attack,3000,0.8635578583765112,3474
+240522,replication,natural_non_iid_federated,threshold_calibration,Flooding Attack,Sybil Attack,86,0.02475532527345999,3474
+240522,replication,natural_non_iid_federated,threshold_calibration,Flooding Attack,UNKNOWN,267,0.0768566493955095,3474
+240522,replication,natural_non_iid_federated,threshold_calibration,Sybil Attack,Normal Traffic,76,0.011683320522674866,6505
+240522,replication,natural_non_iid_federated,threshold_calibration,Sybil Attack,Blackhole Attack,60,0.009223674096848577,6505
+240522,replication,natural_non_iid_federated,threshold_calibration,Sybil Attack,Flooding Attack,6081,0.9348193697156034,6505
+240522,replication,natural_non_iid_federated,threshold_calibration,Sybil Attack,Sybil Attack,231,0.03551114527286703,6505
+240522,replication,natural_non_iid_federated,threshold_calibration,Sybil Attack,UNKNOWN,57,0.00876249039200615,6505
+240523,replication,centralized,checkpoint_selection,Normal Traffic,Normal Traffic,4802,0.9074074074074074,5292
+240523,replication,centralized,checkpoint_selection,Normal Traffic,Blackhole Attack,66,0.012471655328798186,5292
+240523,replication,centralized,checkpoint_selection,Normal Traffic,Flooding Attack,30,0.005668934240362812,5292
+240523,replication,centralized,checkpoint_selection,Normal Traffic,Sybil Attack,269,0.050831443688586546,5292
+240523,replication,centralized,checkpoint_selection,Normal Traffic,UNKNOWN,125,0.02362055933484505,5292
+240523,replication,centralized,checkpoint_selection,Blackhole Attack,Normal Traffic,0,0.0,5983
+240523,replication,centralized,checkpoint_selection,Blackhole Attack,Blackhole Attack,5689,0.9508607721878656,5983
+240523,replication,centralized,checkpoint_selection,Blackhole Attack,Flooding Attack,54,0.009025572455289989,5983
+240523,replication,centralized,checkpoint_selection,Blackhole Attack,Sybil Attack,42,0.0070198896874477685,5983
+240523,replication,centralized,checkpoint_selection,Blackhole Attack,UNKNOWN,198,0.033093765669396626,5983
+240523,replication,centralized,checkpoint_selection,Flooding Attack,Normal Traffic,0,0.0,1519
+240523,replication,centralized,checkpoint_selection,Flooding Attack,Blackhole Attack,57,0.037524687294272545,1519
+240523,replication,centralized,checkpoint_selection,Flooding Attack,Flooding Attack,1289,0.8485845951283739,1519
+240523,replication,centralized,checkpoint_selection,Flooding Attack,Sybil Attack,76,0.050032916392363395,1519
+240523,replication,centralized,checkpoint_selection,Flooding Attack,UNKNOWN,97,0.06385780118499013,1519
+240523,replication,centralized,checkpoint_selection,Sybil Attack,Normal Traffic,5,0.0009342301943198804,5352
+240523,replication,centralized,checkpoint_selection,Sybil Attack,Blackhole Attack,91,0.017002989536621823,5352
+240523,replication,centralized,checkpoint_selection,Sybil Attack,Flooding Attack,2290,0.4278774289985052,5352
+240523,replication,centralized,checkpoint_selection,Sybil Attack,Sybil Attack,2438,0.4555306427503737,5352
+240523,replication,centralized,checkpoint_selection,Sybil Attack,UNKNOWN,528,0.09865470852017937,5352
+240523,replication,centralized,threshold_calibration,Normal Traffic,Normal Traffic,6147,0.8989470605440187,6838
+240523,replication,centralized,threshold_calibration,Normal Traffic,Blackhole Attack,111,0.01623281661304475,6838
+240523,replication,centralized,threshold_calibration,Normal Traffic,Flooding Attack,39,0.005703422053231939,6838
+240523,replication,centralized,threshold_calibration,Normal Traffic,Sybil Attack,403,0.058935361216730035,6838
+240523,replication,centralized,threshold_calibration,Normal Traffic,UNKNOWN,138,0.020181339572974553,6838
+240523,replication,centralized,threshold_calibration,Blackhole Attack,Normal Traffic,0,0.0,6387
+240523,replication,centralized,threshold_calibration,Blackhole Attack,Blackhole Attack,6085,0.9527164552998277,6387
+240523,replication,centralized,threshold_calibration,Blackhole Attack,Flooding Attack,51,0.007984969469234382,6387
+240523,replication,centralized,threshold_calibration,Blackhole Attack,Sybil Attack,40,0.006262721152340692,6387
+240523,replication,centralized,threshold_calibration,Blackhole Attack,UNKNOWN,211,0.03303585407859715,6387
+240523,replication,centralized,threshold_calibration,Flooding Attack,Normal Traffic,20,0.0057570523891767415,3474
+240523,replication,centralized,threshold_calibration,Flooding Attack,Blackhole Attack,75,0.02158894645941278,3474
+240523,replication,centralized,threshold_calibration,Flooding Attack,Flooding Attack,3068,0.8831318364997122,3474
+240523,replication,centralized,threshold_calibration,Flooding Attack,Sybil Attack,139,0.04001151410477835,3474
+240523,replication,centralized,threshold_calibration,Flooding Attack,UNKNOWN,172,0.04951065054691998,3474
+240523,replication,centralized,threshold_calibration,Sybil Attack,Normal Traffic,2,0.00030745580322828596,6505
+240523,replication,centralized,threshold_calibration,Sybil Attack,Blackhole Attack,38,0.005841660261337433,6505
+240523,replication,centralized,threshold_calibration,Sybil Attack,Flooding Attack,2434,0.374173712528824,6505
+240523,replication,centralized,threshold_calibration,Sybil Attack,Sybil Attack,3392,0.521445042275173,6505
+240523,replication,centralized,threshold_calibration,Sybil Attack,UNKNOWN,639,0.09823212913143736,6505
+240523,replication,iid_federated,checkpoint_selection,Normal Traffic,Normal Traffic,4884,0.9229024943310657,5292
+240523,replication,iid_federated,checkpoint_selection,Normal Traffic,Blackhole Attack,57,0.010770975056689343,5292
+240523,replication,iid_federated,checkpoint_selection,Normal Traffic,Flooding Attack,24,0.0045351473922902496,5292
+240523,replication,iid_federated,checkpoint_selection,Normal Traffic,Sybil Attack,126,0.023809523809523808,5292
+240523,replication,iid_federated,checkpoint_selection,Normal Traffic,UNKNOWN,201,0.03798185941043084,5292
+240523,replication,iid_federated,checkpoint_selection,Blackhole Attack,Normal Traffic,5,0.0008357011532675915,5983
+240523,replication,iid_federated,checkpoint_selection,Blackhole Attack,Blackhole Attack,5829,0.9742604044793581,5983
+240523,replication,iid_federated,checkpoint_selection,Blackhole Attack,Flooding Attack,50,0.008357011532675915,5983
+240523,replication,iid_federated,checkpoint_selection,Blackhole Attack,Sybil Attack,19,0.0031756643824168477,5983
+240523,replication,iid_federated,checkpoint_selection,Blackhole Attack,UNKNOWN,80,0.013371218452281465,5983
+240523,replication,iid_federated,checkpoint_selection,Flooding Attack,Normal Traffic,1,0.0006583278472679394,1519
+240523,replication,iid_federated,checkpoint_selection,Flooding Attack,Blackhole Attack,100,0.06583278472679395,1519
+240523,replication,iid_federated,checkpoint_selection,Flooding Attack,Flooding Attack,1253,0.8248847926267281,1519
+240523,replication,iid_federated,checkpoint_selection,Flooding Attack,Sybil Attack,71,0.0467412771560237,1519
+240523,replication,iid_federated,checkpoint_selection,Flooding Attack,UNKNOWN,94,0.06188281764318631,1519
+240523,replication,iid_federated,checkpoint_selection,Sybil Attack,Normal Traffic,12,0.002242152466367713,5352
+240523,replication,iid_federated,checkpoint_selection,Sybil Attack,Blackhole Attack,93,0.017376681614349777,5352
+240523,replication,iid_federated,checkpoint_selection,Sybil Attack,Flooding Attack,3090,0.577354260089686,5352
+240523,replication,iid_federated,checkpoint_selection,Sybil Attack,Sybil Attack,1625,0.3036248131539611,5352
+240523,replication,iid_federated,checkpoint_selection,Sybil Attack,UNKNOWN,532,0.09940209267563528,5352
+240523,replication,iid_federated,threshold_calibration,Normal Traffic,Normal Traffic,6313,0.9232231646680316,6838
+240523,replication,iid_federated,threshold_calibration,Normal Traffic,Blackhole Attack,79,0.01155308569757239,6838
+240523,replication,iid_federated,threshold_calibration,Normal Traffic,Flooding Attack,21,0.0030710734132787364,6838
+240523,replication,iid_federated,threshold_calibration,Normal Traffic,Sybil Attack,157,0.02295992980403627,6838
+240523,replication,iid_federated,threshold_calibration,Normal Traffic,UNKNOWN,268,0.039192746417081016,6838
+240523,replication,iid_federated,threshold_calibration,Blackhole Attack,Normal Traffic,12,0.0018788163457022077,6387
+240523,replication,iid_federated,threshold_calibration,Blackhole Attack,Blackhole Attack,6219,0.973696571160169,6387
+240523,replication,iid_federated,threshold_calibration,Blackhole Attack,Flooding Attack,47,0.007358697354000313,6387
+240523,replication,iid_federated,threshold_calibration,Blackhole Attack,Sybil Attack,16,0.002505088460936277,6387
+240523,replication,iid_federated,threshold_calibration,Blackhole Attack,UNKNOWN,93,0.01456082667919211,6387
+240523,replication,iid_federated,threshold_calibration,Flooding Attack,Normal Traffic,24,0.0069084628670120895,3474
+240523,replication,iid_federated,threshold_calibration,Flooding Attack,Blackhole Attack,128,0.03684513529073115,3474
+240523,replication,iid_federated,threshold_calibration,Flooding Attack,Flooding Attack,2956,0.8508923431203224,3474
+240523,replication,iid_federated,threshold_calibration,Flooding Attack,Sybil Attack,127,0.03655728267127231,3474
+240523,replication,iid_federated,threshold_calibration,Flooding Attack,UNKNOWN,239,0.06879677605066206,3474
+240523,replication,iid_federated,threshold_calibration,Sybil Attack,Normal Traffic,7,0.0010760953112990007,6505
+240523,replication,iid_federated,threshold_calibration,Sybil Attack,Blackhole Attack,45,0.006917755572636433,6505
+240523,replication,iid_federated,threshold_calibration,Sybil Attack,Flooding Attack,3588,0.551575710991545,6505
+240523,replication,iid_federated,threshold_calibration,Sybil Attack,Sybil Attack,2305,0.3543428132205995,6505
+240523,replication,iid_federated,threshold_calibration,Sybil Attack,UNKNOWN,560,0.08608762490392007,6505
+240523,replication,natural_non_iid_federated,checkpoint_selection,Normal Traffic,Normal Traffic,3989,0.7537792894935752,5292
+240523,replication,natural_non_iid_federated,checkpoint_selection,Normal Traffic,Blackhole Attack,60,0.011337868480725623,5292
+240523,replication,natural_non_iid_federated,checkpoint_selection,Normal Traffic,Flooding Attack,90,0.017006802721088437,5292
+240523,replication,natural_non_iid_federated,checkpoint_selection,Normal Traffic,Sybil Attack,928,0.17535903250188964,5292
+240523,replication,natural_non_iid_federated,checkpoint_selection,Normal Traffic,UNKNOWN,225,0.04251700680272109,5292
+240523,replication,natural_non_iid_federated,checkpoint_selection,Blackhole Attack,Normal Traffic,199,0.03326090590005014,5983
+240523,replication,natural_non_iid_federated,checkpoint_selection,Blackhole Attack,Blackhole Attack,4955,0.8281798428881831,5983
+240523,replication,natural_non_iid_federated,checkpoint_selection,Blackhole Attack,Flooding Attack,10,0.001671402306535183,5983
+240523,replication,natural_non_iid_federated,checkpoint_selection,Blackhole Attack,Sybil Attack,234,0.039110813972923285,5983
+240523,replication,natural_non_iid_federated,checkpoint_selection,Blackhole Attack,UNKNOWN,585,0.0977770349323082,5983
+240523,replication,natural_non_iid_federated,checkpoint_selection,Flooding Attack,Normal Traffic,0,0.0,1519
+240523,replication,natural_non_iid_federated,checkpoint_selection,Flooding Attack,Blackhole Attack,173,0.11389071757735353,1519
+240523,replication,natural_non_iid_federated,checkpoint_selection,Flooding Attack,Flooding Attack,877,0.5773535220539829,1519
+240523,replication,natural_non_iid_federated,checkpoint_selection,Flooding Attack,Sybil Attack,333,0.21922317314022383,1519
+240523,replication,natural_non_iid_federated,checkpoint_selection,Flooding Attack,UNKNOWN,136,0.08953258722843976,1519
+240523,replication,natural_non_iid_federated,checkpoint_selection,Sybil Attack,Normal Traffic,60,0.011210762331838564,5352
+240523,replication,natural_non_iid_federated,checkpoint_selection,Sybil Attack,Blackhole Attack,270,0.05044843049327354,5352
+240523,replication,natural_non_iid_federated,checkpoint_selection,Sybil Attack,Flooding Attack,3314,0.6192077727952168,5352
+240523,replication,natural_non_iid_federated,checkpoint_selection,Sybil Attack,Sybil Attack,1630,0.304559043348281,5352
+240523,replication,natural_non_iid_federated,checkpoint_selection,Sybil Attack,UNKNOWN,78,0.014573991031390135,5352
+240523,replication,natural_non_iid_federated,threshold_calibration,Normal Traffic,Normal Traffic,5068,0.741152383737935,6838
+240523,replication,natural_non_iid_federated,threshold_calibration,Normal Traffic,Blackhole Attack,104,0.015209125475285171,6838
+240523,replication,natural_non_iid_federated,threshold_calibration,Normal Traffic,Flooding Attack,93,0.013600467973091548,6838
+240523,replication,natural_non_iid_federated,threshold_calibration,Normal Traffic,Sybil Attack,1235,0.1806083650190114,6838
+240523,replication,natural_non_iid_federated,threshold_calibration,Normal Traffic,UNKNOWN,338,0.049429657794676805,6838
+240523,replication,natural_non_iid_federated,threshold_calibration,Blackhole Attack,Normal Traffic,244,0.03820259902927822,6387
+240523,replication,natural_non_iid_federated,threshold_calibration,Blackhole Attack,Blackhole Attack,5333,0.8349772976358227,6387
+240523,replication,natural_non_iid_federated,threshold_calibration,Blackhole Attack,Flooding Attack,7,0.001095976201659621,6387
+240523,replication,natural_non_iid_federated,threshold_calibration,Blackhole Attack,Sybil Attack,244,0.03820259902927822,6387
+240523,replication,natural_non_iid_federated,threshold_calibration,Blackhole Attack,UNKNOWN,559,0.08752152810396117,6387
+240523,replication,natural_non_iid_federated,threshold_calibration,Flooding Attack,Normal Traffic,0,0.0,3474
+240523,replication,natural_non_iid_federated,threshold_calibration,Flooding Attack,Blackhole Attack,251,0.0722510074841681,3474
+240523,replication,natural_non_iid_federated,threshold_calibration,Flooding Attack,Flooding Attack,2175,0.6260794473229706,3474
+240523,replication,natural_non_iid_federated,threshold_calibration,Flooding Attack,Sybil Attack,825,0.2374784110535406,3474
+240523,replication,natural_non_iid_federated,threshold_calibration,Flooding Attack,UNKNOWN,223,0.06419113413932066,3474
+240523,replication,natural_non_iid_federated,threshold_calibration,Sybil Attack,Normal Traffic,40,0.006149116064565719,6505
+240523,replication,natural_non_iid_federated,threshold_calibration,Sybil Attack,Blackhole Attack,127,0.019523443504996157,6505
+240523,replication,natural_non_iid_federated,threshold_calibration,Sybil Attack,Flooding Attack,4544,0.6985395849346656,6505
+240523,replication,natural_non_iid_federated,threshold_calibration,Sybil Attack,Sybil Attack,1754,0.26963873943120675,6505
+240523,replication,natural_non_iid_federated,threshold_calibration,Sybil Attack,UNKNOWN,40,0.006149116064565719,6505

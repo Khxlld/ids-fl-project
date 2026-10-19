@@ -1,0 +1,21 @@
+{
+  "baseline_method_modified": false,
+  "final_test_performance_evaluated": false,
+  "instrumentation_rng_rule": "tensor reads, clones, reductions, and serialization only; no random draw in instrumentation",
+  "known_only": true,
+  "modes": [
+    "iid_federated",
+    "natural_non_iid_federated"
+  ],
+  "near_zero_vector_cosine_rule": "undefined when either L2 norm <= 1e-05; this excludes absent-head AdamW weight-decay-only movements that are over four orders of magnitude smaller than trained client updates",
+  "post_hoc_exploratory_examples": true,
+  "rounds_replayed": [
+    1
+  ],
+  "seeds": [
+    240520,
+    240523
+  ],
+  "unknown_validation_evaluated": false,
+  "zero_gradient_rule": "zero when L2 norm <= 1e-12"
+}

@@ -1,0 +1,40 @@
+{
+  "protocol_id": "contribution1_fixed_six_seed_development_replication",
+  "pilot_seed": 240517,
+  "replication_training_seeds": [240519, 240520, 240521, 240522, 240523],
+  "config_source": "config/contribution1_baseline.json",
+  "only_permitted_resolved_config_change": "training.seed",
+  "fixed_rng_seeds": {
+    "checkpoint_and_calibration_group_split_seed": 240517,
+    "iid_repartition_seed": 240518
+  },
+  "changed_rngs_per_training_seed": [
+    "Python random",
+    "NumPy global RNG",
+    "PyTorch CPU RNG",
+    "PyTorch CUDA RNGs if CUDA exists (the configured execution device remains CPU)",
+    "class-balanced WeightedRandomSampler generators",
+    "PyTorch dropout randomness"
+  ],
+  "sampler_seed_formulas": {
+    "centralized": "training_seed + epoch",
+    "federated": "training_seed + server_round * 1000 + client_index * 100 + local_epoch"
+  },
+  "within_seed_controls": {
+    "identical_initial_model_tensors_across_three_configurations": true,
+    "reset_global_rngs_to_training_seed_before_each_configuration": true,
+    "all_clients_participate_each_round": true
+  },
+  "fixed_components": [
+    "source partitions and known-only unknown-class exclusion",
+    "checkpoint-selection and calibration groups",
+    "IID client repartition",
+    "CLOSR detector, loss, architecture, inference, and center computation",
+    "sampling policies, preprocessing, training budgets, and stopping rules"
+  ],
+  "forbidden_evaluations": [
+    "unknown-validation performance",
+    "final-test performance"
+  ],
+  "run_directory_pattern": "runs/contribution1-three-way-seed-<training_seed>"
+}
