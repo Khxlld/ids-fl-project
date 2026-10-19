@@ -9,7 +9,7 @@ Last handover update: 2026-10-19.
 - Git worktree and VS Code folder: `C:\Users\feras\Downloads\KAUST 4th stage\glasgow\Project\useCases\smartCity\ids-fl-project-federated-closr`.
 - Experiment directory: `ids-fl-project\experiments\uavids_federated_closr`.
 - The separate pre-existing checkout at `...\smartCity\ids-fl-project-crowdsensing-iot` remains untouched on `crowdsensing-scope-remediation` at `ee51469be590195b5e7d2b96fd3391377ee951db`, with its prior tracked and untracked changes preserved.
-- A peer-review publication commit is being prepared on the isolated review branch. Publisher PDFs remain local and excluded. Publication state and commit information are recorded below.
+- The Contribution 1 peer-review branch has been published. Publisher PDFs remain local and excluded. Publication details are recorded below.
 
 ## Scope and fixed initial design
 
@@ -297,7 +297,11 @@ An isolated publication branch, `review/federated-closr-contribution1`, was crea
 
 Publication verification on 2026-10-19 used Python 3.12.1 and PyTorch 2.5.1+cpu with CUDA unavailable. The command `& '.\.venv\Scripts\python.exe' -m pytest -q` completed successfully with `22 passed`. No smoke training, tuning, unknown-validation evaluation, or final-test performance evaluation was started for publication.
 
-At the time this main review commit was prepared, the repository had no configured remote. The authorized target is `https://github.com/Khxlld/ids-fl-project`; final push status and the content commit SHA will be recorded in a follow-up status-only publication commit.
+The main review content commit is `7e08b2559f0733cb377ebcef027c6840a9fb9c93` (`research: publish federated CLOSR contribution 1 review`). The previously unconfigured `origin` remote now points to `https://github.com/Khxlld/ids-fl-project`, and the isolated branch was pushed successfully without force and without merging:
+
+`https://github.com/Khxlld/ids-fl-project/tree/review/federated-closr-contribution1`
+
+The first elevated push attempt stopped locally before contacting GitHub because Git detected different Windows ownership for the sandbox-created worktree. The successful retry used a one-command `safe.directory` exception limited to this exact repository; no global Git configuration was changed. The branch tracks `origin/review/federated-closr-contribution1`.
 
 ## Exact next justified step
 
